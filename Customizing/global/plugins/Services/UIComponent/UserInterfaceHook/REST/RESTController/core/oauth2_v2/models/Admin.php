@@ -39,26 +39,26 @@ class Admin extends Libs\RESTModel {
   public static function InsertClient($request) {
     // Fetch request-parameters (into table-row format)
     $row = array(
-      'id'                          => $request->params('id',                         null),
-      'api_key'                     => $request->params('api_key',                    null, true),
-      'api_secret'                  => $request->params('api_secret',                 null),
-      'cert_serial'                 => $request->params('cert_serial',                null),
-      'cert_issuer'                 => $request->params('cert_issuer',                null),
-      'cert_subject'                => $request->params('cert_subject',               null),
-      'redirect_uri'                => $request->params('redirect_uri',               null),
-      'consent_message'             => $request->params('consent_message',            null),
-      'client_credentials_userid'   => $request->params('client_credentials_userid',  6),
-      'grant_client_credentials'    => $request->params('grant_client_credentials',   false),
-      'grant_authorization_code'    => $request->params('grant_authorization_code',   false),
-      'grant_implicit'              => $request->params('grant_implicit',             false),
-      'grant_resource_owner'        => $request->params('grant_resource_owner',       false),
-      'refresh_authorization_code'  => $request->params('refresh_authorization_code', false),
-      'refresh_resource_owner'      => $request->params('refresh_resource_owner',     false),
-      'grant_bridge'                => $request->params('grant_bridge',               false),
-      'ips'                         => $request->params('ips',                        null),
-      'users'                       => $request->params('users',                      null),
-      'scopes'                      => $request->params('scopes',                     null),
-      'description'                 => $request->params('description',                null),
+      'id'                          => $request->getParameter('id',                         null),
+      'api_key'                     => $request->getParameter('api_key',                    null, true),
+      'api_secret'                  => $request->getParameter('api_secret',                 null),
+      'cert_serial'                 => $request->getParameter('cert_serial',                null),
+      'cert_issuer'                 => $request->getParameter('cert_issuer',                null),
+      'cert_subject'                => $request->getParameter('cert_subject',               null),
+      'redirect_uri'                => $request->getParameter('redirect_uri',               null),
+      'consent_message'             => $request->getParameter('consent_message',            null),
+      'client_credentials_userid'   => $request->getParameter('client_credentials_userid',  6),
+      'grant_client_credentials'    => $request->getParameter('grant_client_credentials',   false),
+      'grant_authorization_code'    => $request->getParameter('grant_authorization_code',   false),
+      'grant_implicit'              => $request->getParameter('grant_implicit',             false),
+      'grant_resource_owner'        => $request->getParameter('grant_resource_owner',       false),
+      'refresh_authorization_code'  => $request->getParameter('refresh_authorization_code', false),
+      'refresh_resource_owner'      => $request->getParameter('refresh_resource_owner',     false),
+      'grant_bridge'                => $request->getParameter('grant_bridge',               false),
+      'ips'                         => $request->getParameter('ips',                        null),
+      'users'                       => $request->getParameter('users',                      null),
+      'scopes'                      => $request->getParameter('scopes',                     null),
+      'description'                 => $request->getParameter('description',                null),
     );
 
     // Construct new table from given row/request-parameter
@@ -119,7 +119,7 @@ class Admin extends Libs\RESTModel {
     foreach ($keys as $key)
       if ($request->hasParam($key)) {
         // fetch parameter and update client
-        $param  = $request->params($key);
+        $param  = $request->getParameter($key);
         $client->setKey($key, $param);
 
         // Remember that an update needs to be synced to DB
@@ -149,9 +149,9 @@ class Admin extends Libs\RESTModel {
     // Fetch request-parameters (into table-row format)
     $row        = array(
       'api_id'  => intval($clientId),
-      'id'      => $request->params('id',       null),
-      'pattern' => $request->params('pattern',  null, true),
-      'verb'    => $request->params('verb',     null, true),
+      'id'      => $request->getParameter('id',       null),
+      'pattern' => $request->getParameter('pattern',  null, true),
+      'verb'    => $request->getParameter('verb',     null, true),
     );
 
     // Construct new table from given row/request-parameter

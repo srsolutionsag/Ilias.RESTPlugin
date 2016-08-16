@@ -40,7 +40,7 @@ $app->group('/v1', function () use ($app) {
     $app->log->debug("In /v1/client PUT route");
     OAuth2v2\Admin::UpdateClient($id, $app->request);
     if ($app->request->hasParam("permissions")) {
-      $permArray  = $app->request->params(permissions);
+      $permArray  = $app->request->getParameter(permissions);
       ClientsLegacyModel::setPermissions($id, $permArray);
     }
   });
@@ -55,7 +55,7 @@ $app->group('/v1', function () use ($app) {
     $api_id = OAuth2v2\Admin::InsertClient($app->request);
     if ($api_id != false) {
         if ($app->request->hasParam("permissions")) {
-          $permArray  = $app->request->params(permissions);
+          $permArray  = $app->request->getParameter(permissions);
           ClientsLegacyModel::setPermissions($api_id, $permArray);
         }
     }

@@ -425,7 +425,7 @@ $app->group('/v2', function () use ($app) {
       try {
         // Fetch new value from request
         $request  = $app->request();
-        $value    = $request->params('value', null, true);
+        $value    = $request->getParameter('value', null, true);
 
         // Fetch current table entry and update with new value
         $settings = Database\RESTconfig::fromSettingName($key);

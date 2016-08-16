@@ -45,8 +45,8 @@ $app->group('/v2', function () use ($app) {
     $app->get('/routes', function () use ($app) {
       // Fetch all information required by this route
       $request  = $app->request();
-      $apiKey   = $request->params('api_key');
-      $filter   = $request->params('filter');
+      $apiKey   = $request->getParameter('api_key');
+      $filter   = $request->getParameter('filter');
       $routes   = $app->router()->getRoutes();
 
       // Fetch list of (restricted) routes
@@ -67,7 +67,7 @@ $app->group('/v2', function () use ($app) {
 
       $accessToken = $app->request->getToken();
       $apiKey = $accessToken->getApiKey();
-      $filter   = $app->request->params('filter', true, false);
+      $filter   = $app->request->getParameter('filter', true, false);
       $routes   = $app->router()->getRoutes();
 
       // Fetch list of (restricted) routes

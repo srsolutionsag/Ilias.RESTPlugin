@@ -28,6 +28,7 @@ class RESTRequest extends \Slim\Http\Request {
   const MSG_NO_TOKEN        = 'Could not find any {{type}} in header, GET or POST (JSON/x-www-form-urlencoded) parameters.';
   const ID_NO_TOKEN         = 'RESTController\\libs\\RESTRequest::ID_NO_TOKEN';
 
+
   /**
    * Constructor: RESTRequest($env)
    *  Create a new (singleton) instance of the
@@ -41,40 +42,30 @@ class RESTRequest extends \Slim\Http\Request {
     // Call parent constrcutor
     parent::__construct($env);
 
-    // Store all available headers
-    // For some reason slim fails to do this...
-    foreach (self::getallheaders() as $key => $value)
-      $this->headers->set($key, $value);
-
-    // This will store the tokens once fetched
-    $this->tokens = array();
+    // This will store the tokens/parameters once fetched
+    $this->tokens     = array();
+    $this->parameters = null;
   }
 
 
   /**
-   * Static-Function: getallheaders()
-   *  Wrapper, when not using Apache mod_php.
-   *  See: http://www.php.net/manual/en/function.getallheaders.php#84262
+   *
    */
-  protected static function getallheaders() {
-    if (function_exists('getallheaders'))
-      return getallheaders();
-    else {
-      if (!is_array($_SERVER))
-        return array();
+  protected function readParameters() {
+    // Fetch all parameters
+    $body   = $request->getBody();
+    $post   = $request->post();
+    $get    = $request->get();
+    $header = $this->getallheaders();
 
-      $headers = array();
-      foreach ($_SERVER as $name => $value)
-        if (substr($name, 0, 5) == 'HTTP_')
-          $headers[str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', substr($name, 5)))))] = $value;
-
-       return $headers;
-    }
+    // Build union with all parameters
+    // (XML/JSON-Data, Form-Data, Get-Data, Header-Data in this order)
+    return $body + $post + $get + $header;
   }
 
 
   /**
-   * Function: params($key, $default, $throw)
+   * Function: getParameter($key, $default, $throw)
    *  Fetches a request parameter from different locations.
    *  In the following order:
    *   - Look inside header
@@ -95,66 +86,74 @@ class RESTRequest extends \Slim\Http\Request {
    * Return:
    *  <String> - Value attached to the given key (looking inside header, get, url-encoded post, json-encoded post)
    */
-  public function params($key = null, $default = null, $throw = false) {
-    // Return key-value from header?
-    if (isset($key)) {
-      $header = $this->headers($key, null);
-      if ($header != null)
-        return $header;
+  public function getParameter($key, $default = null, $throw = false) {
+    // Read parameter only once
+    if (!isset($this->parameters))
+      $this->parameters = $this->readParameters();
 
-      $header = $this->headers(ucfirst($key), null);
-      if ($header != null)
-        return $header;
+    // CHeck of key is requested
+    if (isset($key)) {
+      // Check if the requested key exists
+      if (array_key_exists($key, $this->parameters))
+        return $this->parameters[$key];
+
+      // Throw exception when enabled
+      elseif ($throw)
+        throw new Exceptions\Parameter(
+          self::MSG_MISSING,
+          self::ID_MISSING,
+          array(
+            'key' => $key
+          )
+        );
+
+      // Return the default value
+      else
+        return $default;
     }
 
-    // Return key-value from url-encoded POST or GET
-    $param = parent::params($key, null);
-    if ($param != null)
-      return $param;
-
-    // Return key-value from JSON POST
-    if (isset($key)) {
-      $body = $this->getBody();
-      if (is_array($body) && isset($body[$key]))
-        return $body[$key];
-    }
-
-    // Return default value or throw exception?
-    if (!$throw)
-      return $default;
-
-    // Throw exception because its enabled
-    throw new Exceptions\Parameter(
-      self::MSG_MISSING,
-      self::ID_MISSING,
-      array(
-        'key' => $key
-      )
-    );
+    // Return complete list of parameters
+    return $this->parameters;
   }
 
-  public function hasParam($key) {
-    // Return key-value from header?
-    if (isset($key)) {
-      $header = $this->headers($key, null);
-      if ($header != null)
-        return true;
+
+  /**
+   * Function: hasParameter($key)
+   *  Checks if the given parameter exists.
+   *
+   * Parameters:
+   *  $key <String> - [Optional] Key of parameter that should be looked up.
+   *                  Returns list of all GET & POST parameters if omited
+   *
+   * Return:
+   *  True wether the given request-parameter exists.
+   */
+  public function hasParameter($key) {
+    // Read parameter only once
+    if (!isset($this->parameters))
+      $this->parameters = $this->readParameters();
+
+    // Check wether key exists
+    return array_key_exists($key, $this->parameters);
+  }
+
+
+  /**
+   * Function: getallheaders()
+   *  Wrapper, when not using Apache mod_php.
+   *  See: http://www.php.net/manual/en/function.getallheaders.php#84262
+   */
+  protected function getallheaders() {
+    if (function_exists('getallheaders'))
+      return getallheaders();
+    else {
+      $headers = array();
+      foreach ($_SERVER as $name => $value)
+        if (substr($name, 0, 5) == 'HTTP_')
+          $headers[str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', substr($name, 5)))))] = $value;
+
+       return $headers;
     }
-
-    // Return key-value from url-encoded POST or GET
-    $param = parent::params($key, null);
-    if ($param != null)
-      return true;
-
-    // Return key-value from JSON POST
-    if (isset($key)) {
-      $body = $this->getBody();
-      if (is_array($body) && isset($body[$key]))
-        return true;
-    }
-
-    // Not found
-    return false;
   }
 
 
@@ -184,11 +183,11 @@ class RESTRequest extends \Slim\Http\Request {
         $type = 'Access-Token';
 
         // Fetch 'access_token' from header, GET or POST...
-        $tokenString = $this->params('access_token');
+        $tokenString = $this->getParameter('access_token');
 
         // Fetch 'token'  from header, GET or POST...
         if ($tokenString == null)
-            $tokenString = $this->params('token');
+            $tokenString = $this->getParameter('token');
 
         // Fetch 'Authorization' from header ONLY!
         if ($tokenString == null) {
@@ -235,7 +234,7 @@ class RESTRequest extends \Slim\Http\Request {
         $type = 'Refresh-Token';
 
         // Fetch 'access_token' from header, GET or POST...
-        $tokenString = $this->params('refresh_token');
+        $tokenString = $this->getParameter('refresh_token');
 
         // Found something that could be an access-token?
         if ($tokenString != null) {
@@ -259,11 +258,11 @@ class RESTRequest extends \Slim\Http\Request {
         $type = 'Authorization-Code-Token';
 
         // Fetch 'access_token' from header, GET or POST...
-        $tokenString = $this->params('authorization_token');
+        $tokenString = $this->getParameter('authorization_token');
 
         // Fetch 'token'  from header, GET or POST...
         if ($tokenString == null)
-            $tokenString = $this->params('code');
+            $tokenString = $this->getParameter('code');
 
         // Found something that could be an access-token?
         if ($tokenString != null) {

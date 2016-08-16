@@ -43,12 +43,12 @@ $app->group('/v2', function () use ($app) {
         $app->log->debug('/v2/bridge/ilias ');
         // Fetch parameters required for all routes
         $request      = $app->request();
-        $apiKey       = $request->params('api_key', null, true);
-        $apiSecret    = $request->params('api_secret');
-        $scope        = $request->params('scope');
-        $userId       = $request->params('user', null, true);
-        $token        = $request->params('token', null, true);
-        $sessionID    = $request->params('session', null, true);
+        $apiKey       = $request->getParameter('api_key', null, true);
+        $apiSecret    = $request->getParameter('api_secret');
+        $scope        = $request->getParameter('scope');
+        $userId       = $request->getParameter('user', null, true);
+        $token        = $request->getParameter('token', null, true);
+        $sessionID    = $request->getParameter('session', null, true);
         $apiCert      = Libs\RESTLib::FetchClientCertificate();
         $remoteIp     = Libs\RESTLib::FetchUserAgentIP();
         $iliasClient  = Libs\RESTilias::FetchILIASClient();
@@ -121,10 +121,10 @@ $app->group('/v2', function () use ($app) {
       try {
         // Fetch parameters required for all routes
         $request      = $app->request();
-        $apiKey       = $request->params('api_key', null, true);
-        $apiSecret    = $request->params('api_secret');
-        $accessCode   = $request->params('access_token', null, true);
-        $goto         = $request->params('goto');
+        $apiKey       = $request->getParameter('api_key', null, true);
+        $apiSecret    = $request->getParameter('api_secret');
+        $accessCode   = $request->getParameter('access_token', null, true);
+        $goto         = $request->getParameter('goto');
         $apiCert      = Libs\RESTLib::FetchClientCertificate();
         $remoteIp     = Libs\RESTLib::FetchUserAgentIP();
         $iliasClient  = Libs\RESTilias::FetchILIASClient();
@@ -195,11 +195,11 @@ $app->group('/v2', function () use ($app) {
       try {
         // Fetch parameters required for all routes
         $request      = $app->request();
-        $apiKey       = $request->params('api_key', null, true);
-        $apiSecret    = $request->params('api_secret');
-        $userId       = $request->params('user', null, true);
-        $token        = $request->params('token', null, true);
-        $sessionID    = $request->params('session', null, true);
+        $apiKey       = $request->getParameter('api_key', null, true);
+        $apiSecret    = $request->getParameter('api_secret');
+        $userId       = $request->getParameter('user', null, true);
+        $token        = $request->getParameter('token', null, true);
+        $sessionID    = $request->getParameter('session', null, true);
         $apiCert      = Libs\RESTLib::FetchClientCertificate();
         $remoteIp     = Libs\RESTLib::FetchUserAgentIP();
         $iliasClient  = Libs\RESTilias::FetchILIASClient();

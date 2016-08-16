@@ -41,12 +41,12 @@ $app->group('/v2', function () use ($app) {
       try {
         // Check request-parameters
         $request      = $app->request();
-        $responseType = $request->params('response_type', null, true);
-        $redirectUri  = $request->params('redirect_uri');
-        $apiSecret    = $request->params('api_secret');
-        $apiKey       = $request->params('api_key',       null, true);
-        $scope        = $request->params('scope');
-        $state        = $request->params('state');
+        $responseType = $request->getParameter('response_type', null, true);
+        $redirectUri  = $request->getParameter('redirect_uri');
+        $apiSecret    = $request->getParameter('api_secret');
+        $apiKey       = $request->getParameter('api_key',       null, true);
+        $scope        = $request->getParameter('scope');
+        $state        = $request->getParameter('state');
         $apiCert      = Libs\RESTLib::FetchClientCertificate();
         $remoteIP     = Libs\RESTLib::FetchUserAgentIP();
         $iliasClient  = Libs\RESTilias::FetchILIASClient();
@@ -109,20 +109,20 @@ $app->group('/v2', function () use ($app) {
       try {
         // Check request-parameters (same as get)
         $request  = $app->request();
-        $responseType = $request->params('response_type', null, true);
-        $redirectUri  = $request->params('redirect_uri');
-        $apiSecret    = $request->params('api_secret');
-        $apiKey       = $request->params('api_key',       null, true);
-        $scope        = $request->params('scope');
-        $state        = $request->params('state');
+        $responseType = $request->getParameter('response_type', null, true);
+        $redirectUri  = $request->getParameter('redirect_uri');
+        $apiSecret    = $request->getParameter('api_secret');
+        $apiKey       = $request->getParameter('api_key',       null, true);
+        $scope        = $request->getParameter('scope');
+        $state        = $request->getParameter('state');
         $apiCert      = Libs\RESTLib::FetchClientCertificate();
         $remoteIP     = Libs\RESTLib::FetchUserAgentIP();
         $iliasClient  = Libs\RESTilias::FetchILIASClient();
 
         // Check request-parameters (additional for post)
-        $userName     = $request->params('username');
-        $passWord     = $request->params('password');
-        $answer       = $request->params('answer');
+        $userName     = $request->getParameter('username');
+        $passWord     = $request->getParameter('password');
+        $answer       = $request->getParameter('answer');
 
         // Proccess input-parameters according to (post) authorziation flow (throws exception on problem)
         $data         = Authorize::FlowPostAuthorize($responseType, $iliasClient, $userName, $passWord, $apiKey, $apiSecret, $apiCert, $redirectUri, $scope, $state, $remoteIP, $answer);
@@ -215,8 +215,8 @@ $app->group('/v2', function () use ($app) {
       try {
         // Fetch parameters required for all routes
         $request      = $app->request();
-        $grantType    = $request->params('grant_type', null, true);
-        $apiSecret    = $request->params('api_secret');
+        $grantType    = $request->getParameter('grant_type', null, true);
+        $apiSecret    = $request->getParameter('api_secret');
         $apiCert      = Libs\RESTLib::FetchClientCertificate();
         $remoteIp     = Libs\RESTLib::FetchUserAgentIP();
         $iliasClient  = Libs\RESTilias::FetchILIASClient();
@@ -224,9 +224,9 @@ $app->group('/v2', function () use ($app) {
         // Exchange refresh-token for access-token (and new refresh-token?)
         if ($grantType == 'refresh_token') {
           // Fetch additional parameters for exchange (api-key is optional)
-          $apiKey = $request->params('api_key');
-          $scope  = $request->params('scope');
-          $code   = $request->params('refresh_token', null, true);
+          $apiKey = $request->getParameter('api_key');
+          $scope  = $request->getParameter('scope');
+          $code   = $request->getParameter('refresh_token', null, true);
 
           // Proccess input-parameters according to (post) token flow (throws exception on problem)
           $data = Token::FlowRefreshToken($grantType, $apiKey, $apiSecret, $apiCert, $code, $iliasClient, $scope, $remoteIp);
@@ -235,7 +235,7 @@ $app->group('/v2', function () use ($app) {
         // Manage all of the other supported grant-types...
         else {
           // Fetch additional parameters for all other requests (api-key is manditory)
-          $apiKey = $request->params('api_key', null, true);
+          $apiKey = $request->getParameter('api_key', null, true);
 
           // Check grant_type is supported
           Token::CheckGrantType(null, $grantType);
@@ -243,8 +243,8 @@ $app->group('/v2', function () use ($app) {
           // Grant-Type: Authorization Code
           if ($grantType == 'authorization_code') {
             // Fetch additional parameters for Authorization-Code grant flow
-            $redirectUri  = $request->params('redirect_uri');
-            $code         = $request->params('code', null, true);
+            $redirectUri  = $request->getParameter('redirect_uri');
+            $code         = $request->getParameter('code', null, true);
 
             // Proccess input-parameters according to (post) token flow (throws exception on problem)
             $data = Token::FlowAuthorizationCode($grantType, $apiKey, $apiSecret, $apiCert, $code, $redirectUri, $iliasClient, $remoteIp);
@@ -253,9 +253,9 @@ $app->group('/v2', function () use ($app) {
           // Grant-Type: Resource-Owner Credentials
           elseif ($grantType == 'password') {
             // Fetch additional parameters for Resource-Owner Credentials grant flow
-            $userName = $request->params('username', null, true);
-            $passWord = $request->params('password', null, true);
-            $scope    = $request->params('scope');
+            $userName = $request->getParameter('username', null, true);
+            $passWord = $request->getParameter('password', null, true);
+            $scope    = $request->getParameter('scope');
 
             // Proccess input-parameters according to (post) token flow (throws exception on problem)
             $data = Token::FlowResourceOwnerCredentials($grantType, $userName, $passWord, $apiKey, $apiSecret, $apiCert, $iliasClient, $remoteIp, $scope);
@@ -264,7 +264,7 @@ $app->group('/v2', function () use ($app) {
           // Grant-Type: Client Credentials
           elseif ($grantType == 'client_credentials') {
             // Fetch additional parameters for Client Credentials grant flow
-            $scope    = $request->params('scope');
+            $scope    = $request->getParameter('scope');
 
             // Proccess input-parameters according to (post) token flow (throws exception on problem)
             $data = Token::FlowClientCredentials($grantType, $apiKey, $apiSecret, $apiCert, $iliasClient, $scope, $remoteIp);
@@ -332,9 +332,9 @@ $app->group('/v2', function () use ($app) {
       try {
         // Fetch parameters required for all routes
         $request      = $app->request();
-        $apiKey       = $request->params('api_key', null, true);
-        $apiSecret    = $request->params('api_secret');
-        $tokenCode    = $request->params('token', null, true);
+        $apiKey       = $request->getParameter('api_key', null, true);
+        $apiSecret    = $request->getParameter('api_secret');
+        $tokenCode    = $request->getParameter('token', null, true);
         $apiCert      = Libs\RESTLib::FetchClientCertificate();
         $remoteIp     = Libs\RESTLib::FetchUserAgentIP();
         $iliasClient  = Libs\RESTilias::FetchILIASClient();
@@ -409,9 +409,9 @@ $app->group('/v2', function () use ($app) {
       try {
         // Fetch parameters required for all routes
         $request      = $app->request();
-        $apiKey       = $request->params('api_key', null, true);
-        $apiSecret    = $request->params('api_secret');
-        $token        = $request->params('token', null, true);
+        $apiKey       = $request->getParameter('api_key', null, true);
+        $apiSecret    = $request->getParameter('api_secret');
+        $token        = $request->getParameter('token', null, true);
         $apiCert      = Libs\RESTLib::FetchClientCertificate();
         $remoteIp     = Libs\RESTLib::FetchUserAgentIP();
         $iliasClient  = Libs\RESTilias::FetchILIASClient();
