@@ -53,82 +53,25 @@ class RESTResponse extends \Slim\Http\Response {
    *  @See \Slim\Http\Response->write(...) for more details
    */
   public function write($body, $replace = false) {
-    // Convert all non-emptry data to JSON
-    if (isset($body) && $body != '')
-      // Convert to desired format
-      switch ($this->format) {
-        case 'JSON':
-          $payload = (is_string($body)) ? $body : json_encode($body);
-          break;
-        case 'XML':
-          $payload = $body; // DoIt: Convert array to XML string (http://www.kodingmadesimple.com/2015/11/convert-multidimensional-array-to-xml-file-in-php.html)
-          break;
-        case 'RAW':
-        case 'HTML':
-        default:
-          $payload = $body;
-          break;
-      }
-    else
-      $payload = $body;
+    //
+    if ($replace === false) {
+      //
+      $oldBody = json_decode($this->body, true);
 
-    // Write (store) formated data and return original
-    parent::write($payload, $replace);
-    return $body;
-  }
+      //
+      if (is_array($oldBody) && is_array($body))
+        $body    = $oldBody + $body;
+      elseif ($oldBody !== null)
+        $body    = $oldBody;
 
-
-  /**
-   * Function: getBody()
-   *  Extends default getBody() method with JSON support.
-   *
-   *  @See \Slim\Http\Response->getBody() for more details
-   */
-  public function getBody() {
-    // Fetch stored JSON data
-    $payload = parent::getBody();
-
-    // Convert from desired format
-    switch ($this->format) {
-      case 'JSON':
-        return json_decode($payload, true);
-      case 'JSON':
-        return $payload; // DoIt: Convert XML (string) to array (see RESTRequest)
-      case 'RAW':
-      case 'HTML':
-      default:
-        return $payload;
+      // Manually merged, replace on
+      $replace = true;
     }
-  }
 
-
-  /**
-   * Function: body($body)
-   *  Extends default body() method with JSON support.
-   *  (DEPRECATED but still USED inside core SLIM ... -.-)
-   *
-   *  @See \Slim\Http\Response->body(...) for more details
-   */
-  public function body($body = null) {
-    // Fetch stored JSON data
-    $payload = parent::body($body);
-
-    // This route will use return value of write() which is already decoded
-    if (!is_null($body))
-      return $payload;
-    // While this will access body property directly... -.-
+    if (!isset($body) || is_string($body))
+      return parent::write($body, $replace);
     else
-      // Convert from desired format
-      switch ($this->format) {
-        case 'JSON':
-          return json_decode($payload, true);
-        case 'JSON':
-          return $payload; // DoIt: Convert XML (string) to array (see RESTRequest)
-        case 'RAW':
-        case 'HTML':
-        default:
-          return $payload;
-      }
+      return parent::write(json_encode($body), $replace);
   }
 
 
@@ -138,6 +81,7 @@ class RESTResponse extends \Slim\Http\Response {
    *
    *  @See \Slim\Http\Response->finalize() for more details
    */
+  /*
   public function finalize()  {
     // Disable cookies for all rest responses
     header_remove('Set-Cookie');
@@ -170,6 +114,13 @@ class RESTResponse extends \Slim\Http\Response {
     // Return updated response
     return array($status, $headers, $body);
   }
+  */
+  public function finalize()  {
+    // Notiz: Aus irgendeinem grund ist body hier doppelt, obwohl es in write (und überall sonstwo einfach ist)
+    list($status, $headers, $body) = parent::finalize();
+    $headers->set('Content-Type', 'application/json');
+    return array($status, $headers, $body);
+  }
 
 
   /**
@@ -183,13 +134,13 @@ class RESTResponse extends \Slim\Http\Response {
    */
   public function setFormat($format) {
     // Get unformated data
-    $payload = $this->getBody();
+    // $payload = $this->getBody();
 
     // Update internal format
     $this->format = strtoupper($format);
 
     // Format and store data
-    $this->setBody($payload);
+    // $this->setBody($payload);
   }
 
 

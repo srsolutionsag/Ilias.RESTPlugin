@@ -80,6 +80,10 @@ class RESTRouter extends \Slim\Router {
    * from ending of the current route.
    */
   public function getResponseFormat($httpMethod, $resourceUri, $reload = false) {
+    // Early exit
+    if (!isset($resourceUri))
+      return null;
+
     # Try to return matched routes without ".<format>" postfix
     foreach ($this->formats as $id => $format) {
       # Prepare to extract postfix
