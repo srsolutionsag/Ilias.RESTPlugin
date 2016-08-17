@@ -49,7 +49,37 @@ class RESTRequest extends \Slim\Http\Request {
 
 
   /**
+   * Function: getFormat()
+   *  Returns the internally useable format of the
+   *  request object. Used to deduct the response
+   *  format if not explicitly set/requested.
+   */
+  public function getFormat() {
+    // Fetch content-type
+    $format = $this->getContentType();
+
+    // Return to format string-literal
+    switch ($format) {
+      case 'application/json':
+      case 'text/json':
+        return 'json';
+      case 'application/xml':
+      case 'text/xml':
+        return 'xml';
+    }
+  }
+
+
+  /**
+   * Function: readParameters()
+   *  Read parameters in the following order
+   *   body (xml, json)
+   *   body (form)
+   *   get
+   *   header
    *
+   * Return:
+   *  <Array> containing a list (union/merge) of all parameters
    */
   protected function readParameters() {
     // Fetch all parameters
@@ -351,7 +381,7 @@ class RESTRequest extends \Slim\Http\Request {
     $client = $token->getClient();
 
     // Fetch client ip and check restriction
-    $remoteIp = RESTLib::FetchUserAgentIP();
+    $remoteIp  = $this->getIp();
     if (!$client->isIpAllowed($remoteIp))
       throw new Exceptions\Denied(
         Auth\Common::MSG_RESTRICTED_IP,

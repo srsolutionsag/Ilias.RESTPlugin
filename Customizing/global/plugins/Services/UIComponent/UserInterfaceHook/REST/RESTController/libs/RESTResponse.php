@@ -43,9 +43,6 @@ class RESTResponse extends \Slim\Http\Response {
   public function __construct($body = '', $status = 200, $headers = array()) {
     // Call parent constrcutor first
     parent::__construct($body, $status, $headers);
-
-    // DoIt: Set in app using info from RESTRequest & RESTRouter
-    $this->setFormat('json');
   }
 
 

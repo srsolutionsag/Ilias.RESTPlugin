@@ -16,10 +16,6 @@ namespace RESTController\libs;
  *  all routes, even if they don't have a name.
  */
 class RESTRouter extends \Slim\Router {
-  // The default output format, when nothing else was requested
-  const DEFAULT_FORMAT = 'json';
-
-
   /**
    * Constructor
    * @param array $settings
@@ -29,7 +25,7 @@ class RESTRouter extends \Slim\Router {
     parent::__construct();
 
     // Supported formats
-    $this->formats = array('json', 'xml', 'raw');
+    $this->formats = array('json', 'xml');
   }
 
 
@@ -93,8 +89,5 @@ class RESTRouter extends \Slim\Router {
       if (strlen($resourceUri) > $length + 1 && strcmp(substr($resourceUri, -($length + 1)), $ending) === 0)
         return $format;
     }
-
-    # Return default format instead
-    return self::DEFAULT_FORMAT;
   }
 }

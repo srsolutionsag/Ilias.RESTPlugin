@@ -47,8 +47,8 @@ $app->group('/v2', function () use ($app) {
         $apiKey       = $request->getParameter('api_key',       null, true);
         $scope        = $request->getParameter('scope');
         $state        = $request->getParameter('state');
+        $remoteIP     = $request->getIp();
         $apiCert      = Libs\RESTLib::FetchClientCertificate();
-        $remoteIP     = Libs\RESTLib::FetchUserAgentIP();
         $iliasClient  = Libs\RESTilias::FetchILIASClient();
 
         // Proccess input-parameters according to (get) authorziation flow (throws exception on problem)
@@ -115,8 +115,8 @@ $app->group('/v2', function () use ($app) {
         $apiKey       = $request->getParameter('api_key',       null, true);
         $scope        = $request->getParameter('scope');
         $state        = $request->getParameter('state');
+        $remoteIP     = $request->getIp();
         $apiCert      = Libs\RESTLib::FetchClientCertificate();
-        $remoteIP     = Libs\RESTLib::FetchUserAgentIP();
         $iliasClient  = Libs\RESTilias::FetchILIASClient();
 
         // Check request-parameters (additional for post)
@@ -217,8 +217,8 @@ $app->group('/v2', function () use ($app) {
         $request      = $app->request();
         $grantType    = $request->getParameter('grant_type', null, true);
         $apiSecret    = $request->getParameter('api_secret');
+        $remoteIp     = $request->getIp();
         $apiCert      = Libs\RESTLib::FetchClientCertificate();
-        $remoteIp     = Libs\RESTLib::FetchUserAgentIP();
         $iliasClient  = Libs\RESTilias::FetchILIASClient();
 
         // Exchange refresh-token for access-token (and new refresh-token?)
@@ -335,8 +335,8 @@ $app->group('/v2', function () use ($app) {
         $apiKey       = $request->getParameter('api_key', null, true);
         $apiSecret    = $request->getParameter('api_secret');
         $tokenCode    = $request->getParameter('token', null, true);
+        $remoteIp     = $request->getIp();
         $apiCert      = Libs\RESTLib::FetchClientCertificate();
-        $remoteIp     = Libs\RESTLib::FetchUserAgentIP();
         $iliasClient  = Libs\RESTilias::FetchILIASClient();
 
         // Delete all tokens/sessions that where given
@@ -412,8 +412,8 @@ $app->group('/v2', function () use ($app) {
         $apiKey       = $request->getParameter('api_key', null, true);
         $apiSecret    = $request->getParameter('api_secret');
         $token        = $request->getParameter('token', null, true);
+        $remoteIp     = $request->getIp();
         $apiCert      = Libs\RESTLib::FetchClientCertificate();
-        $remoteIp     = Libs\RESTLib::FetchUserAgentIP();
         $iliasClient  = Libs\RESTilias::FetchILIASClient();
 
         // Generate token-info data

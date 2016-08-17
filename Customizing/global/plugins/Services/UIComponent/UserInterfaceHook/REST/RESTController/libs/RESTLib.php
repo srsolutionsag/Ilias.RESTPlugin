@@ -36,21 +36,6 @@ class RESTLib {
 
 
   /**
-   * Function: FetchUserAgentIP()
-   *  Return IP-Address of resource-owner user-agent.
-   *  For Reverse-Proxied servers the workers require a module such as mod_rpaf
-   *  that makes sure $_SERVER['REMOTE_ADDR'] does not contain the reverse-proxy
-   *  but the user-agents ip.
-   *
-   * Return:
-   *  <String> - IP-Address of resource-owner user-agent
-   */
-  public static function FetchUserAgentIP() {
-    return $_SERVER['REMOTE_ADDR'];
-  }
-
-
-  /**
    * Function: CheckComplexRestriction($pattern, $subjects, $delimiter)
    *  Checks if the subjects element(s) are all convered by the restrictions given by pattern.
    *  Pattern can either be a regular expressen, in which case all elements of subject are preg_match()'ed
