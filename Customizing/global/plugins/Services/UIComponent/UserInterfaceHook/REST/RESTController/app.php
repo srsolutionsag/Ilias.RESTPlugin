@@ -91,8 +91,13 @@ class RESTController extends \Slim\Slim {
     $this->container->singleton('request',  function ($c) { return new libs\RESTRequest($this->environment()); });
 
     // Add Content-Type middleware (support for JSON/XML requests)
-    $contentType = new libs\Middleware\ContentTypes();
-    $this->add($contentType);
+    //$contentType = new libs\Middleware\ContentTypes();
+    //$this->add($contentType);
+
+    //
+    // var_dump($this->request->get('json'));
+    // var_dump($this->request->get('xml'));
+    // $this->response->setFormat();
   }
 
   /**
@@ -231,11 +236,11 @@ class RESTController extends \Slim\Slim {
       ob_end_clean();
     }
 
+    # Configure the logger
     try {
       $settings = Database\RESTconfig::fetchSettings(array('rest_log'));
       $this->initLogWriter($settings['rest_log']);
-    } catch( Libs\Exceptions\Database $e) {
-    }
+    } catch( Libs\Exceptions\Database $e) {  }
 
     // Log each incoming rest request
     $this->log->info('REST call from ' . $this->request()->getIp() . ' at ' . date('d/m/Y, H:i:s', time()));

@@ -16,20 +16,9 @@ use \RESTController\libs\RESTAuth as RESTAuth;
 // Group implemented routes into common group
 $app->group('/v2/users', function () use ($app) {
   $app->post('/test', function () use ($app) {
-    $request  = $app->request;
-
-    $headers = array();
-    foreach ($_SERVER as $name => $value)
-      if (substr($name, 0, 5) == 'HTTP_')
-        $headers[str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', substr($name, 5)))))] = $value;
-
-    $app->success(array(
-      'body'   => $request->getBody(),                    // XML, JSON
-      'post'   => $request->post(),                       // Form
-      'get'    => $request->get(),                        // GET
-      'slim'   => \Slim\Http\Headers::extract($_SERVER),  // Header
-      'man'    => $headers                                // Header
-    ));
+    // $request  = $app->request;
+    // $app->success($request->getParameter());
+    $app->success('Testing...');
   });
 
   /**

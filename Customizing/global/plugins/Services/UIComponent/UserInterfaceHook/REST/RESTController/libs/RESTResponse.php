@@ -44,8 +44,8 @@ class RESTResponse extends \Slim\Http\Response {
     // Call parent constrcutor first
     parent::__construct($body, $status, $headers);
 
-    // Set default format
-    $this->setFormat('JSON');
+    // DoIt: Set in app using info from RESTRequest & RESTRouter
+    $this->setFormat('json');
   }
 
 
@@ -62,6 +62,9 @@ class RESTResponse extends \Slim\Http\Response {
       switch ($this->format) {
         case 'JSON':
           $payload = (is_string($body)) ? $body : json_encode($body);
+          break;
+        case 'XML':
+          $payload = $body; // DoIt: Convert array to XML string (http://www.kodingmadesimple.com/2015/11/convert-multidimensional-array-to-xml-file-in-php.html)
           break;
         case 'RAW':
         case 'HTML':
@@ -92,6 +95,8 @@ class RESTResponse extends \Slim\Http\Response {
     switch ($this->format) {
       case 'JSON':
         return json_decode($payload, true);
+      case 'JSON':
+        return $payload; // DoIt: Convert XML (string) to array (see RESTRequest)
       case 'RAW':
       case 'HTML':
       default:
@@ -120,6 +125,8 @@ class RESTResponse extends \Slim\Http\Response {
       switch ($this->format) {
         case 'JSON':
           return json_decode($payload, true);
+        case 'JSON':
+          return $payload; // DoIt: Convert XML (string) to array (see RESTRequest)
         case 'RAW':
         case 'HTML':
         default:
@@ -145,6 +152,9 @@ class RESTResponse extends \Slim\Http\Response {
     switch ($this->format) {
       case 'JSON':
         $headers->set('Content-Type', 'application/json');
+        break;
+      case 'JSON':
+        $headers->set('Content-Type', 'application/xml');
         break;
       case 'HTML':
         $headers->set('Content-Type', 'text/html');
