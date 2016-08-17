@@ -53,14 +53,25 @@ class RESTRequest extends \Slim\Http\Request {
    */
   protected function readParameters() {
     // Fetch all parameters
-    $body   = $request->getBody();
-    $post   = $request->post();
-    $get    = $request->get();
+    $body   = $this->getBody();
+    $post   = $this->post();
+    $get    = $this->get();
     $header = $this->getallheaders();
 
     // Build union with all parameters
     // (XML/JSON-Data, Form-Data, Get-Data, Header-Data in this order)
-    return $body + $post + $get + $header;
+    $result = array();
+    if (isset($body) && is_array($body))
+      $result += $body;
+    if (isset($post) && is_array($post))
+      $result += $post;
+    if (isset($get) && is_array($get))
+      $result += $get;
+    if (isset($header) && is_array($header))
+      $result += $header;
+
+      // Return result
+    return $result;
   }
 
 
@@ -86,7 +97,7 @@ class RESTRequest extends \Slim\Http\Request {
    * Return:
    *  <String> - Value attached to the given key (looking inside header, get, url-encoded post, json-encoded post)
    */
-  public function getParameter($key, $default = null, $throw = false) {
+  public function getParameter($key = null, $default = null, $throw = false) {
     // Read parameter only once
     if (!isset($this->parameters))
       $this->parameters = $this->readParameters();
