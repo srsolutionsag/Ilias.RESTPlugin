@@ -16,7 +16,7 @@ use \RESTController\libs\RESTAuth as RESTAuth;
 // Group implemented routes into common group
 $app->group('/v2/users', function () use ($app) {
   $app->post('/test', function () use ($app) {
-    // $request  = $app->request;
+    // $request  = $app->request();
     // $app->success($request->getParameter());
     $app->success('Testing...');
   });

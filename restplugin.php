@@ -6,7 +6,6 @@
  * Since 2014
  */
 
-
 // Include the RESTController application
 $appDirectory = './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/REST/RESTController/';
 require_once($appDirectory . 'app.php');

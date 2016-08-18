@@ -146,15 +146,6 @@ class ClientsLegacyModel extends Libs\RESTModel {
         $sql = Database\RESTclient::safeSQL('DELETE FROM ui_uihk_rest_perm WHERE api_id = %d', $id);
         self::getDB()->manipulate($sql);
 
-        // Delete list of allowed users
-        //$sql = Database\RESTclient:safeSQL('DELETE FROM ui_uihk_rest_key2user WHERE api_id = %d', $id);
-        //self::getDB()->manipulate($sql);
-        // -> concept change by thomas 12/2015 - 02/2016
-
-        // Delete oauth tokens
-        //$sql = Database\RESTclient::safeSQL('DELETE FROM ui_uihk_rest_oauth2 WHERE api_id = %d', $id);
-        //self::getDB()->manipulate($sql);
-
         if ($numAffRows === false) {
             throw new Exceptions\DeleteFailed(self::MSG_NO_CLIENT, $id);
         }

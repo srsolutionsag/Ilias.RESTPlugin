@@ -471,9 +471,8 @@ class RESTilias {
 
     // Fetch user-id from access-token if non is given
     if (!isset($userId)) {
-      //$accessToken = $app->request->getToken();
       $accessToken = RESTRequest::getToken();
-      $userId       = $accessToken->getUserId();
+      $userId      = $accessToken->getUserId();
     }
 
     // Check wether a given user has the admin-role

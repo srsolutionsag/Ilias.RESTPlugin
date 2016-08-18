@@ -91,8 +91,12 @@
     'setting_value' => array('text', '1')
   ));
   $ilDB->insert('ui_uihk_rest_config', array(
-      'setting_name'  => array('text', 'rest_log'),
-      'setting_value' => array('text', '')
+      'setting_name'  => array('text', 'log_file'),
+      'setting_value' => array('text', null)
+  ));
+  $ilDB->insert('ui_uihk_rest_config', array(
+      'setting_name'  => array('text', 'log_level'),
+      'setting_value' => array('text', null)
   ));
   global $ilLog;
   $ilLog->write('Plugin REST -> DB-Update #2: Filled ui_uihk_rest_config.');

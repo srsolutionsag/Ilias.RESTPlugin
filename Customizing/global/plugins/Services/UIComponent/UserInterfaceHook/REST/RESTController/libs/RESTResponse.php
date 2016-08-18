@@ -28,6 +28,10 @@ namespace RESTController\libs;
  * more detailed REST-Code (machine-readable).
  */
 class RESTResponse extends \Slim\Http\Response {
+  // Allow to re-use status messages and codes
+  const MSG_UNSOPPORTED_RESPONSE_CONTENT  = 'Cannot send non-string RESTResponse when using \'{{format}}\' format.';
+  const ID_UNSOPPORTED_RESPONSE_CONTENT   = 'RESTController\\libs\\RESTResponse::ID_UNSOPPORTED_RESPONSE_CONTENT';
+
   // Stores the current active format
   protected $format;
 
@@ -53,25 +57,28 @@ class RESTResponse extends \Slim\Http\Response {
    *  @See \Slim\Http\Response->write(...) for more details
    */
   public function write($body, $replace = false) {
-    //
+    // Merged new body with old content
     if ($replace === false) {
-      //
-      $oldBody = json_decode($this->body, true);
+      // Decode old content
+      $oldBody = $this->decode($this->getBody());
 
-      //
+      // Can only merge two arrays
       if (is_array($oldBody) && is_array($body))
         $body    = $oldBody + $body;
+      // Cannot be merged, keep old content
       elseif ($oldBody !== null)
         $body    = $oldBody;
 
-      // Manually merged, replace on
+      // Manually merged => replace old content
       $replace = true;
     }
 
+    // Write new body as is?
     if (!isset($body) || is_string($body))
       return parent::write($body, $replace);
+    // Write new encoded body
     else
-      return parent::write(json_encode($body), $replace);
+      return parent::write($this->encode($body), $replace);
   }
 
 
@@ -81,20 +88,16 @@ class RESTResponse extends \Slim\Http\Response {
    *
    *  @See \Slim\Http\Response->finalize() for more details
    */
-  /*
   public function finalize()  {
-    // Disable cookies for all rest responses
-    header_remove('Set-Cookie');
-
-    // Finalize response via parent
+    // Notiz: Aus irgendeinem grund ist body hier doppelt, obwohl es in write (und überall sonstwo einfach ist)
     list($status, $headers, $body) = parent::finalize();
 
-    // Add correct header for format
+    // Add correct header according to format
     switch ($this->format) {
       case 'JSON':
         $headers->set('Content-Type', 'application/json');
         break;
-      case 'JSON':
+      case 'XML':
         $headers->set('Content-Type', 'application/xml');
         break;
       case 'HTML':
@@ -114,12 +117,81 @@ class RESTResponse extends \Slim\Http\Response {
     // Return updated response
     return array($status, $headers, $body);
   }
-  */
-  public function finalize()  {
-    // Notiz: Aus irgendeinem grund ist body hier doppelt, obwohl es in write (und überall sonstwo einfach ist)
-    list($status, $headers, $body) = parent::finalize();
-    $headers->set('Content-Type', 'application/json');
-    return array($status, $headers, $body);
+
+
+  /**
+   * Function: Encode($body)
+   *  Encodes the given body using the current format
+   *  and returns it. (Errors of output is non a string!)
+   *
+   * Parameters:
+   *  body <Mixed> - Input to be converted
+   *
+   * Return:
+   *  <String> - Converted input according to format setting
+   */
+  public function encode($body) {
+    // Add correct header according to format
+    switch ($this->format) {
+      case 'JSON':
+        $result = json_encode($body);
+        break;
+      case 'XML':
+        $result = RESTLib::Array2XML($body);
+        break;
+      case 'HTML':
+      case 'RAW':
+      default:
+        $result = $body;
+        break;
+    }
+
+    // Final encoded 'object' musst be of type string
+    // Should only trigger when using RAW/HTML format with non-string body...
+    if (!is_string($result)) {
+      // Switch to JSON on error
+      $format = $this->getFormat();
+      $this->setFormat('json');
+
+      // Throw error and terminate
+      throw new Exceptions\Parameter(
+        self::MSG_UNSOPPORTED_RESPONSE_CONTENT,
+        self::ID_UNSOPPORTED_RESPONSE_CONTENT,
+        array(
+          'content' => $result,
+          'format'  => strtolower($format)
+        )
+      );
+    }
+
+    // Return result-object
+    return $result;
+  }
+
+
+  /**
+   * Function: Decode($body)
+   *  Decodes the given body using the current format
+   *  and returns it.
+   *
+   * Parameters:
+   *  body <Mixed> - Input to be converted
+   *
+   * Return:
+   *  <String> - Converted input according to format setting
+   */
+  public function decode($body) {
+    // Add correct header according to format
+    switch ($this->format) {
+      case 'JSON':
+        return json_decode($body, TRUE);
+      case 'XML':
+        return RESTLib::XML2Array($body);
+      case 'HTML':
+      case 'RAW':
+      default:
+        return $body;
+    }
   }
 
 
@@ -133,14 +205,14 @@ class RESTResponse extends \Slim\Http\Response {
    *  $format <String> - Desired output format
    */
   public function setFormat($format) {
-    // Get unformated data
-    // $payload = $this->getBody();
+    // Get decoded content
+    $payload = $this->decode($this->getBody());
 
     // Update internal format
     $this->format = strtoupper($format);
 
-    // Format and store data
-    // $this->setBody($payload);
+    // Update content using new format
+    $this->setBody($this->encode($payload));
   }
 
 

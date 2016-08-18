@@ -26,7 +26,6 @@ $app->group('/v1', function () use ($app) {
    * Method: GET
    */
   $app->get('/clients', RESTAuth::checkAccess(RESTAuth::ADMIN), function () use ($app) {
-    $app->log->debug("/v1/clients route");
     $result = ClientsLegacyModel::getClients();
     $app->success($result);
   });
@@ -37,10 +36,10 @@ $app->group('/v1', function () use ($app) {
    * Method: PUT
    */
   $app->put('/clients/:id', RESTAuth::checkAccess(RESTAuth::ADMIN), function ($id) use ($app) {
-    $app->log->debug("In /v1/client PUT route");
-    OAuth2v2\Admin::UpdateClient($id, $app->request);
-    if ($app->request->hasParam("permissions")) {
-      $permArray  = $app->request->getParameter(permissions);
+    $request = $app->request();
+    OAuth2v2\Admin::UpdateClient($id, $request);
+    if ($request->hasParam("permissions")) {
+      $permArray  = $request->getParameter(permissions);
       ClientsLegacyModel::setPermissions($id, $permArray);
     }
   });
@@ -51,11 +50,11 @@ $app->group('/v1', function () use ($app) {
    * Method: POST
    */
   $app->post('/clients/', RESTAuth::checkAccess(RESTAuth::ADMIN), function () use ($app) {
-    $app->log->debug("In /v1/clients POST route");
-    $api_id = OAuth2v2\Admin::InsertClient($app->request);
+    $request = $app->request();
+    $api_id  = OAuth2v2\Admin::InsertClient($request);
     if ($api_id != false) {
-        if ($app->request->hasParam("permissions")) {
-          $permArray  = $app->request->getParameter(permissions);
+        if ($request->hasParam("permissions")) {
+          $permArray  = $request->getParameter(permissions);
           ClientsLegacyModel::setPermissions($api_id, $permArray);
         }
     }

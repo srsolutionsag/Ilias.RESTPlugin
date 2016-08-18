@@ -79,7 +79,7 @@ class RESTRouter extends \Slim\Router {
    * Try to extract requested output-format
    * from ending of the current route.
    */
-  public function getResponseFormat($httpMethod, $resourceUri, $reload = false) {
+  public function getResponseFormat($resourceUri) {
     // Early exit
     if (!isset($resourceUri))
       return null;
@@ -88,6 +88,7 @@ class RESTRouter extends \Slim\Router {
     foreach ($this->formats as $id => $format) {
       # Prepare to extract postfix
       $length = strlen($format);
+      $ending = sprintf('.%s', $format);
 
       # Check if postfix matches a format
       if (strlen($resourceUri) > $length + 1 && strcmp(substr($resourceUri, -($length + 1)), $ending) === 0)

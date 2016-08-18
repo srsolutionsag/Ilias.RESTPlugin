@@ -64,11 +64,11 @@ $app->group('/v2', function () use ($app) {
      *
      */
     $app->get('/tokenroutes', function () use ($app) {
-
-      $accessToken = $app->request->getToken();
-      $apiKey = $accessToken->getApiKey();
-      $filter   = $app->request->getParameter('filter', true, false);
-      $routes   = $app->router()->getRoutes();
+      $request     = $app->request();
+      $accessToken = $request->getToken();
+      $apiKey      = $accessToken->getApiKey();
+      $filter      = $request->getParameter('filter', true, false);
+      $routes      = $app->router()->getRoutes();
 
       // Fetch list of (restricted) routes
       $result   = Util::GetRoutes($routes, $apiKey, $filter);

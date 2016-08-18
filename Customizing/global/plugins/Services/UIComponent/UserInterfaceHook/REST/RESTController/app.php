@@ -105,15 +105,8 @@ class RESTController extends \Slim\Slim {
     // Setup error-handler
     $this->setErrorHandlers();
 
-    // Disable fancy debug-messages but enable logging
+    // Disable fancy debug-messages
     $this->config('debug', false);
-    $this->log->setEnabled(true);
-    $this->log->setLevel(\Slim\Log::DEBUG);
-
-    // Apped useful information to (global) slim-environment
-    $env                  = $this->environment();
-    $env['client_id']     = CLIENT_ID;
-    $env['app_directory'] = $appDirectory;
   }
 
 
@@ -130,89 +123,19 @@ class RESTController extends \Slim\Slim {
     $this->initILIAS();
 
     # Configure the logger
-    try {
-      $settings = Database\RESTconfig::fetchSettings(array('rest_log'));
-      $this->initLogWriter($settings['rest_log']);
-    }
-    catch (Libs\Exceptions\Database $e) {
-      $this->initLogWriter(sprintf('%s/restplugin-%s.log', ILIAS_LOG_DIR, CLIENT_ID));
-    }
+    $this->initLogWriter();
 
     // Load routes
     $this->loadRoutes();
 
-    // Log each incoming rest request
-    $this->log->info('REST call from ' . $this->request()->getIp() . ' at ' . date('d/m/Y, H:i:s', time()));
+    // Log each access triggered
+    $this->logPreRun();
 
     // Start the SLIM application
     parent::run();
-  }
 
-
-  /**
-   * Function: displayError($msg, $code, $file, $line, $trace)
-   *  Send the error-message given by the parameters to the clients
-   *  and add a (critical) log-message to the active logfile.
-   *
-   * Parameters:
-   *  $msg <String> - [Optional] Description of error/exception
-   *  $code <Integer> - [Optional] Code of error/exception
-   *  $file <String> - [Optional] File where the error/exception occured
-   *  $line <Integer> - [Optional] Line in file where the error/exception occured
-   *  $trace <String> - [Optional] Full (back-)trace (string) of error/exception
-   */
-  public function getError($error) {
-    if ($error instanceof libs\RESTException)
-      $error = array(
-        'message'   => $error->getRESTMessage(),
-        'status'    => $error->getRESTCode(),
-        'data'      => $error->getRESTData(),
-        'error'     => array(
-          'message' => $error->getMessage(),
-          'code'    => $error->getCode(),
-          'file'    => str_replace('/', '\\', $error->getFile()),
-          'line'    => $error->getLine(),
-          'trace'   => str_replace('/', '\\', $error->getTraceAsString())
-        )
-      );
-
-    elseif ($error instanceof \Exception)
-      $error = array(
-        'message'   => 'An exception was thrown!',
-        'status'    => '\Exception',
-        'error'     => array(
-          'message' => $error->getMessage(),
-          'code'    => $error->getCode(),
-          'file'    => str_replace('/', '\\', $error->getFile()),
-          'line'    => $error->getLine(),
-          'trace'   => str_replace('/', '\\', $error->getTraceAsString())
-        )
-      );
-
-    elseif (is_array($error))
-      $error = array(
-        'message'   => 'There is an error in the executed PHP-Script.',
-        'status'    => 'FATAL',
-        'error'     => array(
-          'message' => $error['message'],
-          'code'    => $error['type'],
-          'file'    => str_replace('/', '\\', $error['file']),
-          'line'    => $error['line'],
-          'trace'   => null
-        )
-      );
-
-    else
-      $error = array(
-        'message'   => 'Unkown error...',
-        'status'    => 'UNKNOWN'
-      );
-
-    // Log error to file
-    $this->log->critical($error);
-
-    // Return error-object
-    return $error;
+    // Log each access triggered
+    $this->logPostRun();
   }
 
 
@@ -287,8 +210,149 @@ class RESTController extends \Slim\Slim {
    *  <Boolean> - True if access-token should be stored and looked up from DB, false otherwise
    */
   public function AccessTokenDB() {
-    // Some day this will be stored inside a config, to lazy now...
+    // Note: Some day this will be stored inside a config, to lazy now...
     return true;
+  }
+
+
+  /**
+   * Function: displayError($msg, $code, $file, $line, $trace)
+   *  Send the error-message given by the parameters to the clients
+   *  and add a (critical) log-message to the active logfile.
+   *
+   * Parameters:
+   *  $msg <String> - [Optional] Description of error/exception
+   *  $code <Integer> - [Optional] Code of error/exception
+   *  $file <String> - [Optional] File where the error/exception occured
+   *  $line <Integer> - [Optional] Line in file where the error/exception occured
+   *  $trace <String> - [Optional] Full (back-)trace (string) of error/exception
+   */
+  public function getError($error) {
+    if ($error instanceof libs\RESTException)
+      $error = array(
+        'message'   => $error->getRESTMessage(),
+        'status'    => $error->getRESTCode(),
+        'data'      => $error->getRESTData(),
+        'error'     => array(
+          'message' => $error->getMessage(),
+          'code'    => $error->getCode(),
+          'file'    => str_replace('/', '\\', $error->getFile()),
+          'line'    => $error->getLine(),
+          'trace'   => str_replace('/', '\\', $error->getTraceAsString())
+        )
+      );
+
+    elseif ($error instanceof \Exception)
+      $error = array(
+        'message'   => 'An exception was thrown!',
+        'status'    => '\Exception',
+        'error'     => array(
+          'message' => $error->getMessage(),
+          'code'    => $error->getCode(),
+          'file'    => str_replace('/', '\\', $error->getFile()),
+          'line'    => $error->getLine(),
+          'trace'   => str_replace('/', '\\', $error->getTraceAsString())
+        )
+      );
+
+    elseif (is_array($error))
+      $error = array(
+        'message'   => 'There is an error in the executed PHP-Script.',
+        'status'    => 'FATAL',
+        'error'     => array(
+          'message' => $error['message'],
+          'code'    => $error['type'],
+          'file'    => str_replace('/', '\\', $error['file']),
+          'line'    => $error['line'],
+          'trace'   => null
+        )
+      );
+
+    else
+      $error = array(
+        'message'   => 'Unkown error...',
+        'status'    => 'UNKNOWN'
+      );
+
+    // Log error to file
+    $this->log->critical($error);
+
+    // Return error-object
+    return $error;
+  }
+
+
+  /**
+   * Function: logRun()
+   *  Logs some valuable information for each access triggering the RESTController to run.
+   */
+  protected function logPreRun() {
+    // Fetch all information that should be logged
+    $log     = $this->getLog();
+    $request = $this->request();
+    $ip      = $request->getIp();
+    $method  = $request->getMethod();
+    $route   = $request->getResourceUri();
+    $when    = date('d/m/Y, H:i:s', time());
+
+    // Log additional information in debug-mode (with parameters)
+    if ($log->getLevel() == \Slim\Log::DEBUG) {
+      $parameters = $request->getParameter();
+      $log->debug(sprintf(
+        "[%s]: REST was called from '%s' on route '%s' [%s] with Parameters:\n%s",
+        $when,
+        $ip,
+        $route,
+        $method,
+        print_r($parameters, true)
+      ));
+    }
+    // Log access without request parameters
+    else
+      $log->info(sprintf(
+        "[%s]: REST was called from '%s' on route '%s' [%s]...",
+        $when,
+        $ip,
+        $route,
+        $method,
+        print_r($parameters, true)
+      ));
+  }
+
+
+  /**
+   * Function: logRun()
+   *  Logs some valuable information for each access triggering the RESTController to run.
+   */
+  protected function logPostRun() {
+    // Fetch logger
+    $log     = $this->getLog();
+
+    // Log additional information in debug-mode (with parameters)
+    if ($log->getLevel() == \Slim\Log::DEBUG) {
+      // Fetch all information that should be logged
+      $request  = $this->request();
+      $response = $this->response();
+      $ip       = $request->getIp();
+      $method   = $request->getMethod();
+      $route    = $request->getResourceUri();
+      $when     = date('d/m/Y, H:i:s', time());
+      $status   = $response->getStatus();
+      $headers  = $response->headers->all();
+      $body     = $response->decode($response->getBody());
+
+      // Output log
+      $log->debug(sprintf(
+        "[%s]: REST call from '%s' on route '%s' [%s] finished with:\nStatus: '%s'\nHeaders:\n%s\nBody:\n%s",
+        $when,
+        $ip,
+        $route,
+        $method,
+        $status,
+        print_r($headers, true),
+        print_r($body, true)
+      ));
+    }
   }
 
 
@@ -313,20 +377,66 @@ class RESTController extends \Slim\Slim {
    * Configure custom LogWriter
    * @param $logFile - string consisting of full path + filename
    */
-  protected function initLogWriter($logFile) {
+  protected function initLogWriter() {
+    // Fetch config location from database
+    try {
+      $settings = Database\RESTconfig::fetchSettings(array('log_file', 'log_level'));
+      $logFile   = $settings['log_file'];
+      $logLevel  = $settings['log_level'];
+    }
+    catch (Libs\Exceptions\Database $e) { }
 
-    if ($logFile!='') {
-      if (!file_exists($logFile)) {
-        $fh = fopen($logFile, 'w');
-        fclose($fh);
-      }
+    // Use fallback values
+    if (!isset($logLevel) || !is_string($logFile))
+      $logFile = sprintf('%s/restplugin-%s.log', ILIAS_LOG_DIR, CLIENT_ID);
+    if (!isset($logLevel))
+      $logLevel = 'DEBUG';
 
-      if (!is_writable($logFile)) {
-        $app->halt(500, 'Can\'t write to log-file: ' . $logFile);
-      }
+    // Create file if it does not exist
+    if (!file_exists($logFile)) {
+      $fh = fopen($logFile, 'w');
+      fclose($fh);
+    }
 
-      $app->getLog()->setWriter(new \Slim\LogWriter(fopen($logFile, 'a')));
-      $app->getLog()->setEnabled(true);
+    // Check wether file exists and is writeable
+    if (!is_writable($logFile))
+      $app->halt(500, sprintf('Can\'t write to log-file: %s (Make sure file exists and is writeable by the PHP process)', $logFile));
+
+    // Open the logfile for writing to using Slim
+    $logWriter = new \Slim\LogWriter(fopen($logFile, 'a'));
+    $log       = $this->getLog();
+    $log->setWriter($logWriter);
+
+    // Set logging level
+    switch (strtoupper($logLevel)) {
+      case 'EMERGENCY':
+        $log->setLevel(\Slim\Log::EMERGENCY);
+        break;
+      case 'ALERT':
+        $log->setLevel(\Slim\Log::ALERT);
+        break;
+      case 'CRITICAL':
+        $log->setLevel(\Slim\Log::CRITICAL);
+        break;
+      case 'FATAL':
+        $log->setLevel(\Slim\Log::FATAL);
+        break;
+      case 'ERROR':
+        $log->setLevel(\Slim\Log::ERROR);
+        break;
+      case 'WARN':
+        $log->setLevel(\Slim\Log::WARN);
+        break;
+      case 'NOTICE':
+        $log->setLevel(\Slim\Log::NOTICE);
+        break;
+      case 'INFO':
+        $log->setLevel(\Slim\Log::INFO);
+        break;
+      case 'DEBUG':
+      default:
+        $log->setLevel(\Slim\Log::DEBUG);
+        break;
     }
   }
 
@@ -341,12 +451,17 @@ class RESTController extends \Slim\Slim {
    */
   protected function initResponseFormat() {
     // Set output-format
-    $inputFormat     = $this->request()->getFormat();
-    $requestedFormat = $this->router()->getResponseFormat();
-    if ($requestedFormat)
-      $this->response()->setFormat($requestedFormat);
-    elseif ($inputFormat)
-      $this->response()->setFormat($inputFormat);
+    $requestURI    = $this->request()->getResourceUri();
+    $routeFormat   = $this->router()->getResponseFormat($requestURI);
+    $requestFormat = $this->request()->getFormat();
+
+    // Prefer format set via route 'file-ending'
+    if ($routeFormat)
+      $this->response()->setFormat($routeFormat);
+    // Use request format as fallback
+    elseif ($requestFormat)
+      $this->response()->setFormat($requestFormat);
+    // Lastly fallback to json
     else
       $this->response()->setFormat('json');
   }
@@ -418,14 +533,16 @@ class RESTController extends \Slim\Slim {
         E_COMPILE_ERROR => 'E_COMPILE_ERROR',
         E_USER_ERROR    => 'E_USER_ERROR'
       );
-      $name = $allowed[$error['type']];
 
       // Log and display error?
-      if ($name) {
+      if (array_key_exists($error['type'], $allowed)) {
         // Output formated error via echo
         header('content-type: application/json');
         echo json_encode($this->getError($error));
       }
+
+      // FixIt: Is this working?
+      $this->getLog()->fatal($error);
     });
   }
 }
