@@ -104,40 +104,6 @@ class RESTLib {
   }
 
 
-  public static function fromMixed($xml, $mixed, $domElement) {
-		if (is_array($mixed)) {
-			foreach( $mixed as $index => $mixedElement ) {
-
-				if ( is_int($index) ) {
-					if ( $index == 0 ) {
-						$node = $domElement;
-					} else {
-						$node = $xml->createElement($domElement->tagName);
-						$domElement->parentNode->appendChild($node);
-					}
-				}
-
-				else {
-          if (preg_match('/^[^A-Za-z0-9]/', $index)) {
-            $node = $xml->createElement('element' . rand());
-            $domElement->appendChild($node);
-          }
-          else {
-		        $node = $xml->createElement($index);
-            $domElement->appendChild($node);
-          }
-				}
-
-				self::fromMixed($xml, $mixedElement, $node);
-
-			}
-		} else {
-			$domElement->appendChild($xml->createTextNode($mixed));
-		}
-
-	}
-
-
   /**
    * Static-Function: Array2XML($array)
    *  Converts the given input assoziative array to an xml
@@ -150,73 +116,54 @@ class RESTLib {
    *  <String> - XML string-representation of converted array
    */
   public static function Array2XML($array) {
+    // Create new DomDocument and append data
+    $xml  = new \DOMDocument('1.0', 'utf-8');
+    $node = $xml->createElement('payload');
+    $xml->appendChild($node);
 
-    try {
-      $xml = new \DOMDocument('1.0', 'utf-8');
-      self::fromMixed($xml, $array, $xml);
-      return $xml->saveXML();
+    // Build XML if there is data
+    if (isset($array) && is_array($array) && count($array) > 0)
+      self::Array2XML_Recursive($xml, $node, $array);
 
-      /*
-      $xml  = new \DOMDocument('1.0', 'utf-8');
-      $root = $xml->createElement('response');
-      $xml->appendChild($root);
-
-
-      $node = $xml->createElement('element');
-      $text = $xml->createTextNode('value');
-      $node->appendChild($text);
-      $root->appendChild($node);
-      //self::Array2XML_Recursive($xml, $root, $array);
-
-
-      return $xml->saveXml();
-      */
-    }
-    catch (\Exception $e) {
-      var_dump($e);
-      die;
-    }
-
-
-    /*
-    $xml = new DOMDocument('1.0', 'utf-8');
-    $root = $xml->createElement('top');
-    $xml->appendChild($root);
-    foreach ($arr as $k => $v) {
-      $node = $xml->createelement($k);
-      $text = $xml->createTextNode($v);
-      $node->appendChild($text);
-      $root->appendChild($node);
-    }
-    echo $xml->saveXml();
-    */
+    // Convert DomDocument to string
+    return $xml->saveXML();
   }
 
 
   /**
+   * Static-Function: Array2XML_Recursive($xml, $root, $mixed)
+   *  Recursively convert arrayto an xml string. Does not return
+   *  anything but instead manipulates the $root parameter.
    *
+   * Parameters:
+   *  $xml <DOMDocument> - Instance of DOMDocument (used for construction)
+   *  $root <DOMElement> - Current root element to append values to
+   *  $mixed <Mixed> - Array to be converted
    */
-  public static function Array2XML_Recursive($xml, $root, $array) {
-    if (is_array($array)) {
-      foreach ($array as $key => $value) {
-        $node = $xml->createElement($key);
-
-        if (is_array($value)) {
-          self::Array2XML_Recursive($xml, $node, $value);
-          $root->appendChild($node);
-        }
+  protected static function Array2XML_Recursive($xml, $root, $mixed) {
+    // Need to iterate over mixed?
+		if (is_array($mixed)) {
+			foreach ($mixed as $key => $value) {
+        // Try to use keys as tags...
+        if (preg_match('/\A(?!XML)[a-z][\w0-9-]*/i', $key))
+          $node = $xml->createElement($key);
+        // ...otherwise fallback to <item key=$key>
         else {
-          $text = $xml->createTextNode('TEXT');
-          $node->appendChild($text);
-          $root->appendChild($node);
+          $node = $xml->createElement('item');
+          $node->setAttribute('key', $key);
         }
-      }
-    }
+
+        // Recurse for current value
+        $root->appendChild($node);
+				self::Array2XML_Recursive($xml, $node, $value);
+			}
+		}
+    // Create a text-node representation
     else {
-      $text = $xml->createTextNode('TEXT');
-      $root->appendChild($text);
-    }
-  }
+      $text = $xml->createTextNode($mixed);
+			$root->appendChild($text);
+		}
+	}
 
 
   /**
@@ -230,16 +177,12 @@ class RESTLib {
    *  <Array> - Assoziative array representing the input xml object
    */
   public static function XML2Array($string) {
-    // Try to convert string to SimpleXMLElement
-    $result = simplexml_load_string($input);
-
-    // Conversion from string to SimpleXMLElement succeded
-    if ($result != FALSE) {
-      if (function_exists('json_decode') && function_exists('json_encode'))
-        return json_decode(json_encode($simpleXML), TRUE);
-      else
-        return self::XML2Array_Recursive($simpleXML);
+    if (isset($string) && is_string($string) && strlen($string) > 0) {
+      $xml = new \DOMDocument();
+      $xml->loadXML($string);
+      return self::XML2Array_Recursive($xml->documentElement);
     }
+    return array();
   }
 
 
@@ -254,21 +197,33 @@ class RESTLib {
    * Return:
    *  <Array> - Assoziative array representing the input xml object
    */
-  protected static function XML2Array_Recursive($simpleXML) {
-    // Iterate input SimpleXMLElement
-    $result = array () ;
-    foreach ($simpleXML as $key => $value) {
-      // Convert to array-object
-      $value = (array) $value ;
+  protected static function XML2Array_Recursive($node) {
+    // Iterate over XML-Elements
+    if ($node->hasChildNodes() && $node->nodeType == XML_ELEMENT_NODE) {
+      $result = array();
+      foreach($node->childNodes as $child) {
+        // Child is an XML-Element
+        if ($child->nodeType == XML_ELEMENT_NODE) {
+          // Fetch key and values for this element
+          $key        = ($child->hasAttributes() && $child->tagName == 'item' && $child->getAttribute('key') != '') ? $child->getAttribute('key') : $child->tagName;
+          $recursion  = self::XML2Array_Recursive($child);
 
-      // Recursively convert SimpleXMLElement into array
-      if (isset($value[0]))
-        $result[$key] = trim($value[0]) ;
-      else
-        $result[$key] = XML2Array_Recursive($value);
+          // Append new value(s)
+          if (isset($result[$key]))
+            $result[$key] = array_merge_recursive((array) $result[$key], (array) $recursion);
+          // Set new value
+          else
+            $result[$key] = $recursion;
+        }
+        else
+          return $child->nodeValue;
+      }
+
+      // Return array
+      return $result;
     }
-
-    // Return finally
-    return $result ;
+    // Return single value
+    else
+      return $child->nodeValue;
   }
 }

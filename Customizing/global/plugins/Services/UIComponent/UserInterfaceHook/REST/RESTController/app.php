@@ -216,73 +216,6 @@ class RESTController extends \Slim\Slim {
 
 
   /**
-   * Function: displayError($msg, $code, $file, $line, $trace)
-   *  Send the error-message given by the parameters to the clients
-   *  and add a (critical) log-message to the active logfile.
-   *
-   * Parameters:
-   *  $msg <String> - [Optional] Description of error/exception
-   *  $code <Integer> - [Optional] Code of error/exception
-   *  $file <String> - [Optional] File where the error/exception occured
-   *  $line <Integer> - [Optional] Line in file where the error/exception occured
-   *  $trace <String> - [Optional] Full (back-)trace (string) of error/exception
-   */
-  public function getError($error) {
-    if ($error instanceof libs\RESTException)
-      $error = array(
-        'message'   => $error->getRESTMessage(),
-        'status'    => $error->getRESTCode(),
-        'data'      => $error->getRESTData(),
-        'error'     => array(
-          'message' => $error->getMessage(),
-          'code'    => $error->getCode(),
-          'file'    => str_replace('/', '\\', $error->getFile()),
-          'line'    => $error->getLine(),
-          'trace'   => str_replace('/', '\\', $error->getTraceAsString())
-        )
-      );
-
-    elseif ($error instanceof \Exception)
-      $error = array(
-        'message'   => 'An exception was thrown!',
-        'status'    => '\Exception',
-        'error'     => array(
-          'message' => $error->getMessage(),
-          'code'    => $error->getCode(),
-          'file'    => str_replace('/', '\\', $error->getFile()),
-          'line'    => $error->getLine(),
-          'trace'   => str_replace('/', '\\', $error->getTraceAsString())
-        )
-      );
-
-    elseif (is_array($error))
-      $error = array(
-        'message'   => 'There is an error in the executed PHP-Script.',
-        'status'    => 'FATAL',
-        'error'     => array(
-          'message' => $error['message'],
-          'code'    => $error['type'],
-          'file'    => str_replace('/', '\\', $error['file']),
-          'line'    => $error['line'],
-          'trace'   => null
-        )
-      );
-
-    else
-      $error = array(
-        'message'   => 'Unkown error...',
-        'status'    => 'UNKNOWN'
-      );
-
-    // Log error to file
-    $this->log->critical($error);
-
-    // Return error-object
-    return $error;
-  }
-
-
-  /**
    * Function: logRun()
    *  Logs some valuable information for each access triggering the RESTController to run.
    */
@@ -515,8 +448,11 @@ class RESTController extends \Slim\Slim {
   protected function setErrorHandlers() {
     // Set default error-handler for exceptions caught by SLIM
     $this->error(function (\Exception $error) {
+      // Log the error
+      $this->getLog()->error($error);
+
       // Stop executing on error
-      $this->halt(500, $this->getError($error));
+      $this->halt(500, $this->parseError($error));
     });
 
     // Set default error-handler for any error/exception not caught by SLIM
@@ -536,13 +472,78 @@ class RESTController extends \Slim\Slim {
 
       // Log and display error?
       if (array_key_exists($error['type'], $allowed)) {
+        // Log the error
+        $this->getLog()->fatal($error);
+
         // Output formated error via echo
         header('content-type: application/json');
-        echo json_encode($this->getError($error));
+        echo json_encode($this->parseError($error));
       }
-
-      // FixIt: Is this working?
-      $this->getLog()->fatal($error);
     });
+  }
+
+
+  /**
+   * Function: displayError($msg, $code, $file, $line, $trace)
+   *  Send the error-message given by the parameters to the clients
+   *  and add a (critical) log-message to the active logfile.
+   *
+   * Parameters:
+   *  $msg <String> - [Optional] Description of error/exception
+   *  $code <Integer> - [Optional] Code of error/exception
+   *  $file <String> - [Optional] File where the error/exception occured
+   *  $line <Integer> - [Optional] Line in file where the error/exception occured
+   *  $trace <String> - [Optional] Full (back-)trace (string) of error/exception
+   */
+  public function parseError($error) {
+    // Parse a RESTException
+    if ($error instanceof libs\RESTException)
+      $error = array(
+        'message'   => $error->getRESTMessage(),
+        'status'    => $error->getRESTCode(),
+        'data'      => $error->getRESTData(),
+        'error'     => array(
+          'message' => $error->getMessage(),
+          'code'    => $error->getCode(),
+          'file'    => str_replace('/', '\\', $error->getFile()),
+          'line'    => $error->getLine(),
+          'trace'   => str_replace('/', '\\', $error->getTraceAsString())
+        )
+      );
+    // Parse standard Exception
+    elseif ($error instanceof \Exception)
+      $error = array(
+        'message'   => 'An exception was thrown!',
+        'status'    => '\Exception',
+        'error'     => array(
+          'message' => $error->getMessage(),
+          'code'    => $error->getCode(),
+          'file'    => str_replace('/', '\\', $error->getFile()),
+          'line'    => $error->getLine(),
+          'trace'   => str_replace('/', '\\', $error->getTraceAsString())
+        )
+      );
+    // Parse error-array object
+    elseif (is_array($error))
+      $error = array(
+        'message'   => 'There is an error in the executed PHP-Script.',
+        'status'    => 'FATAL',
+        'error'     => array(
+          'message' => $error['message'],
+          'code'    => $error['type'],
+          'file'    => str_replace('/', '\\', $error['file']),
+          'line'    => $error['line'],
+          'trace'   => null
+        )
+      );
+    // Last resort fallback
+    else
+      $error = array(
+        'message'   => 'Unkown error...',
+        'status'    => 'UNKNOWN'
+      );
+
+    // Return error-object
+    return $error;
   }
 }
