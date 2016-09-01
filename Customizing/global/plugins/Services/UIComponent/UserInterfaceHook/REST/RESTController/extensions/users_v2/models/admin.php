@@ -43,70 +43,250 @@ class UserAdmin extends Libs\RESTModel {
   const MODE_UPDATE = 'update';
 
 
+  //
+  const fields = array(
+    'login',
+    'id',
+    'auth_mode',
+    'client_ip',
+    'active',
+    'time_limit_from',
+    'time_limit_until',
+    'time_limit_unlimited',
+    'interests_general',
+    'interests_help_offered',
+    'interests_help_looking',
+    'latitude',
+    'longitude',
+    'loc_zoom',
+    'udf',
+    'language',
+    'birthday',
+    'gender',
+    'institution',
+    'department',
+    'street',
+    'city',
+    'zipcode',
+    'country',
+    'sel_country',
+    'phone_office',
+    'phone_home',
+    'phone_mobile',
+    'fax',
+    'matriculation',
+    'hobby',
+    'referral_comment',
+    'delicious',
+    'email',
+    'im_icq',
+    'im_yahoo',
+    'im_msn',
+    'im_aim',
+    'im_skype',
+    'im_jabber',
+    'im_voip',
+    'title',
+    'firstname',
+    'lastname',
+    'hits_per_page',
+    'show_users_online',
+    'hide_own_online_status',
+    'skin',
+    'style',
+    'session_reminder_enabled',
+    'passwd',
+    'ext_account',
+    'disk_quota',
+    'wsp_disk_quota',
+    'userfile',
+    'roles'
+  );
+  // All values covered?
+  //
+  // Login: Required, Validate ilUtils::isLogin() & !ilObjUser::_loginExists()
+  // Passwort: Required, Max 32, Validate ilUtils::isPassword()
+  // Ext-Account: Max 250
+  // Gender: Required by select  ['f' / 'm']
+  // Vorname: Max 32, Required
+  // Nachname: Max 32, Required
+  // Title: Max 32, (Required $settings["require_title"])
+  // Email: (Required $settings["require_"...]), ilUtils::is_email()
+  // Rolle: Required via select (siehe allowedRoles)
+  // Birthdate: (Required $settings["require_"...])
+  // institution: Max 80, (Required $settings["require_"...])
+  // department: Max 80, (Required $settings["require_"...])
+  // street: Max 40, (Required $settings["require_"...])
+  // city: Max 40, (Required $settings["require_"...])
+  // zipcode: Max 10, (Required $settings["require_"...])
+  // country: Max 40, (Required $settings["require_"...])
+  // sel_country: (Required $settings["require_"...])
+  // phone_office: Max 30, (Required $settings["require_"...])
+  // phone_home: Max 30, (Required $settings["require_"...])
+  // phone_mobile: Max 30, (Required $settings["require_"...])
+  // fax: Max 30, (Required $settings["require_"...])
+  // Hobby: Max 3x40, (Required $settings["require_"...])
+  // interests_general: Max 40, (Required $settings["require_"...])
+  // interests_help_offered: Max 40, (Required $settings["require_"...])
+  // interests_help_looking: Max 40, (Required $settings["require_"...])
+  // "icq", "yahoo", "msn", "aim", "skype", "jabber", "voip" -> Max 40
+  // Matriculation: Max 40, (Required $settings["require_"...])
+  // Delicious: Max 40, (Required $settings["require_"...])
+  // Client-IP: Max 255
+  // UDF: (Required $definition['required'])
+  //  $definition['field_type'] == UDF_TYPE_TEXT: Max 255,
+  // show_users_online: Required via select ['y'/'n']
+  // Send-Email Button, Value $ilUser->getPref('send_info_mails') == 'y')
+  // Ignore-Required-Fields: 1 / 0
+  // Language: Value $ilSetting->get("language")
+  // Skin: Value $ilClientIniFile->readVariable("layout","skin"). ":".$ilClientIniFile->readVariable("layout","style"), Valid check ilObjStyleSettings::_lookupActivatedStyle($template["id"],$style["id"])
+  // HitsPerPage: Value $ilSetting->get("hits_per_page")
+  // User-Online: Value $ilSetting->get("show_users_online")
+  // time_limit_unlimited: Value 0 / 1
+  // hide_own_online_status: false (default)
+  // session_reminder_enabled: true (default)
+  // referral_comment: Max 3x40, (Required $settings["require_"...])
+  // Language: Required via select [$lng->getInstalledLanguages()]
+  // Skin/Style: Required via select [$styleDefinition->getAllTemplates()]
+  // auth_mode: Required vis select [ilAuthUtils::_getActiveAuthModes()], 'default' (default)
+
+  // array_key_exists('birthday', $userData) ? $userData['birthday'] : null
+  // $userData['hide_own_online_status'] ? 'y' : 'n'
+  // (int) $userData['session_reminder_enabled']
+  // array_key_exists('time_limit_unlimited', $userData) ? $userData['time_limit_unlimited'] : true
+  // $userObj->setTimeLimitFrom(self::GetTimeValue($userData['time_limit_from']);
+  // $userObj->setTimeLimitUntil(self::GetTimeValue($userData['time_limit_until']);
+
+
   /**
    *
    */
-  public static function CheckUserData() {
-    /* DoIt:
-     *  Check required fields (all fields, before setting)
-     *  Check max length
-     *  Check default values
-     *  Check invalid values
-     *  View differences in 5.1 (ilObjUserGUI)
-     */
+  protected static function IsMissingField($userData, $field, $mode) {
+    // id: Required (edit only!)
 
-    // Login: Required, Validate ilUtils::isLogin() & !ilObjUser::_loginExists()
-    // Passwort: Required, Max 32, Validate ilUtils::isPassword()
-    // Ext-Account: Max 250
-    // Gender: Required by select  ['f' / 'm']
-    // Vorname: Max 32, Required
-    // Nachname: Max 32, Required
-    // Title: Max 32, (Required $settings["require_title"])
-    // Email: (Required $settings["require_"...]), ilUtils::is_email()
-    // Rolle: Required via select (siehe allowedRoles)
+    // Login: Required,
+    // Passwort: Required
+    // Gender: Required by select (Use default)
+    // Vorname: Required
+    // Nachname: Required
+    // Title: (Required $settings["require_title"])
+    // Email: (Required $settings["require_"...])
+    // Rolle: Required via select (Use default)
     // Birthdate: (Required $settings["require_"...])
-    // institution: Max 80, (Required $settings["require_"...])
-    // department: Max 80, (Required $settings["require_"...])
-    // street: Max 40, (Required $settings["require_"...])
-    // city: Max 40, (Required $settings["require_"...])
-    // zipcode: Max 10, (Required $settings["require_"...])
-    // country: Max 40, (Required $settings["require_"...])
+    // institution: (Required $settings["require_"...])
+    // department: (Required $settings["require_"...])
+    // street: (Required $settings["require_"...])
+    // city: (Required $settings["require_"...])
+    // zipcode: (Required $settings["require_"...])
+    // country: (Required $settings["require_"...])
     // sel_country: (Required $settings["require_"...])
-    // phone_office: Max 30, (Required $settings["require_"...])
-    // phone_home: Max 30, (Required $settings["require_"...])
-    // phone_mobile: Max 30, (Required $settings["require_"...])
-    // fax: Max 30, (Required $settings["require_"...])
-    // Hobby: Max 3x40, (Required $settings["require_"...])
-    // interests_general: Max 40, (Required $settings["require_"...])
-    // interests_help_offered: Max 40, (Required $settings["require_"...])
-    // interests_help_looking: Max 40, (Required $settings["require_"...])
-    // "icq", "yahoo", "msn", "aim", "skype", "jabber", "voip" -> Max 40
+    // phone_office: (Required $settings["require_"...])
+    // phone_home: (Required $settings["require_"...])
+    // phone_mobile: (Required $settings["require_"...])
+    // fax: (Required $settings["require_"...])
+    // Hobby: (Required $settings["require_"...])
+    // interests_general: (Required $settings["require_"...])
+    // interests_help_offered: (Required $settings["require_"...])
+    // interests_help_looking: (Required $settings["require_"...])
     // Matriculation: Max 40, (Required $settings["require_"...])
     // Delicious: Max 40, (Required $settings["require_"...])
-    // Client-IP: Max 255
     // UDF: (Required $definition['required'])
     //  $definition['field_type'] == UDF_TYPE_TEXT: Max 255,
-    // show_users_online: Required via select ['y'/'n']
-    // Send-Email Button, Value $ilUser->getPref('send_info_mails') == 'y')
+    // show_users_online: Required via select (Use default)
+    // hide_own_online_status: Required via select (Use default)
+    // Skin: Required by select (Use default)
+    // referral_comment: (Required $settings["require_"...])
+    // Language: Required via select (Use default)
+    // Skin/Style: Required via select (Use default)
+    // auth_mode: Required via select (Use default)
+    // time_limit_unlimited: Required via select (Use default)
+    // time_limit_from: Required via select (Use default)
+    // time_limit_until: Required via select (Use default)
+
+    // !!! Add missing fields
+  }
+
+
+  /**
+   *
+   */
+  protected static function IsValidField($userData, $field, $mode) {
+    // Login: ilUtils::isLogin() & !ilObjUser::_loginExists()
+    // Passwort:  ilUtils::isPassword()
+    // Email: ilUtils::is_email()
+    // Rolle: "Rollen zuweisen elaubt"
+    // show_users_online: 'y' / 'n'
     // Ignore-Required-Fields: 1 / 0
-    // Language: Value $ilSetting->get("language")
-    // Skin: Value $ilClientIniFile->readVariable("layout","skin"). ":".$ilClientIniFile->readVariable("layout","style"), Valid check ilObjStyleSettings::_lookupActivatedStyle($template["id"],$style["id"])
+    // Language: "Sprach-Liste"
+    // Skin: ilObjStyleSettings::_lookupActivatedStyle($template["id"],$style["id"]) / $styleDefinition->getAllTemplates()
     // HitsPerPage: Value $ilSetting->get("hits_per_page")
     // User-Online: Value $ilSetting->get("show_users_online")
     // time_limit_unlimited: Value 0 / 1
-    // hide_own_online_status: false (default)
-    // session_reminder_enabled: true (default)
-    // referral_comment: Max 3x40, (Required $settings["require_"...])
-    // Language: Required via select [$lng->getInstalledLanguages()]
-    // Skin/Style: Required via select [$styleDefinition->getAllTemplates()]
-    // auth_mode: Required vis select [ilAuthUtils::_getActiveAuthModes()], 'default' (default)
+    // Language: $lng->getInstalledLanguages()
+    // auth_mode: ilAuthUtils::_getActiveAuthModes()
+    // hide_own_online_status: 'y' / 'n'
+    // setTimeLimitFrom: is time
+    // setTimeLimitUntil: is time
 
-    // array_key_exists('birthday', $userData) ? $userData['birthday'] : null
-    // $userData['hide_own_online_status'] ? 'y' : 'n'
-    // (int) $userData['session_reminder_enabled']
-    // array_key_exists('time_limit_unlimited', $userData) ? $userData['time_limit_unlimited'] : true
-    // $userObj->setTimeLimitFrom(self::GetTimeValue($userData['time_limit_from']);
-    // $userObj->setTimeLimitUntil(self::GetTimeValue($userData['time_limit_until']);
+    // !!! Add missing fields
+    // !!! Add code from code-dump
+  }
+
+
+  /**
+   *
+   */
+  protected static function GetDefaultValue($field) {
+    // show_users_online: 'y' / 'n'
+    // Send-Email Button: $ilUser->getPref('send_info_mails') == 'y'
+    // Language: $ilSetting->get("language")
+    // Skin: $ilClientIniFile->readVariable("layout","skin"). ":".$ilClientIniFile->readVariable("layout","style")
+    // HitsPerPage: $ilSetting->get("hits_per_page")
+    // User-Online: $ilSetting->get("show_users_online")
+    // time_limit_unlimited: 1
+    // hide_own_online_status: false
+    // session_reminder_enabled: true
+    // auth_mode: 'default'
+    // setTimeLimitFrom: time
+    // setTimeLimitUntil: time
+
+    // !!! Add missing fields
+  }
+
+
+  /**
+   *
+   */
+  public static function CheckUserData($userData, $mode = self::MODE_CREATE) {
+    // Set default values for (optional) missing parameters
+    if ($mode == $mode = self::MODE_CREATE) {
+    foreach (self::fields as $field)
+      if (!array_key_exists($field, $userData))
+        $userData[$field] = self::GetDefaultValue($field);
+
+    // Throw if field is required and missing
+    foreach (self::fields as $field)
+    if (self::IsMissingField($userData, $field, $mode))
+      throw new LibExceptions\Parameter(
+        self::MSG_MISSING_FIELD,
+        self::ID_MISSING_FIELD
+      );
+
+    // Check for invalid parameters (or exceeds maximum length)
+    foreach (self::fields as $field)
+      if (!self::IsValidField($userData, $field, $mode))
+        throw new LibExceptions\Parameter(
+          self::MSG_INVALID_FIELD,
+          self::ID_INVALID_FIELD,
+          array{
+            'field' => $field,
+            'value' => $userData[$field]
+          }
+        );
+    }
+
+    // Return updated user data
+    return $userData;
   }
 
 
@@ -357,8 +537,8 @@ class UserAdmin extends Libs\RESTModel {
 
     // Assign user to given roles (and deassigned missing roles)
     $assignedRoles = $rbacreview->assignedRoles($userObj->getId());
-    $dropRoles     = array_diff($assignedRoles, $userData['default_role']);
-    $addRoles      = array_diff($userData['default_role'], $assignedRoles);
+    $dropRoles     = array_diff($assignedRoles, $userData['roles']);
+    $addRoles      = array_diff($userData['roles'], $assignedRoles);
     foreach ($dropRoles as $role)
       $rbacadmin->deassignUser($role, $userObj->getId());
     foreach ($addRoles as $role)
