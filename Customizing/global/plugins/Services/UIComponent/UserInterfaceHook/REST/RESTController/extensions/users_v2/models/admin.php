@@ -102,115 +102,118 @@ class UserAdmin extends Libs\RESTModel {
     'userfile',
     'roles'
   );
-  // All values covered?
-  //
-  // Login: Required, Validate ilUtils::isLogin() & !ilObjUser::_loginExists()
-  // Passwort: Required, Max 32, Validate ilUtils::isPassword()
-  // Ext-Account: Max 250
-  // Gender: Required by select  ['f' / 'm']
-  // Vorname: Max 32, Required
-  // Nachname: Max 32, Required
-  // Title: Max 32, (Required $settings["require_title"])
-  // Email: (Required $settings["require_"...]), ilUtils::is_email()
-  // Rolle: Required via select (siehe allowedRoles)
-  // Birthdate: (Required $settings["require_"...])
-  // institution: Max 80, (Required $settings["require_"...])
-  // department: Max 80, (Required $settings["require_"...])
-  // street: Max 40, (Required $settings["require_"...])
-  // city: Max 40, (Required $settings["require_"...])
-  // zipcode: Max 10, (Required $settings["require_"...])
-  // country: Max 40, (Required $settings["require_"...])
-  // sel_country: (Required $settings["require_"...])
-  // phone_office: Max 30, (Required $settings["require_"...])
-  // phone_home: Max 30, (Required $settings["require_"...])
-  // phone_mobile: Max 30, (Required $settings["require_"...])
-  // fax: Max 30, (Required $settings["require_"...])
-  // Hobby: Max 3x40, (Required $settings["require_"...])
-  // interests_general: Max 40, (Required $settings["require_"...])
-  // interests_help_offered: Max 40, (Required $settings["require_"...])
-  // interests_help_looking: Max 40, (Required $settings["require_"...])
-  // "icq", "yahoo", "msn", "aim", "skype", "jabber", "voip" -> Max 40
-  // Matriculation: Max 40, (Required $settings["require_"...])
-  // Delicious: Max 40, (Required $settings["require_"...])
-  // Client-IP: Max 255
-  // UDF: (Required $definition['required'])
-  //  $definition['field_type'] == UDF_TYPE_TEXT: Max 255,
-  // show_users_online: Required via select ['y'/'n']
-  // Send-Email Button, Value $ilUser->getPref('send_info_mails') == 'y')
-  // Ignore-Required-Fields: 1 / 0
-  // Language: Value $ilSetting->get("language")
-  // Skin: Value $ilClientIniFile->readVariable("layout","skin"). ":".$ilClientIniFile->readVariable("layout","style"), Valid check ilObjStyleSettings::_lookupActivatedStyle($template["id"],$style["id"])
-  // HitsPerPage: Value $ilSetting->get("hits_per_page")
-  // User-Online: Value $ilSetting->get("show_users_online")
-  // time_limit_unlimited: Value 0 / 1
-  // hide_own_online_status: false (default)
-  // session_reminder_enabled: true (default)
-  // referral_comment: Max 3x40, (Required $settings["require_"...])
-  // Language: Required via select [$lng->getInstalledLanguages()]
-  // Skin/Style: Required via select [$styleDefinition->getAllTemplates()]
-  // auth_mode: Required vis select [ilAuthUtils::_getActiveAuthModes()], 'default' (default)
-
-  // array_key_exists('birthday', $userData) ? $userData['birthday'] : null
-  // $userData['hide_own_online_status'] ? 'y' : 'n'
-  // (int) $userData['session_reminder_enabled']
-  // array_key_exists('time_limit_unlimited', $userData) ? $userData['time_limit_unlimited'] : true
-  // $userObj->setTimeLimitFrom(self::GetTimeValue($userData['time_limit_from']);
-  // $userObj->setTimeLimitUntil(self::GetTimeValue($userData['time_limit_until']);
 
 
   /**
    *
    */
-  protected static function IsMissingField($userData, $field, $mode) {
-    // id: Required (edit only!)
-
-    // Login: Required,
-    // Passwort: Required
-    // Gender: Required by select (Use default)
-    // Vorname: Required
-    // Nachname: Required
-    // Title: (Required $settings["require_title"])
-    // Email: (Required $settings["require_"...])
-    // Rolle: Required via select (Use default)
-    // Birthdate: (Required $settings["require_"...])
-    // institution: (Required $settings["require_"...])
-    // department: (Required $settings["require_"...])
-    // street: (Required $settings["require_"...])
-    // city: (Required $settings["require_"...])
-    // zipcode: (Required $settings["require_"...])
-    // country: (Required $settings["require_"...])
-    // sel_country: (Required $settings["require_"...])
-    // phone_office: (Required $settings["require_"...])
-    // phone_home: (Required $settings["require_"...])
-    // phone_mobile: (Required $settings["require_"...])
-    // fax: (Required $settings["require_"...])
-    // Hobby: (Required $settings["require_"...])
-    // interests_general: (Required $settings["require_"...])
-    // interests_help_offered: (Required $settings["require_"...])
-    // interests_help_looking: (Required $settings["require_"...])
-    // Matriculation: Max 40, (Required $settings["require_"...])
-    // Delicious: Max 40, (Required $settings["require_"...])
-    // UDF: (Required $definition['required'])
-    //  $definition['field_type'] == UDF_TYPE_TEXT: Max 255,
-    // show_users_online: Required via select (Use default)
-    // hide_own_online_status: Required via select (Use default)
-    // Skin: Required by select (Use default)
-    // referral_comment: (Required $settings["require_"...])
-    // Language: Required via select (Use default)
-    // Skin/Style: Required via select (Use default)
-    // auth_mode: Required via select (Use default)
-    // time_limit_unlimited: Required via select (Use default)
-    // time_limit_from: Required via select (Use default)
-    // time_limit_until: Required via select (Use default)
-
-    // !!! Add missing fields
+  protected static function GetDefaultValue($field) {
+    // Send-Email Button: $ilUser->getPref('send_info_mails') == 'y'
+    // language: $ilSetting->get("language")
+    // skin: $ilClientIniFile->readVariable("layout","skin"). ":".$ilClientIniFile->readVariable("layout","style")
+    // style: $ilClientIniFile->readVariable("layout","skin"). ":".$ilClientIniFile->readVariable("layout","style")
+    // hits_per_page: $ilSetting->get("hits_per_page")
+    // show_users_online: $ilSetting->get("show_users_online")
+    // time_limit_unlimited: 1
+    // hide_own_online_status: false
+    // session_reminder_enabled: true
+    // auth_mode: 'default'
+    // time_limit_from: time
+    // time_limit_until: time
+    // active: 1
+    // roles: <default role>
   }
 
 
   /**
    *
    */
-  protected static function IsValidField($userData, $field, $mode) {
+  protected static function TransformField($field, $value) {
+    // Transform based on field
+    switch ($field) {
+      // Requires unix-time
+      case 'time_limit_from':
+      case 'time_limit_until':
+        return self::GetUnixTime($value);
+      // Requires date string without time value
+      case 'birthday':
+        return self::GetISODate($value);
+      // Requires int instead of boolean for some reason (Tip: Its ILIAS... -.-)
+      case 'time_limit_unlimited':
+      case 'active':
+      case 'session_reminder_enabled':
+        return intval($value);
+      // Needs to be 'm' / 'f'
+      case 'gender':
+        if (is_string($value))
+          return substr($value, 0, 1);
+        return $value;
+      // Needs to be an integer value
+      case 'id':
+      case 'hits_per_page':
+      case 'disk_quota':
+      case 'wsp_disk_quota':
+      case 'loc_zoom':
+        return intval($value);
+      // Needs to be 'y' / 'n' instead of boolean (Tip: You guessed it, because 'ILIAS' ...)
+      case 'hide_own_online_status':
+      case 'show_users_online':
+        if (is_bool($value))
+          return ($value) ? 'y' : 'n';
+        if (is_string($value))
+          return substr($value, 0, 1);
+        return $value;
+      // Needs to be numeric (float)
+      case 'latitude',
+      case 'longitude',
+        return floatval($value);
+      // Needs to be an array
+      case 'interests_general':
+      case 'interests_help_offered':
+      case 'interests_help_looking':
+      case 'roles':
+      case 'udf':
+        if (!is_array($value))
+          return array($value);
+        return $value;
+      // No transformation for any other field
+      default:
+        return $value;
+    }
+  }
+
+
+  /**
+   *
+   */
+  protected static function IsMissingField($userData, $field, $mode) {
+    /* EDIT */
+    // id: Required
+
+    /* CREATE */
+    // login: Required
+    // Passwort: Required
+    // Vorname: Required
+    // Nachname: Required
+    // Check all fields using $settings["require_"...]
+    // Check all UDF fields using $definition['required']
+    // Default values are required
+
+    /*
+    include_once './Services/User/classes/class.ilUserDefinedFields.php';
+    $this->user_defined_fields =& ilUserDefinedFields::_getInstance();
+    foreach($this->user_defined_fields->getDefinitions() as $field_id => $definition)
+      if($definition['required'] and !strlen($_POST['udf'][$field_id]))
+        return false;
+    return true;
+    */
+  }
+
+
+  /**
+   *
+   */
+  protected static function IsValidField($userData, $field) {
     // Login: ilUtils::isLogin() & !ilObjUser::_loginExists()
     // Passwort:  ilUtils::isPassword()
     // Email: ilUtils::is_email()
@@ -236,45 +239,31 @@ class UserAdmin extends Libs\RESTModel {
   /**
    *
    */
-  protected static function GetDefaultValue($field) {
-    // show_users_online: 'y' / 'n'
-    // Send-Email Button: $ilUser->getPref('send_info_mails') == 'y'
-    // Language: $ilSetting->get("language")
-    // Skin: $ilClientIniFile->readVariable("layout","skin"). ":".$ilClientIniFile->readVariable("layout","style")
-    // HitsPerPage: $ilSetting->get("hits_per_page")
-    // User-Online: $ilSetting->get("show_users_online")
-    // time_limit_unlimited: 1
-    // hide_own_online_status: false
-    // session_reminder_enabled: true
-    // auth_mode: 'default'
-    // setTimeLimitFrom: time
-    // setTimeLimitUntil: time
-
-    // !!! Add missing fields
-  }
-
-
-  /**
-   *
-   */
   public static function CheckUserData($userData, $mode = self::MODE_CREATE) {
     // Set default values for (optional) missing parameters
-    if ($mode == $mode = self::MODE_CREATE) {
-    foreach (self::fields as $field)
-      if (!array_key_exists($field, $userData))
-        $userData[$field] = self::GetDefaultValue($field);
+    if ($mode == self::MODE_CREATE)
+      foreach (self::fields as $field)
+        if (!array_key_exists($field, $userData)) {
+          $default = self::GetDefaultValue($field);
+          if (isset($default))
+            $userData[$field] = $default;
+        }
+
+    // Transform input values to be more flexible (transform time formats, string/booleans/integer as required)
+    foreach ($userData as $field => $value)
+      $userData[$field] = self::TransformField($field, $value);
 
     // Throw if field is required and missing
     foreach (self::fields as $field)
-    if (self::IsMissingField($userData, $field, $mode))
-      throw new LibExceptions\Parameter(
-        self::MSG_MISSING_FIELD,
-        self::ID_MISSING_FIELD
+      if (self::IsMissingField($userData, $field, $mode))
+        throw new LibExceptions\Parameter(
+          self::MSG_MISSING_FIELD,
+          self::ID_MISSING_FIELD
       );
 
     // Check for invalid parameters (or exceeds maximum length)
     foreach (self::fields as $field)
-      if (!self::IsValidField($userData, $field, $mode))
+      if (!self::IsValidField($userData, $field))
         throw new LibExceptions\Parameter(
           self::MSG_INVALID_FIELD,
           self::ID_INVALID_FIELD,
@@ -283,7 +272,6 @@ class UserAdmin extends Libs\RESTModel {
             'value' => $userData[$field]
           }
         );
-    }
 
     // Return updated user data
     return $userData;
@@ -345,7 +333,7 @@ class UserAdmin extends Libs\RESTModel {
         );
 
       // Load user object
-      $userObj = new ilObjUser($userData['id']);
+      $userObj = new \ilObjUser($userData['id']);
       if (self::HasUserValue($userData, 'login'))
         $userObj->updateLogin($userData['login']);
     }
@@ -482,7 +470,7 @@ class UserAdmin extends Libs\RESTModel {
     // Set password on creation or update if allowed
     if (self::HasUserValue($userData, 'passwd') && (
       $mode == self::MODE_CREATE ||
-      ilAuthUtils::_allowPasswordModificationByAuthMode(ilAuthUtils::_getAuthMode($userData['auth_mode']))
+      \ilAuthUtils::_allowPasswordModificationByAuthMode(\ilAuthUtils::_getAuthMode($userData['auth_mode']))
     ) {
       $userObj->setPasswd($userData['passwd'], IL_PASSWD_PLAIN);
       $userObj->setLastPasswordChangeTS(time());
@@ -490,14 +478,14 @@ class UserAdmin extends Libs\RESTModel {
 
     // Set attached external account if enabled
     include_once('./Services/Authentication/classes/class.ilAuthUtils.php');
-    if (self::HasUserValue($userData, 'ext_account') && ilAuthUtils::_isExternalAccountEnabled())
+    if (self::HasUserValue($userData, 'ext_account') && \ilAuthUtils::_isExternalAccountEnabled())
       $userObj->setExternalAccount($userData['ext_account']);
 
     // Set disk quotas (overall abd workspace)
     require_once 'Services/WebDAV/classes/class.ilDiskQuotaActivationChecker.php';
-    if (self::HasUserValue($userData, 'disk_quota') && ilDiskQuotaActivationChecker::_isActive())
+    if (self::HasUserValue($userData, 'disk_quota') && i\lDiskQuotaActivationChecker::_isActive())
       $userObj->setPref('disk_quota',     $userData['disk_quota']     * ilFormat::_getSizeMagnitude() * ilFormat::_getSizeMagnitude());
-    if (self::HasUserValue($userData, 'wsp_disk_quota') && ilDiskQuotaActivationChecker::_isPersonalWorkspaceActive())
+    if (self::HasUserValue($userData, 'wsp_disk_quota') && \ilDiskQuotaActivationChecker::_isPersonalWorkspaceActive())
       $userObj->setPref('wsp_disk_quota', $userData['wsp_disk_quota'] * ilFormat::_getSizeMagnitude() * ilFormat::_getSizeMagnitude());
 
     // Additional user value we could set (but don't)
@@ -512,7 +500,7 @@ class UserAdmin extends Libs\RESTModel {
 
     // Check wether profile is incomplete ()
     include_once 'Services/User/classes/class.ilUserProfile.php';
-    $userObj->setProfileIncomplete(ilUserProfile::isProfileIncomplete($userObj));
+    $userObj->setProfileIncomplete(\ilUserProfile::isProfileIncomplete($userObj));
 
     // Create and save user account data
     if ($mode == self::MODE_CREATE) {
@@ -526,7 +514,7 @@ class UserAdmin extends Libs\RESTModel {
 
     // Reset login attempts if account is active
     if ($userData['active'])
-      ilObjUser::_resetLoginAttempts($userObj->getId());
+      \ilObjUser::_resetLoginAttempts($userObj->getId());
 
     // Create profile-picture from attached based64 encoded image
     if (self::HasUserValue($userData, 'userfile') &&  self::IsChangeable($refId, $settings, 'upload')) {
@@ -548,7 +536,7 @@ class UserAdmin extends Libs\RESTModel {
     if ($userData['send_mail'] == 'y') {
       // Create new eamil object
       include_once('Services/Mail/classes/class.ilAccountMail.php');
-      $mail = new ilAccountMail();
+      $mail = new \ilAccountMail();
       $mail->useLangVariablesAsFallback(true);
       $mail->setUserPassword($userData['passwd']);
       $mail->setUser($userObj);
@@ -609,7 +597,7 @@ class UserAdmin extends Libs\RESTModel {
       chmod($tmpFile, 0664);
 
       // Check uploaded file for virus and delete + fail if one was detected
-      $scanResult = ilUtil::virusHandling($tmpFile, sprintf('Profile-Picutre [User: %s]', $userObj->getLogin()));
+      $scanResult = \ilUtil::virusHandling($tmpFile, sprintf('Profile-Picutre [User: %s]', $userObj->getLogin()));
       if (!$scanResult[0]) {
         // Delete file
         unlink($tmpFile);
@@ -628,23 +616,58 @@ class UserAdmin extends Libs\RESTModel {
   /**
    *
    */
-  protected static function GetTimeValue($data) {
-    // Return current time as fallback
-    if (!isset($data))
-      return time();
-    // Unix-time given
-    elseif (is_int($data))
+  protected static function GetUnixTime($data) {
+    // Time seems to be in unix-time
+    if (is_int($data))
       return $data;
+    // Time seems to be in unix-time (but a string)
+    elseif (ctype_digit($data))
+      return intval($data);
     // Date and time given, convert to uni-time
     elseif (array_key_exists('date', $data) && array_key_exists('time', $data)) {
-      $time = new ilDateTime(sprintf('%s %s', $data['date'], $data['time'])
+      $time = new \ilDateTime(sprintf('%s %s', $data['date'], $data['time'])
       return $time->get(IL_CAL_UNIX);
     }
-    // Unix-time given as array-key
-    elseif (array_key_exists('unix', $data))
-      return $data['unix'];
+
+    // Try to use DateTime to extract unix-time
+    if (is_string($data)) {
+      try {
+        $date = new DateTime($data);
+        if ($date)
+          return $date->getTimestamp();
+      } catch (Exception $e) { }
+    }
+
     // Absolute fallback-case (should only happen on wrong input)
-    else
-      return time();
+    return time();
   }
+
+
+  /**
+   *
+   */
+  protected static function GetISODate($data) {
+    // Time seems to be in unix-time
+    if (is_int($data))
+      return date('Y-m-d', $data);
+    // Time seems to be in unix-time (but a string)
+    elseif (ctype_digit($data))
+      return date('Y-m-d', intval($data));
+    // Time seems to be in a special format
+    elseif (is_string($data)) {
+      // String seems to contain more than date data
+      if (strlen($data) > 8) {
+        try {
+          $date = new DateTime($data);
+          if ($date)
+            return $date->format('Y-m-d');
+        // Fallback case...
+        } catch (Exception $e) {
+          return $data;
+        }
+      }
+      // String hopefully only contains the date part
+      else
+        return $data;
+    }
 }
