@@ -1,23 +1,3 @@
-// Validate: Minimal one global role!
-$global_roles_all = $rbacreview->getGlobalRoles();
-$assigned_roles_all = $rbacreview->assignedRoles($this->object->getId());
-$assigned_roles = array_intersect($assigned_roles_all,$posted_roles);
-$assigned_global_roles_all = array_intersect($assigned_roles_all,$global_roles_all);
-$assigned_global_roles = array_intersect($assigned_global_roles_all,$posted_roles);
-$posted_global_roles = array_intersect($selected_roles,$global_roles_all);
-if ((empty($selected_roles) and count($assigned_roles_all) == count($assigned_roles))
-or (empty($posted_global_roles) and count($assigned_global_roles_all) == count($assigned_global_roles))) {
-  //$this->ilias->raiseError($this->lng->txt("msg_min_one_role")."<br/>".$this->lng->txt("action_aborted"),$this->ilias->error_obj->MESSAGE);
-  // workaround. sometimes jumps back to wrong page
-  ilUtil::sendFailure($this->lng->txt("msg_min_one_role")."<br/>".$this->lng->txt("action_aborted"),true);
-  $this->ctrl->redirect($this,'roleassignment');
-}
-foreach (array_diff($assigned_roles,$selected_roles) as $role)
-  $rbacadmin->deassignUser($role,$this->object->getId());
-foreach (array_diff($selected_roles,$assigned_roles) as $role)
-  $rbacadmin->assignUser($role,$this->object->getId(),false);
-
-
 /**
  *
  */
@@ -100,25 +80,6 @@ protected static function GetAllowedRoles($refId) {
     }
   }
   */
-}
-
-
-/**
- *
- */
-protected static function GetDefaultRole($allowedRoles) {
-  // Select default role ('User'-Role if available)
-  if (in_array(self::DEFAULT_ROLE_ID, $allowedRoles))
-    return self::DEFAULT_ROLE_ID;
-  // Select role, that is not admin-role
-  elseif (count($allowedRoles) > 1 and in_array(self::SYSTEM_ROLE_ID, $allowedRoles)) {
-    for ($allowedRoles as $role)
-      if ($role != self::SYSTEM_ROLE_ID)
-        return $role;
-  }
-  // Just select some random role
-  else
-    return array_shift($systemRoleKey);
 }
 
 

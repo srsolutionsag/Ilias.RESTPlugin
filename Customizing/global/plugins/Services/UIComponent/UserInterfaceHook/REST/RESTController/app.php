@@ -296,14 +296,14 @@ class RESTController extends \Slim\Slim {
    *  fetching available routes.
    */
   protected function setCustomContainers() {
+    // Add Content-Type middleware (support for JSON/XML requests)
+    $contentType = new libs\Middleware\ContentTypes();
+    $this->add($contentType);
+
     // Attach our custom RESTRouter, RESTRequest, RESTResponse
     $this->container->singleton('router',   function ($c) { return new libs\RESTRouter(); });
     $this->container->singleton('response', function ($c) { return new libs\RESTResponse(); });
     $this->container->singleton('request',  function ($c) { return new libs\RESTRequest($this->environment()); });
-
-    // Add Content-Type middleware (support for JSON/XML requests)
-    $contentType = new libs\Middleware\ContentTypes();
-    $this->add($contentType);
   }
 
   /**

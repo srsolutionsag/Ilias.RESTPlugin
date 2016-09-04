@@ -117,7 +117,7 @@ class Admin extends Libs\RESTModel {
 
     // Update above client keys with request parameters (if parameters are given)
     foreach ($keys as $key)
-      if ($request->hasParam($key)) {
+      if ($request->hasParameter($key)) {
         // fetch parameter and update client
         $param  = $request->getParameter($key);
         $client->setKey($key, $param);

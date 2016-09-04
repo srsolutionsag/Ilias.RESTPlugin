@@ -38,7 +38,7 @@ $app->group('/v1', function () use ($app) {
   $app->put('/clients/:id', RESTAuth::checkAccess(RESTAuth::ADMIN), function ($id) use ($app) {
     $request = $app->request();
     OAuth2v2\Admin::UpdateClient($id, $request);
-    if ($request->hasParam("permissions")) {
+    if ($request->hasParameter("permissions")) {
       $permArray  = $request->getParameter(permissions);
       ClientsLegacyModel::setPermissions($id, $permArray);
     }
@@ -53,7 +53,7 @@ $app->group('/v1', function () use ($app) {
     $request = $app->request();
     $api_id  = OAuth2v2\Admin::InsertClient($request);
     if ($api_id != false) {
-        if ($request->hasParam("permissions")) {
+        if ($request->hasParameter("permissions")) {
           $permArray  = $request->getParameter(permissions);
           ClientsLegacyModel::setPermissions($api_id, $permArray);
         }

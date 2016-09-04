@@ -128,9 +128,8 @@ class RESTRequest extends \Slim\Http\Request {
    *  <String> - Value attached to the given key (looking inside header, get, url-encoded post, json-encoded post)
    */
   public function getParameter($key = null, $default = null, $throw = false) {
-    // Read parameter only once
-    if (!isset($this->parameters))
-      $this->parameters = $this->readParameters();
+    // Read parameter
+    $this->parameters = $this->readParameters();
 
     // CHeck of key is requested
     if (isset($key)) {
@@ -193,7 +192,7 @@ class RESTRequest extends \Slim\Http\Request {
         if (substr($name, 0, 5) == 'HTTP_')
           $headers[str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', substr($name, 5)))))] = $value;
 
-       return $headers;
+     return $headers;
     }
   }
 
@@ -381,7 +380,7 @@ class RESTRequest extends \Slim\Http\Request {
     $client = $token->getClient();
 
     // Fetch client ip and check restriction
-    $remoteIp  = $this->getIp();
+    $remoteIp  = $_SERVER['REMOTE_ADDR'];
     if (!$client->isIpAllowed($remoteIp))
       throw new Exceptions\Denied(
         Auth\Common::MSG_RESTRICTED_IP,

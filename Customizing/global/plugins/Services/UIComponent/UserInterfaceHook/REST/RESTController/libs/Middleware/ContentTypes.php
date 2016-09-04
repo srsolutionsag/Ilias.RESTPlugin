@@ -27,6 +27,7 @@ class ContentTypes extends \Slim\Middleware {
     // Fetch request content-type from headers...
     $mediaType = $this->app->request()->getMediaType();
     if ($mediaType) {
+
       // Store original request and try to convert request to an array
       $env = $this->app->environment();
       $env['slim.input_original'] = $env['slim.input'];
