@@ -28,6 +28,10 @@ class AdminModel extends Libs\RESTModel {
   const ID_USER_PICTURE_EMPTY   = 'RESTController\\extensions\\users_v2\\Admin::ID_USER_PICTURE_EMPTY';
   const MSG_INVALID_MODE        = 'Invalid mode, must either be \'create\' or \'update\'.';
   const ID_INVALID_MODE         = 'RESTController\\extensions\\users_v2\\Admin::ID_INVALID_MODE';
+  const MSG_INVALID_FIELD       = 'Given user-data contains an invalid field: {{field}}';
+  const ID_INVALID_FIELD        = 'RESTController\\extensions\\users_v2\\Admin::ID_INVALID_FIELD';
+  const MSG_MISSING_FIELD       = 'Given user-data is missing a required field: {{field}}';
+  const ID_MISSING_FIELD        = 'RESTController\\extensions\\users_v2\\Admin::ID_MISSING_FIELD';
 
 
   //
@@ -109,7 +113,7 @@ class AdminModel extends Libs\RESTModel {
    */
   protected static function GetDefaultValue($field) {
     // Fetch reference to ILIAS objects
-    global $ilUser, $settings, $ilClientIniFile;
+    global $ilUser, $ilSetting, $ilClientIniFile;
 
     // Return default value based on field
     switch ($field) {
@@ -121,7 +125,7 @@ class AdminModel extends Libs\RESTModel {
         return $ilSetting->get('language');
       // Set default skin
       case 'skin_style':
-        return sprintf('%s:%s', $ilClientIniFile->readVariable('layout', 'skin'), return $ilClientIniFile->readVariable('layout', 'style'));
+        return sprintf('%s:%s', $ilClientIniFile->readVariable('layout', 'skin'), $ilClientIniFile->readVariable('layout', 'style'));
       // The default time-limit (from)
       case 'time_limit_from':
         return time();
@@ -227,11 +231,10 @@ class AdminModel extends Libs\RESTModel {
    *
    */
   protected static function IsMissingField($field, $value, $mode) {
-    // Include required classes
-    include_once('./Services/User/classes/class.ilUserDefinedFields.php');
 
     // Check required fields for edit mode
-    if ($mode == self::MODE_CREATE ) {
+    if ($mode == self::MODE_UPDATE) {
+      // Check based on field
       switch ($field) {
         // User-ID is required
         case 'id':
@@ -243,8 +246,18 @@ class AdminModel extends Libs\RESTModel {
     }
 
     // Check required fields for new user mode
-    elseif ($mode == self::MODE_UPDATE) {
+    elseif ($mode == self::MODE_CREATE) {
+      // Include required classes
+      include_once('./Services/User/classes/class.ilUserDefinedFields.php');
+
+      // Load ILIAS objects
+      global $ilSetting;
+
+      // Check based on field
       switch ($field) {
+        // ID is created
+        case 'id':
+          return false;
         // This settings are always required
         case 'login':
         case 'passwd':
@@ -257,8 +270,8 @@ class AdminModel extends Libs\RESTModel {
           $definitions = $instance->getDefinitions();
           foreach ($definitions as $defField => $definition)
             if ($definition['required'] && !array_key_exists($defField, $value))
-              return false;
-          return true;
+              return true;
+          return false;
         // Check all other values against ILIAS settings
         default:
           // Fetch ILIAS settings for checking requirement
@@ -266,7 +279,7 @@ class AdminModel extends Libs\RESTModel {
 
           // Check if missing and set to required
           $reqField = sprintf('require_%s', $field);
-          return !(isset($value) || array_key_exists($reqField, $settings) && $settings[$reqField]);
+          return !isset($value) && array_key_exists($reqField, $settings) && $settings[$reqField] == 1;
       }
     }
   }
@@ -313,7 +326,7 @@ class AdminModel extends Libs\RESTModel {
         return \ilStyleDefinition::styleExists($skin, $style) && \ilObjStyleSettings::_lookupActivatedStyle($skin, $style);
       // Validate authentication mode
       case 'auth_mode':
-        $modes = \ilAuthUtils::_getActiveAuthModes()
+        $modes = \ilAuthUtils::_getActiveAuthModes();
         return $modes[$value] == 1;
       // Validate list of roles
       case 'roles':
@@ -377,7 +390,7 @@ class AdminModel extends Libs\RESTModel {
       case 'longitude':
         return is_float($value);
       // Validate array values
-      case 'udf'
+      case 'udf':
         return is_array($value);
       // Validate gender values
       case 'gender':
@@ -416,16 +429,20 @@ class AdminModel extends Libs\RESTModel {
       $userData[$field] = self::TransformField($field, $value);
 
     // Check all fields
-    foreach (self::fields as $field) {
+    foreach (self::fields as $field)
       // Throw if field is required and missing
-      if (self::IsMissingField($field, $mode))
+      if (self::IsMissingField($field,$userData[$field], $mode))
         throw new LibExceptions\Parameter(
           self::MSG_MISSING_FIELD,
-          self::ID_MISSING_FIELD
+          self::ID_MISSING_FIELD,
+          array(
+            'field' => $field
+          )
         );
 
+    foreach ($userData as $field => $value)
       // Check for invalid parameters
-      if (!self::IsValidField($field, $userData[$field], $refId))
+      if (!self::IsValidField($field, $value, $mode, $refId))
         throw new LibExceptions\Parameter(
           self::MSG_INVALID_FIELD,
           self::ID_INVALID_FIELD,
@@ -434,7 +451,6 @@ class AdminModel extends Libs\RESTModel {
             'value' => $userData[$field]
           )
         );
-    }
 
     // Return updated user data
     return $userData;
@@ -454,7 +470,7 @@ class AdminModel extends Libs\RESTModel {
    */
   public static function StoreUserData($userData, $mode = self::MODE_CREATE, $refId = self::USER_FOLDER_ID) {
     // Import ILIAS systems (all praise the glorious 'DI-System')
-    global $rbacsystem, $ilSetting, $ilUser;
+    global $rbacsystem, $rbacadmin, $rbacreview, $ilSetting, $ilUser;
 
     // Make sure mode is correct
     if ($mode != self::MODE_CREATE && $mode != self::MODE_UPDATE)
@@ -476,7 +492,7 @@ class AdminModel extends Libs\RESTModel {
         );
 
       // Create new user object
-      $userObj = new ilObjUser();
+      $userObj = new \ilObjUser();
       $userObj->setLogin($userData['login']);
     }
     // Check rights to edit user
@@ -500,6 +516,8 @@ class AdminModel extends Libs\RESTModel {
       if (self::HasUserValue($userData, 'login'))
         $userObj->updateLogin($userData['login']);
     }
+
+    // Alternative: $userObj->assignData($userData);
 
     // Update time-limit owner (since ref-id is always required)
     $userObj->setTimeLimitOwner($refId);
@@ -853,6 +871,8 @@ class AdminModel extends Libs\RESTModel {
    *   $rbacreview->getAssignableRolesInSubtree($refId);
    */
   protected static function ValidateRoles($roles, $refId) {
+    global $rbacreview;
+
     // Fetch list of assignable roles
     $local  = $rbacreview->getRolesOfRoleFolder($refId);
     $global = $rbacreview->getGlobalRoles();

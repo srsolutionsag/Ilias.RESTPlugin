@@ -16,49 +16,6 @@ use \RESTController\libs\RESTAuth as RESTAuth;
 
 // Group implemented routes into common group
 $app->group('/v2/users', function () use ($app) {
-  $app->get('/test', RESTAuth::checkAccess(RESTAuth::PERMISSION), function () use ($app) {
-    include_once './Services/AccessControl/classes/class.ilObjRole.php';
-
-
-    // Initialize RBAC (user is fetched from access-token)
-    Libs\RESTilias::loadIlUser();
-    global $ilUser, $ilSetting, $ilAccess, $rbacsystem, $rbacadmin, $rbacreview, $lng;
-
-    // var_dump(AdminModel::ValidateRoles(7, array(56)));
-    //var_dump(AdminModel::GetAllowedRoles(61));
-
-    //var_dump($rbacreview->getAssignableRolesInSubtree(61));
-    //var_dump($rbacreview->getAssignableRoles());
-
-    $refId       = 7;
-
-    $local  = $rbacreview->getRolesOfRoleFolder($refId);
-    $global = $rbacreview->getGlobalRoles();
-    if ($refId != USER_FOLDER_ID)
-      $global = array_filter($global, function($role) {
-        return \ilObjRole::_getAssignUsersStatus($role);
-      });
-    $assignable = array_merge($local, $global);
-    $assignable = array_map('intval', $assignable);
-
-
-    //
-    //var_dump($assignable);
-    //var_dump($assignable);
-    //var_dump($rbacreview->getAssignableRolesInSubtree(61));
-    include_once('./Services/Authentication/classes/class.ilAuthUtils.php');
-    var_dump(\ilAuthUtils::_getActiveAuthModes());
-
-    //var_dump($rbacreview->getGlobalAssignableRoles());
-
-    //var_dump($rbacreview->getUserPermissionsOnObject($ilUser->getId(), 61));
-
-
-
-    die;
-  });
-
-
   /**
    *
    */
@@ -77,24 +34,29 @@ $app->group('/v2/users', function () use ($app) {
     // Catch and handle exceptions if possible
     try {
       // Fetch input parameters
-      $request      = $app->request;
-      $refId        = $request->getParameter('ref_id', USER_FOLDER_ID);
-      $token        = $request>getToken();
-      $adminUserId  = $token->getUserId();
+      $request  = $app->request;
+      $refId    = $request->getParameter('ref_id', AdminModel::USER_FOLDER_ID);
+      $userData = array();
+      foreach (AdminModel::fields as $field) {
+        $value = $request->getParameter($field);
+        if (isset($value))
+          $userData[$field] = $value;
+      }
 
       // Initialize RBAC (user is fetched from access-token)
       Libs\RESTilias::loadIlUser();
-      global $ilUser, $ilSetting, $ilAccess, $rbacsystem, $rbacadmin, $rbacreview;
+      Libs\RESTilias::initAccessHandling();
 
-      //
-      $result = UserAdmin::CreateUser($adminUserId, $refId);
+      // Check input, create/update user and assign roles
+      $cleanUserData = AdminModel::CheckUserData($userData, AdminModel::MODE_CREATE, $refId);
+      $result        = AdminModel::StoreUserData($cleanUserData, AdminModel::MODE_CREATE, $refId);
 
-      //
-      $app->success('Implementing...');
+      // Return updated user data
+      $app->success($cleanUserData);
     }
-    // Catch missing input parameters
-    catch (Libs\Exceptions\MissingParameter $e) {
-      $app->halt(400, $e->getFormatedMessage(), $e->getRESTCode());
+    // Catch any exception
+    catch (Libs\LibException $e) {
+      $app->halt(500, $e->getFormatedMessage(), $e->getRESTCode());
     }
   });
 

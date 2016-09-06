@@ -137,10 +137,16 @@ class RESTException extends \Exception {
    */
   public function responseObject() {
     // Return formated response-object
+    if (count($this->restData) > 0)
+      return array(
+        'message' => $this->getRESTMessage(),
+        'status'  => $this->getRESTCode(),
+        'data'    => $this->getRESTData()
+      );
+    else
     return array(
       'message' => $this->getRESTMessage(),
-      'status'  => $this->getRESTCode(),
-      'data'    => $this->getRESTData()
+      'status'  => $this->getRESTCode()
     );
   }
 

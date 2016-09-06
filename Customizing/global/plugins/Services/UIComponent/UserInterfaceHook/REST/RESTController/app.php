@@ -478,6 +478,7 @@ class RESTController extends \Slim\Slim {
         // Output formated error via echo
         header('content-type: application/json');
         echo json_encode($this->parseError($error));
+        // Todo: Add support for XML
       }
     });
   }

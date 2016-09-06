@@ -8,7 +8,8 @@
 namespace RESTController\libs\Middleware;
 
 // This allows us to use shortcuts instead of full quantifier
-use \RESTController\libs as Libs;
+use \RESTController\libs            as Libs;
+use \RESTController\libs\Exceptions as LibExceptions;
 
 
 /**
@@ -18,24 +19,35 @@ use \RESTController\libs as Libs;
  *  and XML content...
  */
 class ContentTypes extends \Slim\Middleware {
+  // Allow to re-use status messages and codes
+  const MSG_DECODE_ERROR = 'There was an error when trying to decode request parameters with Content-Type {{contentype}}.';
+  const ID_DECODE_ERROR  = 'RESTController\\libs\\Middleware\\ContentTypes::ID_DECODE_ERROR';
+
+
   /**
    * Function: call()
    *  When used as middleware this function will be called once
    *  the middleware is executed.
    */
   public function call() {
-    // Fetch request content-type from headers...
-    $mediaType = $this->app->request()->getMediaType();
-    if ($mediaType) {
+    try {
+      // Fetch request content-type from headers...
+      $mediaType = $this->app->request()->getMediaType();
+      if ($mediaType) {
+        // Store original request and try to convert request to an array
+        $env = $this->app->environment();
+        $env['slim.input_original'] = $env['slim.input'];
+        $env['slim.input']          = $this->parse($env['slim.input'], $mediaType);
+      }
 
-      // Store original request and try to convert request to an array
-      $env = $this->app->environment();
-      $env['slim.input_original'] = $env['slim.input'];
-      $env['slim.input']          = $this->parse($env['slim.input'], $mediaType);
+      // Invoke next middleware
+      $this->next->call();
     }
-
-    // Invoke next middleware
-    $this->next->call();
+    catch (\Exception $e) {
+      $response = $this->app->response();
+      $response->setStatus(422);
+      $response->setBody($e->responseObject());
+    }
   }
 
 
@@ -85,9 +97,20 @@ class ContentTypes extends \Slim\Middleware {
    */
   protected function parseJSON($input) {
     if (function_exists('json_decode')) {
-      $result = json_decode($input, true);
-      if (json_last_error() === JSON_ERROR_NONE)
+      $result     = json_decode($input, true);
+      $errorCode  = json_last_error();
+      if ($errorCode === JSON_ERROR_NONE)
         return $result;
+      else
+        throw new LibExceptions\Parameter(
+          self::MSG_DECODE_ERROR,
+          self::ID_DECODE_ERROR,
+          array(
+            code       => $errorCode,
+            message    => json_last_error_msg(),
+            contentype => $this->app->request()->getMediaType()
+          )
+        );
     }
   }
 
@@ -105,7 +128,34 @@ class ContentTypes extends \Slim\Middleware {
    */
   protected function parseXML($input) {
     if (function_exists('simplexml_load_string')) {
-      return Libs\RESTLib::XML2Array($result);
+      try {
+        set_error_handler(array($this, 'HandleXmlError'));
+        $array = Libs\RESTLib::XML2Array($result);
+        restore_error_handler();
+        return $array;
+      }
+      // Catch and transform any exception generated while decoding the XML
+      catch (\Exceptions $e) {
+        throw new LibExceptions\Parameter(
+          self::MSG_DECODE_ERROR,
+          self::ID_DECODE_ERROR,
+          array(
+            message    => $e->getMessage(),
+            contentype => $this->app->request()->getMediaType()
+          )
+        );
+      }
     }
   }
+
+
+  /**
+   *
+   */
+  function HandleXmlError($errno, $errstr, $errfile, $errline) {
+    if ($errno == E_WARNING && substr_count($errstr, "DOMDocument::loadXML()") > 0)
+      throw new DOMException($errstr);
+    else
+      return false;
+ }
 }
