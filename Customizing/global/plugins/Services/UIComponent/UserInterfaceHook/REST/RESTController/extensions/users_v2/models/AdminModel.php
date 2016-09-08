@@ -230,7 +230,7 @@ class AdminModel extends Libs\RESTModel {
   /**
    *
    */
-  protected static function IsMissingField($field, $value, $mode) {
+  protected static function IsMissingField($field, $value, $mode, $refId) {
 
     // Check required fields for edit mode
     if ($mode == self::MODE_UPDATE) {
@@ -267,7 +267,7 @@ class AdminModel extends Libs\RESTModel {
         // Check User-Defined-Values against ILIAS settings
         case 'udf':
           $instance    = \ilUserDefinedFields::_getInstance();
-          $definitions = $instance->getDefinitions();
+          $definitions = ($refId == self::USER_FOLDER_ID) ? $instance->getDefinitions() : $instance->getChangeableLocalUserAdministrationDefinitions();
           foreach ($definitions as $defField => $definition)
             if ($definition['required'] && !array_key_exists($defField, $value))
               return true;
@@ -296,6 +296,7 @@ class AdminModel extends Libs\RESTModel {
     include_once('./Services/Style/classes/class.ilObjStyleSettings.php');
     include_once('./Services/Style/classes/class.ilStyleDefinition.php');
     include_once('./Services/Authentication/classes/class.ilAuthUtils.php');
+    include_once('./Services/User/classes/class.ilUserDefinedFields.php');
 
     //
     switch ($field) {
@@ -361,6 +362,7 @@ class AdminModel extends Libs\RESTModel {
       case 'street':
       case 'city':
       case 'country':
+      // TODO: Check sel_country via ilCountry::getCountryCodes()
       case 'sel_country':
       case 'phone_office':
       case 'phone_home':
@@ -391,6 +393,15 @@ class AdminModel extends Libs\RESTModel {
         return is_float($value);
       // Validate array values
       case 'udf':
+        // Fetch valid definitions
+        $instance    = \ilUserDefinedFields::_getInstance();
+        $definitions = ($refId == self::USER_FOLDER_ID) ? $instance->getDefinitions() : $instance->getChangeableLocalUserAdministrationDefinitions();
+
+        // Check for excess definitions
+        foreach ($value as $defField => $defValue)
+          if (!array_key_exists($defField, $definitions))
+            return false;
+
         return is_array($value);
       // Validate gender values
       case 'gender':
@@ -431,7 +442,7 @@ class AdminModel extends Libs\RESTModel {
     // Check all fields
     foreach (self::fields as $field)
       // Throw if field is required and missing
-      if (self::IsMissingField($field,$userData[$field], $mode))
+      if (self::IsMissingField($field,$userData[$field], $mode, $refId))
         throw new LibExceptions\Parameter(
           self::MSG_MISSING_FIELD,
           self::ID_MISSING_FIELD,
@@ -458,6 +469,167 @@ class AdminModel extends Libs\RESTModel {
 
 
   /**
+   *
+   */
+  public static function FetchUserData($userId, $refId = self::USER_FOLDER_ID) {
+    // Include required classes (who needs an AutoLoader/DI-System anyway?! -.-)
+    include_once('./Services/Authentication/classes/class.ilAuthUtils.php');
+
+    // Import ILIAS systems (all praise the glorious 'DI-System')
+    global $rbacsystem, $rbacadmin, $rbacreview, $ilSetting, $ilUser;
+
+    // Load user object
+    $userObj = new \ilObjUser($userId);
+
+    // Check for local administration access-rights (Note: getTimeLimitOwner() should be $refId for new users)
+    if ($refId != USER_FOLDER_ID && !$rbacsystem->checkAccess('cat_administrate_users', $userObj->getTimeLimitOwner()))
+      throw new LibExceptions\RBAC(
+        self::MSG_RBAC_CREATE_DENIED,
+        self::ID_RBAC_CREATE_DENIED
+      );
+
+    // Check for Admin-GUI access-rights to users
+    if ($refId == USER_FOLDER_ID && !$rbacsystem->checkAccess('visible,read', $refId))
+      throw new LibExceptions\RBAC(
+        self::MSG_RBAC_READ_DENIED,
+        self::ID_RBAC_READ_DENIED
+      );
+
+    // Magnitude of byte units (1024)
+    $magnitude = \ilFormat::_getSizeMagnitude();
+
+    // TODO: Return time as ISO 6801 format, use ilFormat::formatDate($this->object->getCreateDate(),'datetime',true);
+
+    // Collect user-data
+    $userData                             = array();
+    $userData['id']                       = $userId;
+    $userData['roles']                    = $rbacreview->assignedRoles($userId);
+    $userData['login']                    = $userObj->getLogin();
+    $userData['time_limit_owner']         = $userObj->getTimeLimitOwner();
+    $userData['owner']                    = $userObj->getOwner();
+    $userData['owner_login']              = \ilObjUser::_lookupLogin($userData['owner']);
+    $userData['auth_mode']                = $userObj->getAuthMode();
+    $userData['client_ip']                = $userObj->getClientIP();
+    $userData['active']                   = $userObj->getActive();
+    $userData['time_limit_from']          = $userObj->getTimeLimitFrom();
+    $userData['time_limit_until']         = $userObj->getTimeLimitUntil();
+    $userData['time_limit_unlimited']     = $userObj->getTimeLimitUnlimited();
+    $userData['interests_general']        = $userObj->getGeneralInterests();
+    $userData['interests_help_offered']   = $userObj->getOfferingHelp();
+    $userData['interests_help_looking']   = $userObj->getLookingForHelp();
+    $userData['latitude']                 = $userObj->getLatitude();
+    $userData['longitude']                = $userObj->getLongitude();
+    $userData['loc_zoom']                 = $userObj->getLocationZoom();
+    $userData['udf']                      = $userObj->getUserDefinedData();
+    $userData['ext_account']              = $userObj->getExternalAccount();
+    $userData['time_zone']                = $userObj->getTimeZone();
+    $userData['time_format']              = $userObj->getTimeFormat();
+    $userData['date_format']              = $userObj->getDateFormat();
+    $userData['user_agreement_accepted']  = $userObj->hasAcceptedUserAgreement();
+    $userData['last_update']              = $userObj->getLastUpdate();
+    $userData['login_attemps']            = $userObj->getLoginAttempts();
+    $userData['passwd_change_demanded']   = $userObj->isPasswordChangeDemanded();
+    $userData['passwd_expired']           = $userObj->isPasswordExpired();
+    $userData['passwd_enc_type']          = $userObj->getPasswordEncodingType();
+    $userData['passwd_timestamp']         = $userObj->getLastPasswordChangeTS();
+    $userData['agree_date']               = $userObj->getAgreeDate();
+    $userData["create_date"]              = $userObj->getCreateDate();
+    $userData['last_login']               = $userObj->getLastLogin();
+    $userData['approve_date']             = $userObj->getApproveDate();
+    $userData['time_limit_message']       = $userObj->getTimeLimitMessage();
+    $userData['profile_incomplete']       = $userObj->getProfileIncomplete();
+    $userData['disk_quota']               = $userObj->getPref('disk_quota')     / $magnitude / $magnitude;
+    $userData['wsp_disk_quota']           = $userObj->getPref('wsp_disk_quota') / $magnitude / $magnitude;
+    $userData['session_reminder_enabled'] = $userObj->getPref('session_reminder_enabled');
+    if (self::IsChangeable('language', $refId))
+      $userData['language']               = $userObj->getLanguage();
+    if (self::IsChangeable('birthday', $refId))
+      $userData['birthday']               = $userObj->getBirthday();
+		if (self::IsChangeable('gender', $refId))
+			$userData['gender']                 = $userObj->getGender();
+    if (self::IsChangeable('institution', $refId))
+			$userData['institution']            = $userObj->getInstitution();
+		if (self::IsChangeable('department', $refId))
+			$userData['department']             = $userObj->getDepartment();
+		if (self::IsChangeable('street', $refId))
+			$userData['street']                 = $userObj->getStreet();
+		if (self::IsChangeable('city', $refId))
+			$userData['city']                   = $userObj->getCity();
+		if (self::IsChangeable('zipcode', $refId))
+			$userData['zipcode']                = $userObj->getZipcode();
+		if (self::IsChangeable('country', $refId))
+			$userData['country']                = $userObj->getCountry();
+		if (self::IsChangeable('sel_country', $refId))
+			$userData['sel_country']            = $userObj->getSelectedCountry();
+		if (self::IsChangeable('phone_office', $refId))
+			$userData['phone_office']           = $userObj->getPhoneOffice();
+		if (self::IsChangeable('phone_home', $refId))
+			$userData['phone_home']             = $userObj->getPhoneHome();
+		if (self::IsChangeable('phone_mobile', $refId))
+			$userData['phone_mobile']           = $userObj->getPhoneMobile();
+		if (self::IsChangeable('fax', $refId))
+			$userData['fax']                    = $userObj->getFax();
+		if (self::IsChangeable('matriculation', $refId))
+			$userData['matriculation']          = $userObj->getMatriculation();
+		if (self::IsChangeable('hobby', $refId))
+			$userData['hobby']                  = $userObj->getHobby();
+		if (self::IsChangeable('referral_comment', $refId))
+			$userData['referral_comment']       = $userObj->getComment();
+    if (self::IsChangeable('delicious', $refId))
+      $userData['delicious']              = $userObj->getDelicious();
+    if (self::IsChangeable('hits_per_page', $refId))
+      $userData['hits_per_page']          = $userObj->getPref('hits_per_page');
+    if (self::IsChangeable('show_users_online', $refId))
+      $userData['show_users_online']      = $userObj->getPref('show_users_online');
+    if (self::IsChangeable('hide_own_online_status', $refId))
+      $userData['hide_own_online_status'] = $userObj->getPref('hide_own_online_status');
+		if (self::IsChangeable('email', $refId))
+			$userData['email']                  = $userObj->getEmail();
+    if (self::IsChangeable('skin_style', $refId))
+      $userData['fullname']               = sprintf('%s:%s', $userObj->setPref('skin',  $skin), $userObj->setPref('style', $style));
+    if (self::IsChangeable('instant_messengers', $refId)) {
+      $userData['im_icq']                 = $userObj->getInstantMessengerId('icq');
+      $userData['im_yahoo']               = $userObj->getInstantMessengerId('yahoo');
+      $userData['im_msn']                 = $userObj->getInstantMessengerId('msn');
+      $userData['im_aim']                 = $userObj->getInstantMessengerId('aim');
+      $userData['im_skype']               = $userObj->getInstantMessengerId('skype');
+      $userData['im_jabber']              = $userObj->getInstantMessengerId('jabber');
+      $userData['im_voip']                = $userObj->getInstantMessengerId('voip');
+    }
+    if (self::IsChangeable('title', $refId)) {
+      $userData['title']                  = $userObj->getUTitle();
+      $userData['fullname']               = $userObj->getFullname();
+    }
+    if (self::IsChangeable('firstname', $refId)) {
+      $userData['firstname']              = $userObj->getFirstname();
+      $userData['fullname']               = $userObj->getFullname();
+    }
+    if (self::IsChangeable('lastname', $refId)) {
+      $userData['lastname']               = $userObj->getLastname();
+      $userData['fullname']               = $userObj->getFullname();
+    }
+    if (!$userObj->getActive())
+      $userData['inactivation_date']      = $userObj->getInactivationDate();
+
+    // Convert profile-picture to base64 encoded data
+    if (self::IsChangeable('upload', $refId)) {
+      $picturePath = $userObj->getPersonalPicturePath();
+      if (is_string($picturePath)) {
+        $type = pathinfo($picturePath, PATHINFO_EXTENSION);
+        $data = file_get_contents($picturePath);
+        if (is_string($type) && is_string($data) && strlen($data) > 0)
+          $userData['upload'] = sprintf('data:image/%s;base64,%s', $type, base64_encode($data));
+      }
+    }
+
+    // TODO: Values are returned unformated, convert 0/1/y/n to true/false, and numeric to int/float (depending on field) [reuse Transform method?]
+
+    // Return collected user-data
+    return $userData;
+  }
+
+
+  /**
    * Note 1:
    *  refID is either self::USER_FOLDER_ID, which in the context of ILIAS means the Admin-GUI
    *  or the Reference-ID of a categorie or organisational-unit for local administration.
@@ -469,6 +641,11 @@ class AdminModel extends Libs\RESTModel {
    *  This method does not do any input validation, this is the responisbility of functions like self::CheckUserData().
    */
   public static function StoreUserData($userData, $mode = self::MODE_CREATE, $refId = self::USER_FOLDER_ID) {
+    // Include required classes (who needs an AutoLoader/DI-System anyway?! -.-)
+    include_once('./Services/Authentication/classes/class.ilAuthUtils.php');
+    include_once('Services/User/classes/class.ilUserProfile.php');
+    include_once('Services/Mail/classes/class.ilAccountMail.php');
+
     // Import ILIAS systems (all praise the glorious 'DI-System')
     global $rbacsystem, $rbacadmin, $rbacreview, $ilSetting, $ilUser;
 
@@ -497,6 +674,9 @@ class AdminModel extends Libs\RESTModel {
     }
     // Check rights to edit user
     else {
+      // Load user object
+      $userObj = new \ilObjUser($userData['id']);
+
       // Check for local administration access-rights (Note: getTimeLimitOwner() should be $refId for new users)
       if ($refId != USER_FOLDER_ID && !$rbacsystem->checkAccess('cat_administrate_users', $userObj->getTimeLimitOwner()))
         throw new LibExceptions\RBAC(
@@ -511,13 +691,10 @@ class AdminModel extends Libs\RESTModel {
           self::ID_RBAC_READ_DENIED
         );
 
-      // Load user object
-      $userObj = new \ilObjUser($userData['id']);
+      // Update login of existing account
       if (self::HasUserValue($userData, 'login'))
         $userObj->updateLogin($userData['login']);
     }
-
-    // Alternative: $userObj->assignData($userData);
 
     // Update time-limit owner (since ref-id is always required)
     $userObj->setTimeLimitOwner($refId);
@@ -650,25 +827,24 @@ class AdminModel extends Libs\RESTModel {
       $userObj->setPref('session_reminder_enabled', $userData['session_reminder_enabled']);
 
     // Set password on creation or update if allowed
-    if (self::HasUserValue($userData, 'passwd') && (
-      $mode == self::MODE_CREATE ||
-      \ilAuthUtils::_allowPasswordModificationByAuthMode(\ilAuthUtils::_getAuthMode($userData['auth_mode']))
-    )) {
+    $userAuthMode    = $userObj->getAuthMode();
+    $userAuthModeID  = \ilAuthUtils::_getAuthMode($userAuthMode);
+    $pwChangeAllowed = \ilAuthUtils::_allowPasswordModificationByAuthMode($userAuthModeID);
+    if (self::HasUserValue($userData, 'passwd') && ($mode == self::MODE_CREATE || $pwChangeAllowed)) {
       $userObj->setPasswd($userData['passwd'], IL_PASSWD_PLAIN);
       $userObj->setLastPasswordChangeTS(time());
     }
 
     // Set attached external account if enabled
-    include_once('./Services/Authentication/classes/class.ilAuthUtils.php');
     if (self::HasUserValue($userData, 'ext_account') && \ilAuthUtils::_isExternalAccountEnabled())
       $userObj->setExternalAccount($userData['ext_account']);
 
     // Set disk quotas (overall abd workspace)
     require_once 'Services/WebDAV/classes/class.ilDiskQuotaActivationChecker.php';
-    if (self::HasUserValue($userData, 'disk_quota') && i\lDiskQuotaActivationChecker::_isActive())
-      $userObj->setPref('disk_quota',     $userData['disk_quota']     * ilFormat::_getSizeMagnitude() * ilFormat::_getSizeMagnitude());
+    if (self::HasUserValue($userData, 'disk_quota')     && \lDiskQuotaActivationChecker::_isActive())
+      $userObj->setPref('disk_quota',     $userData['disk_quota']     * \ilFormat::_getSizeMagnitude() * \ilFormat::_getSizeMagnitude());
     if (self::HasUserValue($userData, 'wsp_disk_quota') && \ilDiskQuotaActivationChecker::_isPersonalWorkspaceActive())
-      $userObj->setPref('wsp_disk_quota', $userData['wsp_disk_quota'] * ilFormat::_getSizeMagnitude() * ilFormat::_getSizeMagnitude());
+      $userObj->setPref('wsp_disk_quota', $userData['wsp_disk_quota'] * \ilFormat::_getSizeMagnitude() * \ilFormat::_getSizeMagnitude());
 
     // Additional user value we could set (but don't)
     // $userObj->setAgreeDate($userData['agree_date']);
@@ -681,7 +857,6 @@ class AdminModel extends Libs\RESTModel {
     //   $userObj->setLastPasswordChangeToNow();
 
     // Check wether profile is incomplete ()
-    include_once 'Services/User/classes/class.ilUserProfile.php';
     $userObj->setProfileIncomplete(\ilUserProfile::isProfileIncomplete($userObj));
 
     // Create and save user account data
@@ -694,7 +869,7 @@ class AdminModel extends Libs\RESTModel {
     else
       $this->object->update();
 
-    // Reset login attempts if account is active
+    // Reset login attempts if account state might have changed
     if ($userData['active'])
       \ilObjUser::_resetLoginAttempts($userObj->getId());
 
@@ -715,9 +890,8 @@ class AdminModel extends Libs\RESTModel {
       $rbacadmin->assignUser($role, $userObj->getId());
 
     // Send email?
-    if ($userData['send_mail'] == 'y') {
+    if ($mode == self::MODE_CREATE && $userData['send_mail'] == 'y') {
       // Create new eamil object
-      include_once('Services/Mail/classes/class.ilAccountMail.php');
       $mail = new \ilAccountMail();
       $mail->useLangVariablesAsFallback(true);
       $mail->setUserPassword($userData['passwd']);
@@ -771,7 +945,8 @@ class AdminModel extends Libs\RESTModel {
     // Create user pciture files (profile-pricutre and thumbnails)
     else {
       // Extract base64 encoded image data
-      $encodedData = preg_replace('#^data:image/\w+;base64,#i', '', $imgData);
+      // TODO: Allow general image formats ('#^data:image/\w+;base64,#i')
+      $encodedData = preg_replace('#^data:image/jpeg;base64,#i', '', $imgData);
       if (!isset($encodedData) || strlen($encodedData) == 0 || strcmp($imgData, $encodedData) == 0)
         throw new LibExceptions\Parameter(
           self::MSG_USER_PICTURE_EMPTY,
@@ -796,7 +971,7 @@ class AdminModel extends Libs\RESTModel {
 
       // Generate tumbnails, write and update prefs
       $userObj->_uploadPersonalPicture($tmpFile, $userObj->getId());
-      $userObj->setPref('profile_image', sprintf('usr_%d.jpg', $userObj->getId()));
+      $userObj->setPref('profile_image', sprintf('usr_%d.jpeg', $userObj->getId()));
     }
   }
 

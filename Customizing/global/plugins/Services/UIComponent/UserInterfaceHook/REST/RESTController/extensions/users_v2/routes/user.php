@@ -14,53 +14,40 @@ use \RESTController\libs\RESTAuth as RESTAuth;
 
 
 // Group implemented routes into common group
+//  This routes are more common-user focused rather than administative
 $app->group('/v2/users', function () use ($app) {
-  $app->post('/test', function () use ($app) {
-    // $request  = $app->request();
-    // $app->success($request->getParameter());
-    $app->success('Testing...');
-  });
-
   /**
-   *
+   * Todo: Implement route to list all available user accounts, keep returned user-data fields to a minimum though!
    */
   $app->get('/list', RESTAuth::checkAccess(RESTAuth::PERMISSION), function () use ($app) {
-    // Return some fields only as admin
-    // Respect profile visibility
-
+    // Note: Return only minimal set of user-data fields
     $app->halt(501, 'Not yet implemented...');
   });
 
 
   /**
-   *
+   * Todo: Implement route to search users by certain user-data fields, keep returned user-data fields to a minimum though!
    */
   $app->get('/search', RESTAuth::checkAccess(RESTAuth::PERMISSION), function () use ($app) {
-    // Return some fields only as admin
-    // Respect profile visibility
-
+    // Note: Return some user-data fields only based on RBAC (& Profile settings)
     $app->halt(501, 'Not yet implemented...');
   });
 
 
   /**
-   *
+   * Todo: Implement route to return users profile data
    */
-  $app->get('/account/:id', RESTAuth::checkAccess(RESTAuth::PERMISSION), function ($id) use ($app) {
-    // Return some fields only as admin
-    // Respect profile visibility
-
+  $app->get('/profile/:id', RESTAuth::checkAccess(RESTAuth::PERMISSION), function ($id) use ($app) {
+    // Note: Return some user-data fields only based on Profile settings
     $app->halt(501, 'Not yet implemented...');
   });
 
 
   /**
-   *
+   * Todo: Implement route to update users profile data
    */
-  $app->put('/account', RESTAuth::checkAccess(RESTAuth::ADMIN), function () use ($app) {
-    // Edit only own account
-    // Admins may edit others
-
+  $app->put('/profile', RESTAuth::checkAccess(RESTAuth::ADMIN), function () use ($app) {
+    // Note: Only allowed to edit onw account/profile
     $app->halt(501, 'Not yet implemented...');
   });
 // End of URI group

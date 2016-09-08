@@ -129,10 +129,7 @@ class ContentTypes extends \Slim\Middleware {
   protected function parseXML($input) {
     if (function_exists('simplexml_load_string')) {
       try {
-        set_error_handler(array($this, 'HandleXmlError'));
-        $array = Libs\RESTLib::XML2Array($result);
-        restore_error_handler();
-        return $array;
+        return Libs\RESTLib::XML2Array($result);
       }
       // Catch and transform any exception generated while decoding the XML
       catch (\Exceptions $e) {
@@ -147,15 +144,4 @@ class ContentTypes extends \Slim\Middleware {
       }
     }
   }
-
-
-  /**
-   *
-   */
-  function HandleXmlError($errno, $errstr, $errfile, $errline) {
-    if ($errno == E_WARNING && substr_count($errstr, "DOMDocument::loadXML()") > 0)
-      throw new DOMException($errstr);
-    else
-      return false;
- }
 }

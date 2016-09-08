@@ -178,10 +178,20 @@ class RESTLib {
    */
   public static function XML2Array($string) {
     if (isset($string) && is_string($string) && strlen($string) > 0) {
+      // Set new error-handler to catch otherwise non catchable xml parsing errors (because PHP...)
+      set_error_handler(array('\RESTController\libs\RESTLib', 'HandleXmlError'));
+
+      // Parse XML to array
       $xml = new \DOMDocument();
       $xml->loadXML($string);
-      return self::XML2Array_Recursive($xml->documentElement);
+      $array = self::XML2Array_Recursive($xml->documentElement);
+
+      // Restore original error-handler and return decoded xml
+      restore_error_handler();
+      return $array;
     }
+
+    // Nothing to decode?!
     return array();
   }
 
@@ -226,4 +236,17 @@ class RESTLib {
     else
       return $child->nodeValue;
   }
+
+
+  /**
+   * Function: HandleXmlError($errno, $errstr, $errfile, $errline)
+   *  ErroHandler that throws a catchable exception. Used to handle
+   *  xml parsing errors since they are otherwise not catchable...
+   */
+  protected static function HandleXmlError(($errno, $errstr, $errfile, $errline)) {
+    if ($errno == E_WARNING && substr_count($errstr, "DOMDocument::loadXML()") > 0)
+      throw new DOMException($errstr);
+    else
+      return false;
+ }
 }

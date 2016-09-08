@@ -241,8 +241,8 @@ class RESTilias {
 
     // Fetch user-id from access-token if non is given
     if (!isset($userId)) {
-      $app = \RESTController\RESTController::getInstance();
-      $accessToken =  \RESTController\RESTController::getInstance()->request()->getToken();
+      $app          = \RESTController\RESTController::getInstance();
+      $accessToken  = $app->request()->getToken();
       $userId       = $accessToken->getUserId();
       //$app->getLog()->debug('userId = '.$userId);
     }
@@ -465,13 +465,14 @@ class RESTilias {
    * Return:
    *  <Boolean> - True if the given user havs the admin-role in ILIAS, false otherwise
    */
-  public static function isAdmin($userId) {
+  public static function isAdmin($userId = null) {
     // Load role-based access-control review-functions
     require_once('./Services/AccessControl/classes/class.ilRbacReview.php');
 
     // Fetch user-id from access-token if non is given
     if (!isset($userId)) {
-      $accessToken = RESTRequest::getToken();
+      $app         = \RESTController\RESTController::getInstance();
+      $accessToken = $app->request()->getToken();
       $userId      = $accessToken->getUserId();
     }
 

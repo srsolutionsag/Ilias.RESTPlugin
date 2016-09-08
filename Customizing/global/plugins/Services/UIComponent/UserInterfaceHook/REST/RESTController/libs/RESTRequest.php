@@ -180,20 +180,22 @@ class RESTRequest extends \Slim\Http\Request {
 
   /**
    * Function: getallheaders()
-   *  Wrapper, when not using Apache mod_php.
-   *  See: http://www.php.net/manual/en/function.getallheaders.php#84262
+   *  This behaves more in line with RFC 2616 and returns all header
+   *  fields as lower-case keys (since they should be treated as case-insensitive),
+   *  keeping dashes (-) but ignoring any underscores (_) since
+   *  most webservers drop headers with underscore (silently). (See Apache/Nginx)
    */
   protected function getallheaders() {
-    if (function_exists('getallheaders'))
-      return getallheaders();
-    else {
-      $headers = array();
-      foreach ($_SERVER as $name => $value)
-        if (substr($name, 0, 5) == 'HTTP_')
-          $headers[str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', substr($name, 5)))))] = $value;
+    $headers = array();
+    foreach ($_SERVER as $name => $value)
+      if (substr($name, 0, 5) == 'HTTP_') {
+        $key = substr($name, 5);
+        $key = strtolower($key);
+        $key = str_replace('_', '-', $key);
+        $headers[$key] = $value;
+      }
 
      return $headers;
-    }
   }
 
 
@@ -222,25 +224,24 @@ class RESTRequest extends \Slim\Http\Request {
       case 'access':
         $type = 'Access-Token';
 
-        // Fetch 'access_token' from header, GET or POST...
-        $tokenString = $this->getParameter('access_token');
+        // Fetch all parameters and convert keys to lower-case
+        $headers    = $this->getallheaders();
+        $parameters = array_change_key_case($this->getParameter());
 
-        // Fetch 'token'  from header, GET or POST...
-        if ($tokenString == null)
-            $tokenString = $this->getParameter('token');
-
-        // Fetch 'Authorization' from header ONLY!
-        if ($tokenString == null) {
-          $authHeader = $this->headers('Authorization');
-
-          // Found Authorization header?
-          if (is_string($authHeader)) {
-              $authArray = explode(' ', $authHeader);
-
-              // Look for bearer-type token
-              if (strtolower($authArray[0]) == 'bearer')
-                $tokenString = $authArray[1];
-          }
+        // Fetch token from 'authorization' field (but from headers first)
+        if (array_key_exists('authorization', $headers)) {
+          $tokenString = $headers['authorization'];
+          if (is_string($tokenString) && stripos($tokenString, 'Bearer ') !== false)
+            $tokenString = substr($tokenString, 7);
+        }
+        // Fetch token from 'access_token' field (from headers, get or body)
+        elseif (array_key_exists('access_token', $parameters))
+          $tokenString = $parameters['access_token'];
+        // Fetch token from 'authorization' field (from headers, get or body)
+        elseif (array_key_exists('authorization', $parameters)) {
+          $tokenString = $parameters['authorization'];
+          if (is_string($tokenString) && stripos($tokenString, 'Bearer ') !== false)
+            $tokenString = substr($tokenString, 7);
         }
 
         // Found something that could be an access-token?
