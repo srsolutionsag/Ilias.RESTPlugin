@@ -13,8 +13,8 @@ use \RESTController\libs\Exceptions as LibExceptions;
 
 
 /**
- * Class:
- *
+ * Class: AdminModel
+ *  TODO: Refactor class into smaller parts!!!
  */
 class AdminModel extends Libs\RESTModel {
   // Allow to re-use status messages and codes
@@ -34,7 +34,7 @@ class AdminModel extends Libs\RESTModel {
   const ID_MISSING_FIELD        = 'RESTController\\extensions\\users_v2\\Admin::ID_MISSING_FIELD';
 
 
-  //
+  // Redefine global constants as local constants
   const DEFAULT_ROLE_ID     = 4;
   const SYSTEM_ROLE_ID      = SYSTEM_ROLE_ID;
   const ANONYMOUS_ROLE_ID   = ANONYMOUS_ROLE_ID;
@@ -42,12 +42,13 @@ class AdminModel extends Libs\RESTModel {
   const USER_FOLDER_ID      = USER_FOLDER_ID;
 
 
-  //
+  // Pseudo-Enum values to control user-data storage behaviour (create or update existing)
   const MODE_CREATE = 'create';
   const MODE_UPDATE = 'update';
 
 
-  //
+  // List of valid user-data fields that can be SET
+  // Naming of fields was taken mostly unchanged from ilObjUserGUI
   const fields = array(
     'login',
     'id',
@@ -109,7 +110,15 @@ class AdminModel extends Libs\RESTModel {
 
 
   /**
+   * Function: GetDefaultValue($field)
+   *  Returns a default value (if possible) for the given user-data field.
+   *  Returns null if no default value can be generated.
    *
+   * Parameters:
+   *  field <String> - User-data field to return a default value for
+   *
+   * Returns
+   *  <Any> Default value for given field
    */
   protected static function GetDefaultValue($field) {
     // Fetch reference to ILIAS objects
@@ -161,7 +170,21 @@ class AdminModel extends Libs\RESTModel {
 
 
   /**
+   * Function: TransformField($field, $value)
+   *  Since ILIAS is the most consistent software writen since
+   *  there was any good Sonic game we transform input to the
+   *  RESTPlugin for ILIAS as well as output from the RESTPlugin
+   *  taken from ILIAS into a more consistent format.
+   *  Most common transformations are (1,y)->true (0,n)->false,
+   *  numeric conversions of strings, ISO 6801 (and ILIAS pseudo UTC-Format)
+   *  to and from unix-time, etc...
    *
+   * Parameters:
+   *  field <String> - User-data field, required to select correct transformation
+   *  value <Any> - User-data field-value to be transformed
+   *
+   * Returns:
+   *  <Any> Possibly transformed value
    */
   protected static function TransformField($field, $value) {
     // Transform based on field
@@ -228,10 +251,19 @@ class AdminModel extends Libs\RESTModel {
 
 
   /**
+   * Function: IsMissingField($field, $value, $mode, $refId)
    *
+   *
+   * Parameters:
+   *  field <String> - User-data field to check if it is arequired field
+   *  value <Any> - User-data field-value to check if it counts as missing
+   *  mode <MODE_CREATE/MODE_UPDATE> - Different modes require different fields
+   *  redId <Int> - refId of local category or USER_FOLDER_ID
+   *
+   * Returns:
+   *  <Bool> True if field is required and missing, false otherwise
    */
   protected static function IsMissingField($field, $value, $mode, $refId) {
-
     // Check required fields for edit mode
     if ($mode == self::MODE_UPDATE) {
       // Check based on field
@@ -426,6 +458,8 @@ class AdminModel extends Libs\RESTModel {
    *
    */
   public static function CheckUserData($userData, $mode = self::MODE_CREATE, $refId = self::USER_FOLDER_ID) {
+    // TODO: Be more verbose about validation-issues, eg. existing 'login'
+
     // Set default values for (optional) missing parameters
     if ($mode == self::MODE_CREATE)
       foreach (self::fields as $field)
@@ -867,7 +901,7 @@ class AdminModel extends Libs\RESTModel {
     }
     // Update user account in database
     else
-      $this->object->update();
+      $userObj->update();
 
     // Reset login attempts if account state might have changed
     if ($userData['active'])

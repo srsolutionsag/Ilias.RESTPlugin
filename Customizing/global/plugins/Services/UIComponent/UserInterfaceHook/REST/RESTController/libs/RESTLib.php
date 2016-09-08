@@ -243,7 +243,7 @@ class RESTLib {
    *  ErroHandler that throws a catchable exception. Used to handle
    *  xml parsing errors since they are otherwise not catchable...
    */
-  protected static function HandleXmlError(($errno, $errstr, $errfile, $errline)) {
+  protected static function HandleXmlError($errno, $errstr, $errfile, $errline) {
     if ($errno == E_WARNING && substr_count($errstr, "DOMDocument::loadXML()") > 0)
       throw new DOMException($errstr);
     else
