@@ -13,10 +13,10 @@ use \RESTController\libs\Exceptions as LibExceptions;
 
 
 /**
- * Class: AdminModel
+ * Class: Admin
  *  TODO: Refactor class into smaller parts!!!
  */
-class AdminModel extends Libs\RESTModel {
+class Admin extends Libs\RESTModel {
   // Allow to re-use status messages and codes
   const MSG_RBAC_CREATE_DENIED  = 'Permission to create/modify user-account denied by RBAC-System.';
   const ID_RBAC_CREATE_DENIED   = 'RESTController\\extensions\\users_v2\\Admin::ID_RBAC_CREATE_DENIED';

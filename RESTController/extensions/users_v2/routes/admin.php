@@ -25,11 +25,11 @@ $app->group('/v2/users', function () use ($app) {
    *
    * Parameters:
    *  ref_id <Int> [OPTIONAL] ILIAS internal ref-id of category in which local user-account given by <userId> exists
-   *  userId <Int> ILIAS internal user-id of user to return information for
+   *  user <String/Int> ILIAS internal user-id or (unique) login of user to return information for
    *
    * Returns:
-   *  userId <Int> ILIAS internal user-id of user to update user-data for
-   *  login <String> User login
+   *  id <Int> ILIAS internal user-id of user to update user-data for
+   *  login <String> ILIAS login-name of user
    *  auth_mode <String> Authentication-Mode for user (@See ilAuthUtils::_getAuthModeName(...))
    *  time_limit_owner <Int> Reference-ID of owning ILIAS object (eg. refId of category or USER_FOLDER_ID for global accounts)
    *  owner <Int> ILIAS user-id of user who created this account
@@ -100,19 +100,26 @@ $app->group('/v2/users', function () use ($app) {
    * Throws:
    *  <DocIt!!!>
    */
-  $app->get('/account/:userId', RESTAuth::checkAccess(RESTAuth::PERMISSION), function ($userId) use ($app) {
+  $app->get('/account/:user', RESTAuth::checkAccess(RESTAuth::PERMISSION), function ($user) use ($app) {
     // Catch and handle exceptions if possible
     try {
       // Fetch additional input parameters
       $request  = $app->request();
-      $refId    = $request->getParameter('ref_id', AdminModel::USER_FOLDER_ID);
+      $refId    = $request->getParameter('ref_id', Admin::USER_FOLDER_ID);
 
       // Initialize RBAC (user is fetched from access-token)
       Libs\RESTilias::loadIlUser();
       Libs\RESTilias::initAccessHandling();
 
+      // User was given by user-id
+      if (is_numeric($user))
+        $userId = intval($user);
+      // User was given by login (probably)
+      else
+        $userId = Libs\RESTIlias::getUserId($user);
+
       // Check input, create/update user and assign roles
-      $userData = AdminModel::FetchUserData($userId, $refId);
+      $userData = Admin::FetchUserData($userId, $refId);
 
       // Return updated user data
       $app->success($userData);
@@ -126,14 +133,14 @@ $app->group('/v2/users', function () use ($app) {
 
 
   /**
-   * Route: [PUT] /account/:userId
+   * Route: [PUT] /account/:user
    *  Updates user-data of an existing ILIAS user object, eg. changing password, first- or lastname.
    *  Access-Token needs to have SYSTEM role (for global accounts) or be CATEGORY-ADMIN in
    *  category given by ref_id parameter (for local accounts).
    *
    * Parameters:
    *  ref_id <Int> [OPTIONAL] ILIAS internal ref-id of category in which local user-account given by <user_id> exists (omit for global user-accounts)
-   *  userId <Int> - ILIAS internal user-id of user to update user-data for
+   *  id <Int> - ILIAS internal user-id of user to update user-data for
    *  login <String> - [Optional] User login
    *  auth_mode <String> - [Optional] Authentication-Mode for user (@See ilAuthUtils::_getAuthModeName(...))
    *  client_ip <String> - [Optional] Restrict user to given ip
@@ -190,21 +197,28 @@ $app->group('/v2/users', function () use ($app) {
    *  roles <Array<Int>> - [Optional] A list of ilias roles (numeric-ids) of roles to assign the user to
    *
    * Returns:
-   *  On success a cleaned-up list of input-parameters if returned. This does not mean every value was
-   *  actually changed, since this depends on ILIAS settings for user-data fields and the access-token user role.
-   *  (@See: Administration -> User Administration -> Default Fields / User-Defined Fields)
+   *  id <Int> - Returns ILIAS internal user-id of updated user
    *
    * Throws:
    *  <DocIt!!!>
    */
-  $app->put('/account/:userId', RESTAuth::checkAccess(RESTAuth::PERMISSION), function ($userId) use ($app) {
+  $app->put('/account/:user', RESTAuth::checkAccess(RESTAuth::PERMISSION), function ($user) use ($app) {
     // Catch and handle exceptions if possible
     try {
       // Fetch input parameters
       $request  = $app->request();
-      $refId    = $request->getParameter('ref_id', AdminModel::USER_FOLDER_ID);
+      $refId    = $request->getParameter('ref_id', Admin::USER_FOLDER_ID);
+
+      // User was given by user-id
+      if (is_numeric($user))
+        $userId = intval($user);
+      // User was given by login (probably)
+      else
+        $userId = Libs\RESTIlias::getUserId($user);
+
+      // Extract additional parameters
       $userData = array();
-      foreach (AdminModel::fields as $field) {
+      foreach (Admin::fields as $field) {
         $value = $request->getParameter($field);
         if (isset($value))
           $userData[$field] = $value;
@@ -216,13 +230,15 @@ $app->group('/v2/users', function () use ($app) {
       Libs\RESTilias::initAccessHandling();
 
       // Check input, create/update user and assign roles
-      $cleanUserData = AdminModel::CheckUserData($userData, AdminModel::MODE_UPDATE, $refId);
-      $result        = AdminModel::StoreUserData($cleanUserData, AdminModel::MODE_UPDATE, $refId);
+      $cleanUserData = Admin::CheckUserData($userData, Admin::MODE_UPDATE, $refId);
+      $result        = Admin::StoreUserData($cleanUserData, Admin::MODE_UPDATE, $refId);
 
       // TODO: Return what [GET] /account/:userId would
 
       // Return updated user data
-      $app->success($cleanUserData);
+      $app->success(array(
+        'id' => $userId
+      ));
     }
     // Catch any exception
     // TODO: Send different return code based on exception class!!!
@@ -300,9 +316,6 @@ $app->group('/v2/users', function () use ($app) {
    *  send_mail <Bool> - [Optional] Trigger sending user email notification
    *
    * Returns:
-   *  On success a cleaned-up list of input-parameters if returned. This does not mean every value was
-   *  actually changed, since this depends on ILIAS settings for user-data fields and the access-token user role.
-   *  (@See: Administration -> User Administration -> Default Fields / User-Defined Fields)
    *  id <Int> - ILIAS User-id of newly generated user
    *
    * Throws:
@@ -313,9 +326,11 @@ $app->group('/v2/users', function () use ($app) {
     try {
       // Fetch input parameters
       $request  = $app->request;
-      $refId    = $request->getParameter('ref_id', AdminModel::USER_FOLDER_ID);
+      $refId    = $request->getParameter('ref_id', Admin::USER_FOLDER_ID);
+
+      // Fetch additional parameters
       $userData = array();
-      foreach (AdminModel::fields as $field) {
+      foreach (Admin::fields as $field) {
         $value = $request->getParameter($field);
         if (isset($value))
           $userData[$field] = $value;
@@ -326,14 +341,13 @@ $app->group('/v2/users', function () use ($app) {
       Libs\RESTilias::initAccessHandling();
 
       // Check input, create/update user and assign roles
-      $cleanUserData       = AdminModel::CheckUserData($userData, AdminModel::MODE_CREATE, $refId);
-      $result              = AdminModel::StoreUserData($cleanUserData, AdminModel::MODE_CREATE, $refId);
-      $cleanUserData['id'] = intval($result['user']->getId());
-
-      // TODO: Return what [GET] /account/:userId would
+      $cleanUserData       = Admin::CheckUserData($userData, Admin::MODE_CREATE, $refId);
+      $result              = Admin::StoreUserData($cleanUserData, Admin::MODE_CREATE, $refId);
 
       // Return updated user data
-      $app->success($cleanUserData);
+      $app->success(array(
+        'id' => $result['user']->getId()
+      ));
     }
     // Catch any exception
     // TODO: Send different return code based on exception class!!!
@@ -346,9 +360,33 @@ $app->group('/v2/users', function () use ($app) {
   /**
    * Todo: Implement a route that can delete an existing ILIAS user
    */
-  $app->delete('/account/:userId', RESTAuth::checkAccess(RESTAuth::PERMISSION), function ($userId) use ($app) {
+  $app->delete('/account/:user', RESTAuth::checkAccess(RESTAuth::PERMISSION), function ($user) use ($app) {
+      // Fetch input parameters
+      $request  = $app->request;
+      $refId    = $request->getParameter('ref_id', Admin::USER_FOLDER_ID);
+
+      // User was given by user-id
+      if (is_numeric($user))
+        $userId = intval($user);
+      // User was given by login (probably)
+      else
+        $userId = Libs\RESTIlias::getUserId($user);
+
     // Note: Ensure access-token is allowed to delete given user
     $app->halt(501, 'Not yet implemented...');
+  });
+
+
+  /**
+   * Todo: Implement a route that can delete an existing ILIAS user
+   */
+  $app->post('/test123', function () use ($app) {
+    // Fetch input parameters
+    $request  = $app->request;
+
+    // Note: Ensure access-token is allowed to delete given user
+    // $app->halt(501, 'Not yet implemented...');
+    $app->success($request->getParameter());
   });
 // End of URI group
 });

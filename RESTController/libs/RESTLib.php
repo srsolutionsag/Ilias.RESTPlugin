@@ -143,18 +143,37 @@ class RESTLib {
   protected static function Array2XML_Recursive($xml, $root, $mixed) {
     // Need to iterate over mixed?
 		if (is_array($mixed)) {
+      // Ensure array is sorted by key
+      ksort($mixed);
+
+      // Iterate over keys
 			foreach ($mixed as $key => $value) {
+        // Convert underscores to dashes
+        $key = str_replace('_', '-', $key);
+
         // Try to use keys as tags...
-        if (preg_match('/\A(?!XML)[a-z][\w0-9-]*/i', $key))
+        if (preg_match('/\A(?!XML)[a-z][\w0-9-]*/i', $key)) {
           $node = $xml->createElement($key);
+          $root->appendChild($node);
+        }
+        // Key is an REAL positive integer-value (without 0 prefix)
+        elseif (preg_match('/^(0|([1-9][0-9]*))$/i', $key)) {
+          $key = intval($key);
+          if ($key == 0)
+						$node = $root;
+					else {
+						$node = $xml->createElement($root->tagName);
+						$root->parentNode->appendChild($node);
+					}
+        }
         // ...otherwise fallback to <item key=$key>
         else {
           $node = $xml->createElement('item');
           $node->setAttribute('key', $key);
+          $root->appendChild($node);
         }
 
-        // Recurse for current value
-        $root->appendChild($node);
+        // Build XML ecursively
 				self::Array2XML_Recursive($xml, $node, $value);
 			}
 		}
@@ -210,31 +229,37 @@ class RESTLib {
   protected static function XML2Array_Recursive($node) {
     // Iterate over XML-Elements
     if ($node->hasChildNodes() && $node->nodeType == XML_ELEMENT_NODE) {
-      $result = array();
-      foreach($node->childNodes as $child) {
-        // Child is an XML-Element
-        if ($child->nodeType == XML_ELEMENT_NODE) {
-          // Fetch key and values for this element
-          $key        = ($child->hasAttributes() && $child->tagName == 'item' && $child->getAttribute('key') != '') ? $child->getAttribute('key') : $child->tagName;
-          $recursion  = self::XML2Array_Recursive($child);
+      $tags   = array();
 
-          // Append new value(s)
-          if (isset($result[$key]))
-            $result[$key] = array_merge_recursive((array) $result[$key], (array) $recursion);
-          // Set new value
-          else
-            $result[$key] = $recursion;
+      // Fill result array
+      foreach ($node->childNodes as $child) {
+        // Fetch values recursively
+        $value = self::XML2Array_Recursive($child);
+
+        // Its an xml-elemt with additional sub-elements
+        if ($child->nodeType == XML_ELEMENT_NODE) {
+          // Extract array keys from tagname or key-attribute as fallback
+          // Convert dashed to underscores (since most routes use underscores parameters and no dashes), use <item key=''> syntax to keep dashes
+          $key = ($child->hasAttributes() && $child->tagName == 'item' && $child->getAttribute('key') != '') ? $child->getAttribute('key') : $child->tagName;
+
+          // Append value(s) to tags
+          $tags[$key] = isset($tags[$key]) ? array_merge_recursive((array) $tags[$key], (array) $value) : $value;
         }
+        // XML-Element (text-) content
         else
-          return $child->nodeValue;
+          $values = isset($values) ? array_merge_recursive((array) $values, (array) $value) : $value;
       }
 
-      // Return array
-      return $result;
+      // We don't support mixed tags and values, return only tags
+      if (count($tags) > 0)
+        return $tags;
+
+      // Return values if no tags have been set
+      return $values;
     }
     // Return single value
     else
-      return $child->nodeValue;
+      return $node->nodeValue;
   }
 
 

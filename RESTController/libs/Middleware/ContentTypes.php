@@ -129,7 +129,7 @@ class ContentTypes extends \Slim\Middleware {
   protected function parseXML($input) {
     if (function_exists('simplexml_load_string')) {
       try {
-        return Libs\RESTLib::XML2Array($result);
+        return Libs\RESTLib::XML2Array($input);
       }
       // Catch and transform any exception generated while decoding the XML
       catch (\Exceptions $e) {
