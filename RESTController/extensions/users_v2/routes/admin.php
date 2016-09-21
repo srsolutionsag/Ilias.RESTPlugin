@@ -24,12 +24,12 @@ $app->group('/v2/users', function () use ($app) {
    *  category given by ref_id parameter (for local accounts).
    *
    * Parameters:
-   *  userId <Int> ILIAS internal user-id of user to return information for
    *  ref_id <Int> [OPTIONAL] ILIAS internal ref-id of category in which local user-account given by <userId> exists
+   *  userId <Int> ILIAS internal user-id of user to return information for
    *
    * Returns:
    *  userId <Int> ILIAS internal user-id of user to update user-data for
-   *  login <Int> User login
+   *  login <String> User login
    *  auth_mode <String> Authentication-Mode for user (@See ilAuthUtils::_getAuthModeName(...))
    *  time_limit_owner <Int> Reference-ID of owning ILIAS object (eg. refId of category or USER_FOLDER_ID for global accounts)
    *  owner <Int> ILIAS user-id of user who created this account
@@ -132,8 +132,9 @@ $app->group('/v2/users', function () use ($app) {
    *  category given by ref_id parameter (for local accounts).
    *
    * Parameters:
+   *  ref_id <Int> [OPTIONAL] ILIAS internal ref-id of category in which local user-account given by <user_id> exists (omit for global user-accounts)
    *  userId <Int> - ILIAS internal user-id of user to update user-data for
-   *  login <Int> - [Optional] User login
+   *  login <String> - [Optional] User login
    *  auth_mode <String> - [Optional] Authentication-Mode for user (@See ilAuthUtils::_getAuthModeName(...))
    *  client_ip <String> - [Optional] Restrict user to given ip
    *  active <Bool> - [Optional] Active or deactive user account
@@ -241,7 +242,8 @@ $app->group('/v2/users', function () use ($app) {
    *  (@See Administration -> User Administration -> Default Fields / User-Defined Fields)
    *
    * Parameters:
-   *  login <Int> - User login
+   *  ref_id <Int> [OPTIONAL] ILIAS internal ref-id of category in which local user-account given by <user_id> exists (omit for global user-accounts)
+   *  login <String> - User login
    *  auth_mode <String> - [Optional] Authentication-Mode for user (@See ilAuthUtils::_getAuthModeName(...))
    *  client_ip <String> - [Optional] Restrict user to given ip
    *  active <Bool> - [Optional] Active or deactive user account
