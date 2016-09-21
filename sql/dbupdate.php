@@ -158,22 +158,22 @@
       'default' => -1
     ),
     'grant_client_credentials' => array(
-      'type'    => 'boolean'
+      'type'    => 'integer'
     ),
     'grant_authorization_code' => array(
-      'type'    => 'boolean'
+      'type'    => 'integer'
     ),
     'grant_implicit' => array(
-      'type'    => 'boolean'
+      'type'    => 'integer'
     ),
     'grant_resource_owner' => array(
-      'type'    => 'boolean'
+      'type'    => 'integer'
     ),
     'refresh_authorization_code' => array(
-      'type'    => 'boolean'
+      'type'    => 'integer'
     ),
     'refresh_resource_owner' => array(
-      'type'    => 'boolean'
+      'type'    => 'integer'
     ),
     'grant_bridge' => array(
       'type'    => 'text',
@@ -225,7 +225,7 @@
   $ilDB->insert('ui_uihk_rest_client', array(
     'api_key'                   => array('text',    $api_key),
     'api_secret'                => array('text',    $api_secret),
-    'grant_resource_owner'      => array('boolean', true),
+    'grant_resource_owner'      => array('integer', 1),
     'description'               => array('text',    $description),
     'grant_bridge'              => array('text', 'b')
   ));
