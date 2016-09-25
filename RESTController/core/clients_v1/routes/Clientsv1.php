@@ -72,8 +72,9 @@ $app->group('/v1', function () use ($app) {
 
       // Send affirmation status
       $app->success(array('id' => $id));
-    } catch(ClientExceptions\DeleteFailed $e) {
-      $app->halt(500, $e->getFormatedMessage(), $e::ID);
+    }
+    catch(ClientExceptions\DeleteFailed $e) {
+      $e->send();
     }
   });
 

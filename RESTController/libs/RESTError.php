@@ -70,7 +70,7 @@ class RESTError {
    *   $line <Integer> - [Optional] Line in file where the error/exception occured
    *   $trace <String> - [Optional] Full (back-)trace (string) of error/exception
    */
-  protected static function parseError($error) {
+  public static function parseError($error) {
     // Parse a RESTException
     if ($error instanceof libs\RESTException)
       $error = array(

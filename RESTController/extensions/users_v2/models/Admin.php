@@ -15,11 +15,69 @@ use \RESTController\libs\Exceptions as LibExceptions;
 /**
  * Class: Admin
  *  TODO: Refactor class into smaller parts!!!
+ *
+ * Definition of USER-DATA:
+ *  ref_id <Int> ILIAS internal ref-id of category in which local user-account given by <user_id> exists (omit for global user-accounts)
+ *  id <Int> - ILIAS internal user-id of user to update user-data for
+ *  login <String> - User login
+ *  auth_mode <String> - Authentication-Mode for user (@See ilAuthUtils::_getAuthModeName(...))
+ *  client_ip <String> - Restrict user to given ip
+ *  active <Bool> - Active or deactive user account
+ *  time_limit_from <String/Int> - Set time limit from-which user should be able to use account (Unix-Time or ISO 6801)
+ *  time_limit_until <String/Int> - Set time limit until-which user should be able to use account (Unix-Time or ISO 6801)
+ *  time_limit_unlimited <Bool> - Set account to unlimited (otherwise time_limit_from & time_limit_until are active)
+ *  interests_general <Array<String>> - General interrest fields of user
+ *  interests_help_offered <Array<String>> - Help offered fields of user
+ *  interests_help_looking <Array<String>> - Help looking fields of user
+ *  latitude <Number> - GPS-Location of user, latitude
+ *  longitude <Number> - GPS-Location of user, longitude
+ *  loc_zoom <Int> - Default Zoom-Level for maps
+ *  udf <Array<Mixed> - List of user-defined key => value pairs (@See: Administration -> User Administration -> User-Defined Fields)
+ *  language <String> - Current language of user (@See ilLanguage->getInstalledLanguages())
+ *  birthday <String> - The users birthday (Only date-section of ISO 6801)
+ *  gender <m/f> - Gender of user (can also be Male/Female)
+ *  institution <String> - Institution of user
+ *  department <String> - Department of user
+ *  street <String> - Street of user
+ *  city <String> - City of user
+ *  zipcode <String> - City-Zipcode of user
+ *  country <String> - Country of user (Free-text)
+ *  sel_country <String> - Country of user (Via selection) (@See ilCountry::getCountryCodes())
+ *  phone_office <String> - Office phone-number of user
+ *  phone_home <String> - Home phone-number of user
+ *  phone_mobile <String> - Mobile phone-number of user
+ *  fax <String> - FAX-Number of user
+ *  matriculation <String> - Matriculation (ID) of user
+ *  hobby <String> - Hobby-text of user
+ *  referral_comment <String> - Referral comment of user
+ *  delicious <String> - Delicious account of user
+ *  email <String> - Email-Address of user
+ *  im_icq <String> - Instant-Messenging ICQ-Account of user
+ *  im_yahoo <String> - Instant-Messenging Yahoo-Account of user
+ *  im_msn <String> - Instant-Messenging MSN-Account of user
+ *  im_aim <String> - Instant-Messenging AIM-Account of user
+ *  im_skype <String> - Instant-Messenging Skype-Account of user
+ *  im_jabber <String> - Instant-Messenging Jabber-Account of user
+ *  im_voip <String> - Instant-Messenging VOIP-Number of user
+ *  title <String> - Title of user
+ *  firstname <String> - Firstname of user
+ *  lastname <String> - Lastname of user
+ *  hits_per_page <Int> - Hits-Per-Page setting of user
+ *  show_users_online <Bool> - Show-Users-Online setting of user
+ *  hide_own_online_status <Bool> - Hide-Online-Status setting of user
+ *  skin_style <String> - Skin & Style setting of user, needs to be in Format 'SKIN:STYLE' (colon-delimited)
+ *  session_reminder_enabled <Bool> - Session-Reminder setting of user
+ *  passwd <String> - Plain-Text password of user
+ *  ext_account <String> - External account name of user
+ *  disk_quota <Number> - Global disk-quota for user (courses, groups, files, etc)
+ *  wsp_disk_quota <Number> - Personal workspace disk-quota for user
+ *  userfile <String> - BASE64-Encoded JPG image (Example: data:image/jpeg;base64,<BASE-64-PAYLOAD>, without <>)
+ *  roles <Array<Int>> - A list of ilias roles (numeric-ids) of roles to assign the user to
  */
 class Admin extends Libs\RESTModel {
   // Allow to re-use status messages and codes
-  const MSG_RBAC_CREATE_DENIED  = 'Permission to create/modify user-account denied by RBAC-System.';
-  const ID_RBAC_CREATE_DENIED   = 'RESTController\\extensions\\users_v2\\Admin::ID_RBAC_CREATE_DENIED';
+  const MSG_RBAC_EDIT_DENIED    = 'Permission to read, create or modify user-account denied by RBAC-System.';
+  const ID_RBAC_EDIT_DENIED     = 'RESTController\\extensions\\users_v2\\Admin::ID_RBAC_CREATE_DENIED';
   const MSG_RBAC_READ_DENIED    = 'Permission to read user-account denied by RBAC-System.';
   const ID_RBAC_READ_DENIED     = 'RESTController\\extensions\\users_v2\\Admin::ID_RBAC_READ_DENIED';
   const MSG_NO_GLOBAL_ROLE      = 'Access-token user has no global role that could be inherited by new users.';
@@ -32,6 +90,10 @@ class Admin extends Libs\RESTModel {
   const ID_INVALID_FIELD        = 'RESTController\\extensions\\users_v2\\Admin::ID_INVALID_FIELD';
   const MSG_MISSING_FIELD       = 'Given user-data is missing a required field: {{field}}';
   const ID_MISSING_FIELD        = 'RESTController\\extensions\\users_v2\\Admin::ID_MISSING_FIELD';
+  const MSG_DELETE_SELF         = 'Not allowed to delete own user-account.';
+  const ID_DELETE_SELF          = 'RESTController\\extensions\\users_v2\\Admin::ID_DELETE_SELF';
+  const MSG_REFID_MISMATCH      = 'Time-Limit owner ({{owner}}) does not match given ref-id ({{ref_id}}).';
+  const ID_REFID_MISMATCH       = 'RESTController\\extensions\\users_v2\\Admin::ID_REFID_MISMATCH';
 
 
   // Redefine global constants as local constants
@@ -318,7 +380,17 @@ class Admin extends Libs\RESTModel {
 
 
   /**
+   * Function: IsValidField($field, $value, $mode, $refId)
+   *  Checks if the given input-value is valid for its field.
    *
+   * Parameters:
+   *  field <String> - Field to check value for
+   *  value <Mixed> - Value to be cheched
+   *  mode <MODE_CREATE/MODE_UPDATE> - Creating or mofifying existing account
+   *  refId <Int> - Reference-id of local category (or admin-panel)
+   *
+   * Return:
+   *  <Bool> - True if value if valid for given field
    */
   protected static function IsValidField($field, $value, $mode, $refId) {
     // Load ILIAS objects
@@ -389,6 +461,7 @@ class Admin extends Libs\RESTModel {
       case 'interests_general':
       case 'interests_help_offered':
       case 'interests_help_looking':
+        return is_array($value);
       case 'institution':
       case 'department':
       case 'street':
@@ -428,10 +501,11 @@ class Admin extends Libs\RESTModel {
         // Fetch valid definitions
         $instance    = \ilUserDefinedFields::_getInstance();
         $definitions = ($refId == self::USER_FOLDER_ID) ? $instance->getDefinitions() : $instance->getChangeableLocalUserAdministrationDefinitions();
+        $definitions = array_map(function($definition) { return intval($definition['field_id']); }, $definitions);
 
         // Check for excess definitions
-        foreach ($value as $defField => $defValue)
-          if (!array_key_exists($defField, $definitions))
+        foreach ($value as $udfField => $udfValue)
+          if (!((is_int($udfField) || ctype_digit($udfField)) && in_array(intval($udfField), $definitions)))
             return false;
 
         return is_array($value);
@@ -443,7 +517,7 @@ class Admin extends Libs\RESTModel {
         return preg_match('#^data:image/\w+;base64,#i', $value) === 1;
       // Validate birthday format
       case 'birthday':
-        return preg_match('/^(\d{4})-(\d{2})-(\d{2}))$/', $value) === 1;
+        return preg_match('/^(\d{4})-(\d{2})-(\d{2})$/', $value) === 1;
       // Validate boolean values
       case 'send_mail':
         return is_bool($value);
@@ -455,7 +529,16 @@ class Admin extends Libs\RESTModel {
 
 
   /**
+   * Function: CheckUserData($userData, $mode, $refId)
+   *  Checks wether the given user-data is valid and has values for all required fields.
    *
+   * Prameters:
+   *  userData <USER-DATA> - User-data to be checked
+   *  mode <MODE_CREATE/MODE_UPDATE> - Wether to create or update ILIAS user account
+   *  refId <Int> - Ref-id for local user administration
+   *
+   * Return:
+   *  <USER-DATA> - Potentially cleaned up user-data with additional default values where appropriate
    */
   public static function CheckUserData($userData, $mode = self::MODE_CREATE, $refId = self::USER_FOLDER_ID) {
     // TODO: Be more verbose about validation-issues, eg. existing 'login'
@@ -503,7 +586,15 @@ class Admin extends Libs\RESTModel {
 
 
   /**
+   * Function: FetchUserData($userId, $refId)
+   *  Returns user-data for the given ILIAS user.
    *
+   * Paramters:
+   *  userId <Int> - ILIAS user id to fetch data for
+   *  refId <Int> - Ref-id for local user administration
+   *
+   * Return:
+   *  <USER-DATA> - Fetched user-data for given ILIAS user
    */
   public static function FetchUserData($userId, $refId = self::USER_FOLDER_ID) {
     // Include required classes (who needs an AutoLoader/DI-System anyway?! -.-)
@@ -516,17 +607,29 @@ class Admin extends Libs\RESTModel {
     $userObj = new \ilObjUser($userId);
 
     // Check for local administration access-rights (Note: getTimeLimitOwner() should be $refId for new users)
-    if ($refId != USER_FOLDER_ID && !$rbacsystem->checkAccess('cat_administrate_users', $userObj->getTimeLimitOwner()))
+    if ($refId != USER_FOLDER_ID && !$rbacsystem->checkAccess('cat_administrate_users', $refId))
       throw new LibExceptions\RBAC(
-        self::MSG_RBAC_CREATE_DENIED,
-        self::ID_RBAC_CREATE_DENIED
+        self::MSG_RBAC_EDIT_DENIED,
+        self::ID_RBAC_EDIT_DENIED
       );
+      // TODO: Validate that refId == time_limit_owner ?
 
     // Check for Admin-GUI access-rights to users
     if ($refId == USER_FOLDER_ID && !$rbacsystem->checkAccess('visible,read', $refId))
       throw new LibExceptions\RBAC(
         self::MSG_RBAC_READ_DENIED,
         self::ID_RBAC_READ_DENIED
+      );
+
+    // RefID must match time-limit owner
+    if ($refId != $userObj->getTimeLimitOwner())
+      throw new LibExceptions\RBAC(
+        self::MSG_REFID_MISMATCH,
+        self::ID_REFID_MISMATCH,
+        array(
+          owner  => $userObj->getTimeLimitOwner(),
+          ref_id => $refId
+        )
       );
 
     // Magnitude of byte units (1024)
@@ -657,6 +760,7 @@ class Admin extends Libs\RESTModel {
     }
 
     // TODO: Values are returned unformated, convert 0/1/y/n to true/false, and numeric to int/float (depending on field) [reuse Transform method?]
+    // udf[f_<id>] -> udf[<id>]
 
     // Return collected user-data
     return $userData;
@@ -664,15 +768,26 @@ class Admin extends Libs\RESTModel {
 
 
   /**
+   * Function: StoreUserData($userData, $mode, $refId)
+   *  Creates a new ILIAS user account or updates an existing one with the given user-data.
+   *
    * Note 1:
    *  refID is either self::USER_FOLDER_ID, which in the context of ILIAS means the Admin-GUI
    *  or the Reference-ID of a categorie or organisational-unit for local administration.
-   *
    * Note 2:
    *  The RBAC-System needs to be initialized with the access-token user account. (RESTIlias::loadIlUser())
-   *
    * Note 3:
    *  This method does not do any input validation, this is the responisbility of functions like self::CheckUserData().
+   *
+   * Parameters:
+   *  userData <USER-DATA> - User data used to create or update ILIAS user
+   *  mode <MODE_CREATE/MODE_UPDATE> - Wether to create or update account
+   *  refId <Int> - Ref-id for local user administration
+   *
+   * Return:
+   *  userfile <Bool> - Contains addition information if a virus was detected in the users profile-picture
+   *  email <Bool> - Wether a notification email was send successfully...
+   *  user <ilObjUser> - ILIAS user object that was created or updated
    */
   public static function StoreUserData($userData, $mode = self::MODE_CREATE, $refId = self::USER_FOLDER_ID) {
     // Include required classes (who needs an AutoLoader/DI-System anyway?! -.-)
@@ -681,7 +796,7 @@ class Admin extends Libs\RESTModel {
     include_once('Services/Mail/classes/class.ilAccountMail.php');
 
     // Import ILIAS systems (all praise the glorious 'DI-System')
-    global $rbacsystem, $rbacadmin, $rbacreview, $ilSetting, $ilUser;
+    global $rbacsystem, $rbacadmin, $rbacreview, $ilSetting, $ilAccess, $ilUser;
 
     // Make sure mode is correct
     if ($mode != self::MODE_CREATE && $mode != self::MODE_UPDATE)
@@ -698,13 +813,14 @@ class Admin extends Libs\RESTModel {
       // Check of user is allowd to create user globally or in given category/org-unit
       if (!$rbacsystem->checkAccess('create_usr', $refId) && !$ilAccess->checkAccess('cat_administrate_users', '', $refId))
         throw new LibExceptions\RBAC(
-          self::MSG_RBAC_CREATE_DENIED,
-          self::ID_RBAC_CREATE_DENIED
+          self::MSG_RBAC_EDIT_DENIED,
+          self::ID_RBAC_EDIT_DENIED
         );
 
       // Create new user object
       $userObj = new \ilObjUser();
       $userObj->setLogin($userData['login']);
+      $userObj->setTimeLimitOwner($refId);
     }
     // Check rights to edit user
     else {
@@ -712,11 +828,12 @@ class Admin extends Libs\RESTModel {
       $userObj = new \ilObjUser($userData['id']);
 
       // Check for local administration access-rights (Note: getTimeLimitOwner() should be $refId for new users)
-      if ($refId != USER_FOLDER_ID && !$rbacsystem->checkAccess('cat_administrate_users', $userObj->getTimeLimitOwner()))
+      if ($refId != USER_FOLDER_ID && !$rbacsystem->checkAccess('cat_administrate_users', $refId))
         throw new LibExceptions\RBAC(
-          self::MSG_RBAC_CREATE_DENIED,
-          self::ID_RBAC_CREATE_DENIED
+          self::MSG_RBAC_EDIT_DENIED,
+          self::ID_RBAC_EDIT_DENIED
         );
+        // TODO: Validate that refId == time_limit_owner ?
 
       // Check for Admin-GUI access-rights to users
       if ($refId == USER_FOLDER_ID && !$rbacsystem->checkAccess('visible,read', $refId))
@@ -725,13 +842,21 @@ class Admin extends Libs\RESTModel {
           self::ID_RBAC_READ_DENIED
         );
 
+      // RefID must match time-limit owner
+      if ($refId != $userObj->getTimeLimitOwner())
+        throw new LibExceptions\RBAC(
+          self::MSG_REFID_MISMATCH,
+          self::ID_REFID_MISMATCH,
+          array(
+            owner  => $userObj->getTimeLimitOwner(),
+            ref_id => $refId
+          )
+        );
+
       // Update login of existing account
       if (self::HasUserValue($userData, 'login'))
         $userObj->updateLogin($userData['login']);
     }
-
-    // Update time-limit owner (since ref-id is always required)
-    $userObj->setTimeLimitOwner($refId);
 
     // Set user-values
     if (self::HasUserValue($userData, 'auth_mode'))
@@ -875,7 +1000,7 @@ class Admin extends Libs\RESTModel {
 
     // Set disk quotas (overall abd workspace)
     require_once 'Services/WebDAV/classes/class.ilDiskQuotaActivationChecker.php';
-    if (self::HasUserValue($userData, 'disk_quota')     && \lDiskQuotaActivationChecker::_isActive())
+    if (self::HasUserValue($userData, 'disk_quota')     && \ilDiskQuotaActivationChecker::_isActive())
       $userObj->setPref('disk_quota',     $userData['disk_quota']     * \ilFormat::_getSizeMagnitude() * \ilFormat::_getSizeMagnitude());
     if (self::HasUserValue($userData, 'wsp_disk_quota') && \ilDiskQuotaActivationChecker::_isPersonalWorkspaceActive())
       $userObj->setPref('wsp_disk_quota', $userData['wsp_disk_quota'] * \ilFormat::_getSizeMagnitude() * \ilFormat::_getSizeMagnitude());
@@ -944,7 +1069,59 @@ class Admin extends Libs\RESTModel {
 
 
   /**
+   * Function: DeleteUser($userId,  $refId)
+   *  Checks RBAC permissions and deletes the given (local/global) user account,
+   *  with the given user-id.
    *
+   * Parameters:
+   *  userId <Int> - User id of user to be deleted
+   *  refId <Int> - Ref-id for local user administration
+   */
+  public function DeleteUser($userId,  $refId = self::USER_FOLDER_ID) {
+    global $rbacsystem, $ilAccess, $ilUser;
+
+    // Check if allowed to delete user
+    if ($refId == self::USER_FOLDER_ID && !$rbacsystem->checkAccess('delete', $refId)
+    ||  $refId != self::USER_FOLDER_ID && !$ilAccess->checkAccess('cat_administrate_users', '', $refId))
+     throw new LibExceptions\RBAC(
+       self::MSG_RBAC_DENIED,
+       self::MSG_RBAC_DENIED
+     );
+
+    // Can't delte yourself
+    if ($ilUser->getId() == $userId)
+      throw new LibExceptions\RBAC(
+        self::MSG_DELETE_SELF,
+        self::ID_DELETE_SELF
+      );
+
+    // Check if given refid matches
+    $userObj = new \ilObjUser($userId);
+    if ($refId != $userObj->getTimeLimitOwner())
+      throw new LibExceptions\RBAC(
+        self::MSG_REFID_MISMATCH,
+        self::ID_REFID_MISMATCH,
+        array(
+          owner  => $userObj->getTimeLimitOwner(),
+          ref_id => $refId
+        )
+      );
+
+    // Delete user
+    $userObj->delete();
+  }
+
+
+  /**
+   * Function: HasUserValue($userData, $field)
+   *  Checks if the given user-data has a value for the given field.
+   *
+   * Paramters:
+   *  userData <USER-DATA> - User data
+   *  field <String> - Field inside user data
+   *
+   * Return:
+   *  <Bool> - User-data contains a value for the given field
    */
   protected function HasUserValue($userData, $field) {
     return (is_array($userData) && array_key_exists($field, $userData));
@@ -952,7 +1129,17 @@ class Admin extends Libs\RESTModel {
 
 
   /**
+   * Function: IsChangeable($field, $refId)
+   *  Checks wether this user-field is allowed to be edited.
+   *  @See Administration -> User Administration -> Default Fields / User-Defined Fields
+   *  for setting wether a field is changeable (and/or required).
    *
+   * Parameters:
+   *  field <String> - User-data field to check
+   *  refId <Int> - Ref-id for local user administration
+   *
+   * Return:
+   *  <Bool> - True wether the field is allowed to be changed
    */
   protected function IsChangeable($field, $refId) {
     // Fetch reference to ILIAS settings
@@ -971,7 +1158,13 @@ class Admin extends Libs\RESTModel {
 
 
   /**
+   * Function: ProcessUserPicture($userObj, $imgData)
+   *  Converts input base64-encoded image into a file that can be used by ILIAS.
+   *  (Also applies virus-scanner to created file to be sure)
    *
+   * Parameters:
+   *  userObj <ilObUser> - ILIAS User-Object to attach profile picture to
+   *  imgData <String> - Base64 encoded image data
    */
   protected static function ProcessUserPicture($userObj, $imgData) {
     // Delete user picture files
@@ -1013,7 +1206,16 @@ class Admin extends Libs\RESTModel {
 
 
   /**
+   * Function: GetUnixTime($data)
+   *  Converts various input-formats to uni-time.
+   *  Supported input-formats are unit-time, array with [date][time] keys
+   *  and any format supported by DateTime.
    *
+   * Parameters:
+   *  data <Mixed> - Input time
+   *
+   * Return:
+   *  <Int> - Input time converted to unit-time
    */
   protected static function GetUnixTime($data) {
     // Time seems to be in unix-time
@@ -1031,10 +1233,10 @@ class Admin extends Libs\RESTModel {
     // Try to use DateTime to extract unix-time
     if (is_string($data)) {
       try {
-        $date = new DateTime($data);
+        $date = new \DateTime($data);
         if ($date)
           return $date->getTimestamp();
-      } catch (Exception $e) { }
+      } catch (\Exception $e) { }
     }
 
     // Absolute fallback-case (should only happen on wrong input)
@@ -1043,7 +1245,15 @@ class Admin extends Libs\RESTModel {
 
 
   /**
+   * Function: GetISODate($data)
+   *  Convert various ILIAS time-formats into a valid ISO 8601 format.
+   *  This only returns the DATE (not time) part!
    *
+   * Parameter:
+   *  data <Mixed> - Input time (any supported by DateTime)
+   *
+   * Return:
+   *  <String> - Time formated in ISO 8601 format
    */
   protected static function GetISODate($data) {
     // Time seems to be in unix-time
@@ -1057,11 +1267,11 @@ class Admin extends Libs\RESTModel {
       // String seems to contain more than date data
       if (strlen($data) > 8) {
         try {
-          $date = new DateTime($data);
+          $date = new \DateTime($data);
           if ($date)
             return $date->format('Y-m-d');
         // Fallback case...
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
           return $data;
         }
       }
@@ -1073,6 +1283,11 @@ class Admin extends Libs\RESTModel {
 
 
   /**
+   * Function: ValidateRoles($roles, $refId)
+   *  Checks wether all given rules match what the currently active
+   *  ILIAS user is allowed to assign. System admins are allowed to assign
+   *  all roles, all others only those roles assigned to themself.
+   *
    * Note: This check is rather restrictive (even for admins),
    *  only global and local roles in Categorie/Organisational-Unit
    *  are valid.
@@ -1080,9 +1295,18 @@ class Admin extends Libs\RESTModel {
    *   $rbacreview->getAssignableRoles();
    *  and local admins any role from
    *   $rbacreview->getAssignableRolesInSubtree($refId);
+   *
+   * Parameters:
+   *  roles <Array<Int>> - List of roles to check
+   *  refId <Int> - Ref-Id of category (or system-panel) for local roles
+   *
+   * Return:
+   *  <Bool> - True if all roles can be assigned by the currently active ILIAS user
    */
   protected static function ValidateRoles($roles, $refId) {
+    include_once('./Services/AccessControl/classes/class.ilObjRole.php');
     global $rbacreview;
+
 
     // Fetch list of assignable roles
     $local  = $rbacreview->getRolesOfRoleFolder($refId);

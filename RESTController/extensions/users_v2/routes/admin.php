@@ -107,16 +107,19 @@ $app->group('/v2/users', function () use ($app) {
       $request  = $app->request();
       $refId    = $request->getParameter('ref_id', Admin::USER_FOLDER_ID);
 
-      // Initialize RBAC (user is fetched from access-token)
-      Libs\RESTilias::loadIlUser();
-      Libs\RESTilias::initAccessHandling();
-
       // User was given by user-id
-      if (is_numeric($user))
+      if (is_numeric($user)) {
+        // Convert to int and check existence
         $userId = intval($user);
+        Libs\RESTIlias::getUserName($userId);
+      }
       // User was given by login (probably)
       else
         $userId = Libs\RESTIlias::getUserId($user);
+
+      // Initialize RBAC (user is fetched from access-token)
+      Libs\RESTilias::loadIlUser();
+      Libs\RESTilias::initAccessHandling();
 
       // Check input, create/update user and assign roles
       $userData = Admin::FetchUserData($userId, $refId);
@@ -126,8 +129,8 @@ $app->group('/v2/users', function () use ($app) {
     }
     // Catch any exception
     // TODO: Send different return code based on exception class!!!
-    catch (Libs\LibException $e) {
-      $app->halt(500, $e->getFormatedMessage(), $e->getRESTCode());
+    catch (Libs\RESTException $e) {
+      $e->send(500);
     }
   });
 
@@ -140,7 +143,7 @@ $app->group('/v2/users', function () use ($app) {
    *
    * Parameters:
    *  ref_id <Int> [OPTIONAL] ILIAS internal ref-id of category in which local user-account given by <user_id> exists (omit for global user-accounts)
-   *  id <Int> - ILIAS internal user-id of user to update user-data for
+   *  user <String/Int> - ILIAS internal user-id or login name of user to update user-data for
    *  login <String> - [Optional] User login
    *  auth_mode <String> - [Optional] Authentication-Mode for user (@See ilAuthUtils::_getAuthModeName(...))
    *  client_ip <String> - [Optional] Restrict user to given ip
@@ -210,8 +213,10 @@ $app->group('/v2/users', function () use ($app) {
       $refId    = $request->getParameter('ref_id', Admin::USER_FOLDER_ID);
 
       // User was given by user-id
-      if (is_numeric($user))
+      if (is_numeric($user)) {
         $userId = intval($user);
+        Libs\RESTIlias::getUserName($userId);
+      }
       // User was given by login (probably)
       else
         $userId = Libs\RESTIlias::getUserId($user);
@@ -242,8 +247,8 @@ $app->group('/v2/users', function () use ($app) {
     }
     // Catch any exception
     // TODO: Send different return code based on exception class!!!
-    catch (Libs\LibException $e) {
-      $app->halt(500, $e->getFormatedMessage(), $e->getRESTCode());
+    catch (Libs\RESTException $e) {
+      $e->send(500);
     }
   });
 
@@ -351,42 +356,60 @@ $app->group('/v2/users', function () use ($app) {
     }
     // Catch any exception
     // TODO: Send different return code based on exception class!!!
-    catch (Libs\LibException $e) {
-      $app->halt(500, $e->getFormatedMessage(), $e->getRESTCode());
+    catch (Libs\RESTException $e) {
+      $e->send(500);
     }
   });
 
 
   /**
-   * Todo: Implement a route that can delete an existing ILIAS user
+   * Route: [DELETE] /account/:user
+   *  This route deletes an existing ILIAS user account with the given user-id or login.
+   *  Access-Token needs to have SYSTEM role (for global accounts) or be CATEGORY-ADMIN in
+   *  category given by ref_id parameter (for local accounts).
+   *
+   * Parameters:
+   *  ref_id <Int> [OPTIONAL] ILIAS internal ref-id of category in which local user-account given by <user_id> exists (omit for global user-accounts)
+   *  user <String/Int> - ILIAS internal user-id or login name of user to delete
+   *
+   * Returns:
+   *  id <Int> - ILIAS User-id of newly generated user
+   *
+   * Throws:
+   *  <DocIt!!!>
    */
   $app->delete('/account/:user', RESTAuth::checkAccess(RESTAuth::PERMISSION), function ($user) use ($app) {
+    try {
       // Fetch input parameters
       $request  = $app->request;
       $refId    = $request->getParameter('ref_id', Admin::USER_FOLDER_ID);
 
       // User was given by user-id
-      if (is_numeric($user))
+      if (is_numeric($user)) {
         $userId = intval($user);
+        Libs\RESTIlias::getUserName($userId);
+      }
       // User was given by login (probably)
       else
         $userId = Libs\RESTIlias::getUserId($user);
 
-    // Note: Ensure access-token is allowed to delete given user
-    $app->halt(501, 'Not yet implemented...');
-  });
+      // Initialize RBAC (user is fetched from access-token)
+      Libs\RESTilias::loadIlUser();
+      Libs\RESTilias::initAccessHandling();
 
+      // Delete user
+      $success = Admin::DeleteUser($userId, $refId);
 
-  /**
-   * Todo: Implement a route that can delete an existing ILIAS user
-   */
-  $app->post('/test123', function () use ($app) {
-    // Fetch input parameters
-    $request  = $app->request;
-
-    // Note: Ensure access-token is allowed to delete given user
-    // $app->halt(501, 'Not yet implemented...');
-    $app->success($request->getParameter());
+      // Send success information
+      $app->success(array(
+        'id' => $userId
+      ));
+    }
+    // Catch any exception
+    // TODO: Send different return code based on exception class!!!
+    catch (Libs\RESTException $e) {
+      $e->send(500);
+    }
   });
 // End of URI group
 });

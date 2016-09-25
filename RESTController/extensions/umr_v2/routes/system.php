@@ -22,8 +22,10 @@ $app->group('/v2/umr/system', function () use ($app) {
    */
   $app->get('/login-stats/:user', RESTAuth::checkAccess(RESTAuth::ADMIN), function ($user) use ($app) {
     // User was given by user-id
-    if (is_numeric($user))
+    if (is_numeric($user)) {
       $userId = intval($user);
+      Libs\RESTIlias::getUserName($userId);
+    }
     // User was given by login (probably)
     else
       $userId = Libs\RESTIlias::getUserId($user);
