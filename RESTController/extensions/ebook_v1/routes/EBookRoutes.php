@@ -67,7 +67,7 @@ $app->group('/v1/ebook', function () use ($app) {
 	/**
 	 * GET key
 	 */
-	$app->get('/:refId/key', RESTAuth::checkAccess(RESTAuth::TOKEN), function($ref_id) use ($app) {
+	$app->post('/:refId/key', RESTAuth::checkAccess(RESTAuth::TOKEN), function($ref_id) use ($app) {
 		$accessToken = $app->request->getToken();
 		$model = new EBookModel();
 		$userId = $accessToken->getUserId();
@@ -76,16 +76,17 @@ $app->group('/v1/ebook', function () use ($app) {
 			$key = $model->getKeyByRefId($userId, $ref_id);
 			$remote_address = $_SERVER['REMOTE_ADDR'];
 			$forwarded_for = $_SERVER['HTTP_X_FORWARDED_FOR'];
-
+			$hardware_id = $app->request->getParameter('hardware_id');
 			$access = new \ileBookAccessLog();
 			$access->setUserId($userId);
 			$access->setEbookId($ref_id);
 			$access->setRemoteAddress($remote_address);
 			$access->setXForwardedFor($forwarded_for);
+			$access->setHardwareId($hardware_id);
 			$access->updateTimestamp();
 			$access->setAction(\ileBookAccessLog::ACTION_DOWNLOAD_TOKEN);
-//			print_r($access);exit;
 			$access->create();
+			$access->triggerCheck();
 
 			$app->response->body(json_encode(["key" => $key]));
 		} catch (NoFileException $e) {
