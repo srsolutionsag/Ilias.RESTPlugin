@@ -103,7 +103,7 @@ $app->group('/v1/ebook', function () use ($app) {
 	 *
 	 * returns success if the logged in user still has access to the ebook.
 	 */
-	$app->get('/:refId/validateKey', RESTAuth::checkAccess(RESTAuth::TOKEN), function($ref_id) use ($app) {
+	$app->get('/:refId/validate-key', RESTAuth::checkAccess(RESTAuth::TOKEN), function($ref_id) use ($app) {
 		$accessToken = $app->request->getToken();
 		$model = new EBookModel();
 		$userId = $accessToken->getUserId();
