@@ -5,6 +5,8 @@ namespace RESTController\extensions\eBook;
 //require_once(dirname(__DIR__) . '/models/EBookModel.php');
 require_once("./Customizing/global/plugins/Services/Repository/RepositoryObject/eBook/classes/class.ilObjeBook.php");
 require_once("./Customizing/global/plugins/Services/Repository/RepositoryObject/eBook/classes/class.ileBookConfig.php");
+require_once("./Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/REST/RESTController/extensions/ebook_v1/models/NoAccessException.php");
+require_once("./Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/REST/RESTController/extensions/ebook_v1/models/NoFileException.php");
 
 use \RESTController\libs as Libs;
 
@@ -100,11 +102,7 @@ class EBookModel  extends Libs\RESTModel {
 	 * @throws NoFileException
 	 */
 	public function getFilePathByRefId($user_id, $ref_id) {
-		global $DIC;
-
-		$access = $DIC->access();
-
-		if(!$access->checkAccessOfUser($user_id, "read", "", $ref_id))
+		if(!$this->checkAccessOfUser($user_id, $ref_id))
 			throw new NoAccessException();
 
 		$object = new \ilObjeBook($ref_id);
@@ -116,12 +114,8 @@ class EBookModel  extends Libs\RESTModel {
 	}
 
 
-	public function getKeyByRefId($userId, $ref_id) {
-		global $DIC;
-
-		$access = $DIC->access();
-
-		if(!$access->checkAccessOfUser($userId, "read", "", $ref_id))
+	public function getKeyByRefId($user_id, $ref_id) {
+		if(!$this->checkAccessOfUser($user_id, $ref_id))
 			throw new NoAccessException();
 
 		$object = new \ilObjeBook($ref_id);
@@ -130,5 +124,24 @@ class EBookModel  extends Libs\RESTModel {
 			throw new NoFileException("There's no key to this ref id.");
 
 		return $object->getSecret();
+	}
+
+	private function checkAccessOfUser($user_id, $ref_id) {
+		global $DIC;
+
+		$access = $DIC->access();
+		$db = $DIC->database();
+		if(!$access->checkAccessOfUser($user_id, "read", "", $ref_id))
+			return false;
+
+		$query =   "SELECT * FROM rep_robj_xebk_data as data
+					INNER JOIN object_reference ref ON ref.obj_id = data.id AND ref.ref_id = {$db->quote($ref_id, "integer")}
+					WHERE data.is_online = 1";
+		$set = $db->query($query);
+		if($db->numRows($set) == 0)
+			return false;
+
+		return true;
+
 	}
 }
