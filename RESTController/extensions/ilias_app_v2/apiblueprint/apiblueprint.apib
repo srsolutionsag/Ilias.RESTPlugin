@@ -1,4 +1,4 @@
-Format: 1.0.0
+Format: 2.0.0-uncompleted
 
 # ILIAS Learnplace API
 
@@ -9,7 +9,7 @@ It allows to view blocks and their setting, that are used in a learnplace.
 
 Resources that are directly related to a learnplace.
 
-## A single learnplace [/learnplace/{id}]
+## A single learnplace [/learnplace/{objectId}]
 
 ### Get a single learnplace [GET]
 Information of a learnplace including the location.
@@ -19,10 +19,8 @@ Information of a learnplace including the location.
     + Body
 
             {
-                "id": 1,
                 "objectId": 24,
                 "location": {
-                    "id": 1,
                     "latitude": 501.0112,
                     "longitude": -201.210,
                     "elevation": 10.05,
@@ -39,10 +37,6 @@ Information of a learnplace including the location.
                 "title": "Learnplace",
                 "type": "object",
                 "properties": {
-                    "id": {
-                        "type": "integer",
-                        "minimum": 1
-                    },
                     "objectId": {
                         "description": "The object id used in ILIAS to identify the object"
                         "type": "integer",
@@ -51,10 +45,6 @@ Information of a learnplace including the location.
                     "location": {
                         "type": "object",
                         "properties": {
-                            "id": {
-                                "type": "integer",
-                                "minimum": 1
-                            },
                             "latitude": {
                                 "type": "float"
                             },
@@ -74,14 +64,15 @@ Information of a learnplace including the location.
                         "type": [ "object", "null" ],
                         "properties": {
                             "visibility": {
-                                "type": "string"
+                                "type": "string",
+                                "pattern": "^ALWAYS$|^NEVER$|^ONLY_AT_PLACE$|^AFTER_PLACE_VISIT$"
                             }
                         }
                     }
                 }
             }
 
-## Visit journal of a learnplace [/learnplace{id}/visit-journal]
+## Visit journal of a learnplace [/learnplace/{objectId}/journal-entries]
 
 ### List the visit journal of a learnplace [GET]
 The visit journal of a learnplace contains all users that visited the learnplace including their time.
@@ -113,7 +104,7 @@ The visit journal of a learnplace contains all users that visited the learnplace
                             "type": "string"
                         },
                         "timestamp": {
-                            "description": "The unix time in milliseconds",
+                            "description": "The unix time in seconds",
                             "type": "long",
                             "minimum": 0
                         }
@@ -121,8 +112,10 @@ The visit journal of a learnplace contains all users that visited the learnplace
                 }
             }
 
+## Visit journal entry of a learnplace [/learnplace/{objectId}/journal-entry]
+
 ### Create a new entry to the learnplace visit journal [POST]
-You can create a new entry to the visit journal. The user is identified by the authentication process.
+You can create a new entry to the visit journal. The user is identified by the rest api.
 
 + Request  (application/json)
 
@@ -139,7 +132,7 @@ You can create a new entry to the visit journal. The user is identified by the a
                 "type": "object",
                 "properties": {
                     "time": {
-                        "description": "The Unix time in milliseconds",
+                        "description": "The Unix time in seconds",
                         "type": "long",
                         "minimum": 0
                     }
@@ -192,7 +185,7 @@ You can create a new entry to the visit journal. The user is identified by the a
 
 Blocks are the content of a learnplace.
 
-## All blocks of a learnplace [/learnplace/{id}/blocks]
+## All blocks of a learnplace [/learnplace/{objectId}/blocks]
 
 ### Get all blocks of a single learnplace [GET]
 All common blocks that are related to the learnplace. Different block types are in different properties.
@@ -218,16 +211,15 @@ The accordion block is a special block, that can contains all other block types.
                         "visibility": "ALWAYS",
                         "title": "a fancy picture",
                         "description": "",
-                        "thumbnailUrl": "https://to.the-thumbnail.com",
-                        "url": "https://to.the-original.com"
+                        "thumbnailUrl": "data/default/xsrl_5/iranetirrtni.jpg",
+                        "url": "data/default/xsrl_5/naeuvaner.jpg"
                     }
                 ],
                 "video": [
                     {
                         "sequence": 3,
                         "visibility": "ALWAYS",
-                        "coverUrl": "https://to.the-cover.com",
-                        "url": "https://to.the-video.com"
+                        "url": "data/default/xsrl_6/enuiatrenuiar.mp4"
                     }
                 ],
                 "iliasLink": [
@@ -255,16 +247,15 @@ The accordion block is a special block, that can contains all other block types.
                             "visibility": "ALWAYS",
                             "title": "a fancy picture",
                             "description": "",
-                            "thumbnailUrl": "https://to.the-thumbnail.com",
-                            "url": "https://to.the-original.com"
+                            "thumbnailUrl": "data/default/xsrl_5/iranetirrtni.jpg",
+                            "url": "data/default/xsrl_5/naeuvaner.jpg"
                         }
                     ],
                     "video": [
                         {
                             "sequence": 3,
                             "visibility": "ALWAYS",
-                            "coverUrl": "https://to.the-cover.com",
-                            "url": "https://to.the-video.com"
+                            "url": "data/default/xsrl_6/enuiatrenuiar.mp4"
                         }
                     ],
                     "iliasLink": [
@@ -299,7 +290,8 @@ The accordion block is a special block, that can contains all other block types.
                                     "minimum": 1
                                 },
                                 "visibility": {
-                                    "type": "string"
+                                    "type": "string",
+                                    "pattern": "^ALWAYS$|^NEVER$|^ONLY_AT_PLACE$|^AFTER_PLACE_VISIT$"
                                 },
                                 "content": {
                                     "description": "The text blocks content as html format",
@@ -320,7 +312,8 @@ The accordion block is a special block, that can contains all other block types.
                                     "minimum": 1
                                 },
                                 "visibility": {
-                                    "type": "string"
+                                    "type": "string",
+                                    "pattern": "^ALWAYS$|^NEVER$|^ONLY_AT_PLACE$|^AFTER_PLACE_VISIT$"
                                 },
                                 "title": {
                                     "type": "string"
@@ -329,10 +322,14 @@ The accordion block is a special block, that can contains all other block types.
                                     "type": "string"
                                 },
                                 "thumbnailUrl": {
-                                    "type": "string"
+                                    "description": "Relative path of the file. Thumbnail has a static width of 1280px",
+                                    "type": "string",
+                                    "pattern": "^(.*?\/){2,}.*?\.(jpg|png)$"
                                 },
                                 "url": {
-                                    "type": "string"
+                                    "description": "Relative path of the file",
+                                    "type": "string",
+                                    "pattern": "^(.*?\/){2,}.*?\.(jpg|png)$"
                                 }
                             }
                         }
@@ -349,13 +346,13 @@ The accordion block is a special block, that can contains all other block types.
                                     "minimum": 1
                                 },
                                 "visibility": {
-                                    "type": "string"
-                                },
-                                "coverUrl": {
-                                    "type": "string"
+                                    "type": "string",
+                                    "pattern": "^ALWAYS$|^NEVER$|^ONLY_AT_PLACE$|^AFTER_PLACE_VISIT$"
                                 },
                                 "url": {
-                                    "type": "string"
+                                    "description": "Relative path of the file",
+                                    "type": "string",
+                                    "pattern": "^(.*?\/){2,}.*?\.mp4$"
                                 }
                             }
                         }
@@ -372,26 +369,14 @@ The accordion block is a special block, that can contains all other block types.
                                     "minimum": 1
                                 },
                                 "visibility": {
-                                    "type": "string"
+                                    "type": "string",
+                                    "pattern": "^ALWAYS$|^NEVER$|^ONLY_AT_PLACE$|^AFTER_PLACE_VISIT$"
                                 },
                                 "refId": {
                                     "description": "The ref id used in ILIAS",
                                     "type": "integer",
                                     "minimum": 1
                                 }
-                            }
-                        }
-                    },
-                    "feedback": {
-                        "type": [ "object", "null" ],
-                        "properties": {
-                            "sequence": {
-                                "description": "Position of the block ordering",
-                                "type": "integer",
-                                "minimum": 1
-                            },
-                            "visibility": {
-                                "type": "string"
                             }
                         }
                     },
@@ -404,7 +389,8 @@ The accordion block is a special block, that can contains all other block types.
                                 "minimum": 1
                             },
                             "visibility": {
-                                "type": "string"
+                                "type": "string",
+                                "pattern": "^ALWAYS$|^NEVER$|^ONLY_AT_PLACE$|^AFTER_PLACE_VISIT$"
                             }
                         }
                     },
@@ -426,7 +412,8 @@ The accordion block is a special block, that can contains all other block types.
                                                 "minimum": 1
                                             },
                                             "visibility": {
-                                                "type": "string"
+                                                "type": "string",
+                                                "pattern": "^ALWAYS$|^NEVER$|^ONLY_AT_PLACE$|^AFTER_PLACE_VISIT$"
                                             },
                                             "content": {
                                                 "description": "The text blocks content as html format",
@@ -447,7 +434,8 @@ The accordion block is a special block, that can contains all other block types.
                                                 "minimum": 1
                                             },
                                             "visibility": {
-                                                "type": "string"
+                                                "type": "string",
+                                                "pattern": "^ALWAYS$|^NEVER$|^ONLY_AT_PLACE$|^AFTER_PLACE_VISIT$"
                                             },
                                             "title": {
                                                 "type": "string"
@@ -456,10 +444,14 @@ The accordion block is a special block, that can contains all other block types.
                                                 "type": "string"
                                             },
                                             "thumbnailUrl": {
-                                                "type": "string"
+                                                "description": "Relative path of the file. Thumbnail has a static width of 1280px",
+                                                "type": "string",
+                                                "pattern": "^(.*?\/){2,}.*?\.(jpg|png)$"
                                             },
                                             "url": {
-                                                "type": "string"
+                                                "description": "Relative path of the file",
+                                                "type": "string",
+                                                "pattern": "^(.*?\/){2,}.*?\.(jpg|png)$"
                                             }
                                         }
                                     }
@@ -476,13 +468,13 @@ The accordion block is a special block, that can contains all other block types.
                                                 "minimum": 1
                                             },
                                             "visibility": {
-                                                "type": "string"
-                                            },
-                                            "coverUrl": {
-                                                "type": "string"
+                                                "type": "string",
+                                                "pattern": "^ALWAYS$|^NEVER$|^ONLY_AT_PLACE$|^AFTER_PLACE_VISIT$"
                                             },
                                             "url": {
-                                                "type": "string"
+                                                "description": "Relative path of the file",
+                                                "type": "string",
+                                                 "pattern": "^(.*?\/){2,}.*?\.mp4$"
                                             }
                                         }
                                     }
@@ -499,26 +491,14 @@ The accordion block is a special block, that can contains all other block types.
                                                 "minimum": 1
                                             },
                                             "visibility": {
-                                                "type": "string"
+                                                "type": "string",
+                                                "pattern": "^ALWAYS$|^NEVER$|^ONLY_AT_PLACE$|^AFTER_PLACE_VISIT$"
                                             },
                                             "refId": {
                                                 "description": "The ref id used in ILIAS",
                                                 "type": "integer",
                                                 "minimum": 1
                                             }
-                                        }
-                                    }
-                                },
-                                "feedback": {
-                                    "type": [ "object", "null" ],
-                                    "properties": {
-                                        "sequence": {
-                                            "description": "Position of the block ordering",
-                                            "type": "integer",
-                                            "minimum": 1
-                                        },
-                                        "visibility": {
-                                            "type": "string"
                                         }
                                     }
                                 },
@@ -531,7 +511,8 @@ The accordion block is a special block, that can contains all other block types.
                                             "minimum": 1
                                         },
                                         "visibility": {
-                                            "type": "string"
+                                            "type": "string",
+                                            "pattern": "^ALWAYS$|^NEVER$|^ONLY_AT_PLACE$|^AFTER_PLACE_VISIT$"
                                         }
                                     }
                                 }
@@ -546,15 +527,24 @@ The accordion block is a special block, that can contains all other block types.
 
 All sort of pictures of a learnplace.
 
-## Picture for a gallery of a learnplace [/learnplace/{id}/gallery/picture]
+## Picture for a gallery of a learnplace [/learnplace/{objectId}/picture]
 
 ### Create a new picture [POST]
 You can create an new picture using this action. The picture is associated to the learnplace with
-the id used in the request url and will be added to a gallery.
+the id used in the request url.
 
-+ Request  (image/png)
++ Request  (multipart/form-data)
 
     + Body
+
+            ------------287032381131322
+            Content-Disposition: form-data; name="datafile1"; filename="r.png"
+            Content-Type: image/png
+
+            PN87a.............,...........D..;
+            ------------287032381131322
+            Content-Disposition: form-data; name="batman"; filename="b.jpg"
+            Content-Type: image/jpg
 
             11111111111111111111111111
             11111100111111111100111111
@@ -569,6 +559,13 @@ the id used in the request url and will be added to a gallery.
             11001111111100111111110011
             11100111111100111111100111
             11111111111111111111111111
+
+            ------------287032381131322
+            Content-Disposition: form-data; name="datafile3"; filename="b.png"
+            Content-Type: image/png
+
+            GIF87a.............,...........D..;
+            ------------287032381131322--
 
 + Response 200 (application/json)
 
