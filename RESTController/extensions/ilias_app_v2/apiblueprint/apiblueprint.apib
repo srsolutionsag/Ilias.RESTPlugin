@@ -1,0 +1,541 @@
+Format: 1.0.0
+
+# ILIAS Learnplace API
+
+Learnplace is an API for the ILIAS Plugin 'Lernorte'.
+It allows to view blocks and their setting, that are used in a learnplace.
+
+# Group Learnplace
+
+Resources that are directly related to a learnplace.
+
+## A single learnplace [/learnplace/{id}]
+
+### Get a single learnplace [GET]
+
++ Response 200 (application/json)
+
+    + Body
+
+            {
+                "id": 1,
+                "objectId": 24,
+                "location": {
+                    "id": 1,
+                    "latitude": 501.0112,
+                    "longitude": -201.210,
+                    "elevation": 10.05,
+                    "radius": 15
+                },
+                "map": {
+                    "visibility": "ALWAYS"
+                }
+            }
+
+    + Schema
+
+            {
+                "title": "Learnplace",
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "minimum": 1
+                    },
+                    "objectId": {
+                        "description": "The object id used in ILIAS to identify the object"
+                        "type": "integer",
+                        "minimum": 1
+                    },
+                    "location": {
+                        "type": "object",
+                        "properties": {
+                            "id": {
+                                "type": "integer",
+                                "minimum": 1
+                            },
+                            "latitude": {
+                                "type": "float"
+                            },
+                            "longitude": {
+                                "type": "float"
+                            },
+                            "evelation": {
+                                "description": "The height of a geographic location",
+                                "type": "float"
+                            },
+                            "radius": {
+                                "type": "integer"
+                            }
+                        }
+                    },
+                    "map": {
+                        "type": [ "object", "null" ],
+                        "properties": {
+                            "visibility": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+
+## Visit journal of a learnplace [/learnplace{id}/visit-journal]
+
+### List all visiter of a learnplace [GET]
+
++ Response 200 (application/json)
+
+    + Body
+
+            [
+                {
+                    "username": "mmuster",
+                    "timestamp": 1415463675
+                },
+                {
+                    "username": "ssuster",
+                    "timestamp": 1415687564
+                }
+            ]
+
+    + Schema
+
+            {
+                "title": "visit journal",
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "username": {
+                            "type": "string"
+                        },
+                        "timestamp": {
+                            "description": "The unix time in milliseconds",
+                            "type": "long",
+                            "minimum": 0
+                        }
+                    }
+                }
+            }
+
+# Group Block
+
+Blocks are the content of a learnplace.
+
+## All blocks of a learnplace [/learnplace/{id}/blocks]
+
+### Get all blocks of a single learnplace [GET]
+
++ Response 200 (application/json)
+
+    + Body
+
+            {
+                "text": [
+                    {
+                        "sequence": 1,
+                        "visibility": "ALWAYS",
+                        "content": ""
+                    }
+                ],
+                "picture": [
+                    {
+                        "sequence": 2,
+                        "visibility": "ALWAYS",
+                        "title": "a fancy picture",
+                        "description": "",
+                        "thumbnailUrl": "https://to.the-thumbnail.com",
+                        "url": "https://to.the-original.com"
+                    }
+                ],
+                "video": [
+                    {
+                        "sequence": 3,
+                        "visibility": "ALWAYS",
+                        "coverUrl": "https://to.the-cover.com",
+                        "url": "https://to.the-video.com"
+                    }
+                ],
+                "iliasLink": [
+                    {
+                        "sequence": 4,
+                        "visibility": "ALWAYS",
+                        "refId": 285
+                    }
+                ],
+                "pictureUpload": {
+                    "sequence": 6,
+                    "visibility": "ALWAYS"
+                },
+                "accordion": {
+                    "text": [
+                        {
+                            "sequence": 1,
+                            "visibility": "ALWAYS",
+                            "content": ""
+                        }
+                    ],
+                    "picture": [
+                        {
+                            "sequence": 2,
+                            "visibility": "ALWAYS",
+                            "title": "a fancy picture",
+                            "description": "",
+                            "thumbnailUrl": "https://to.the-thumbnail.com",
+                            "url": "https://to.the-original.com"
+                        }
+                    ],
+                    "video": [
+                        {
+                            "sequence": 3,
+                            "visibility": "ALWAYS",
+                            "coverUrl": "https://to.the-cover.com",
+                            "url": "https://to.the-video.com"
+                        }
+                    ],
+                    "iliasLink": [
+                        {
+                            "sequence": 4,
+                            "visibility": "ALWAYS",
+                            "refId": 285
+                        }
+                    ],
+                    "pictureUpload": {
+                        "sequence": 6,
+                        "visibility": "ALWAYS"
+                    }
+                }
+            }
+
+    + Schema
+
+            {
+                "title": "blocks",
+                "type": "object",
+                "properties": {
+                    "text": {
+                        "description": "Contains all text blocks of the learnplace"
+                        "type": "array",
+                        "items" {
+                            "type": "object",
+                            "properties": {
+                                "sequence": {
+                                    "description": "Position of the block ordering",
+                                    "type": "integer",
+                                    "minimum": 1
+                                },
+                                "visibility": {
+                                    "type": "string"
+                                },
+                                "content": {
+                                    "description": "The text blocks content as html format",
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "picture": {
+                         "description": "Contains all picture blocks of the learnplace"
+                        "type": "array",
+                        "items" {
+                            "type": "object",
+                            "properties": {
+                                "sequence": {
+                                    "description": "Position of the block ordering",
+                                    "type": "integer",
+                                    "minimum": 1
+                                },
+                                "visibility": {
+                                    "type": "string"
+                                },
+                                "title": {
+                                    "type": "string"
+                                },
+                                "description": {
+                                    "type": "string"
+                                },
+                                "thumbnailUrl": {
+                                    "type": "string"
+                                },
+                                "url": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "video": {
+                        "description": "Contains all video blocks of the learnplace"
+                        "type": "array",
+                        "items" {
+                            "type": "object",
+                            "properties": {
+                                "sequence": {
+                                    "description": "Position of the block ordering",
+                                    "type": "integer",
+                                    "minimum": 1
+                                },
+                                "visibility": {
+                                    "type": "string"
+                                },
+                                "coverUrl": {
+                                    "type": "string"
+                                },
+                                "url": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "iliasLink": {
+                        "description": "Contains all ILIAS link blocks of the learnplace"
+                        "type": "array",
+                        "items" {
+                            "type": "object",
+                            "properties": {
+                                "sequence": {
+                                    "description": "Position of the block ordering",
+                                    "type": "integer",
+                                    "minimum": 1
+                                },
+                                "visibility": {
+                                    "type": "string"
+                                },
+                                "refId": {
+                                    "description": "The ref id used in ILIAS",
+                                    "type": "integer",
+                                    "minimum": 1
+                                }
+                            }
+                        }
+                    },
+                    "feedback": {
+                        "type": [ "object", "null" ],
+                        "properties": {
+                            "sequence": {
+                                "description": "Position of the block ordering",
+                                "type": "integer",
+                                "minimum": 1
+                            },
+                            "visibility": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "pictureUpload": {
+                        "type": [ "object", "null" ],
+                        "properties": {
+                            "sequence": {
+                                "description": "Position of the block ordering",
+                                "type": "integer",
+                                "minimum": 1
+                            },
+                            "visibility": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "accordion": {
+                        "description": "Contains the id of all accordions of this leanrplace"
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "text": {
+                                    "description": "Contains all text blocks of the accordion"
+                                    "type": "array",
+                                    "items" {
+                                        "type": "object",
+                                        "properties": {
+                                            "sequence": {
+                                                "description": "Position of the block ordering",
+                                                "type": "integer",
+                                                "minimum": 1
+                                            },
+                                            "visibility": {
+                                                "type": "string"
+                                            },
+                                            "content": {
+                                                "description": "The text blocks content as html format",
+                                                "type": "string"
+                                            }
+                                        }
+                                    }
+                                },
+                                "picture": {
+                                     "description": "Contains all picture blocks of the accordion"
+                                    "type": "array",
+                                    "items" {
+                                        "type": "object",
+                                        "properties": {
+                                            "sequence": {
+                                                "description": "Position of the block ordering",
+                                                "type": "integer",
+                                                "minimum": 1
+                                            },
+                                            "visibility": {
+                                                "type": "string"
+                                            },
+                                            "title": {
+                                                "type": "string"
+                                            },
+                                            "description": {
+                                                "type": "string"
+                                            },
+                                            "thumbnailUrl": {
+                                                "type": "string"
+                                            },
+                                            "url": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    }
+                                },
+                                "video": {
+                                    "description": "Contains all video blocks of the accordion"
+                                    "type": "array",
+                                    "items" {
+                                        "type": "object",
+                                        "properties": {
+                                            "sequence": {
+                                                "description": "Position of the block ordering",
+                                                "type": "integer",
+                                                "minimum": 1
+                                            },
+                                            "visibility": {
+                                                "type": "string"
+                                            },
+                                            "coverUrl": {
+                                                "type": "string"
+                                            },
+                                            "url": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    }
+                                },
+                                "iliasLink": {
+                                    "description": "Contains all ILIAS link blocks of the accordion"
+                                    "type": "array",
+                                    "items" {
+                                        "type": "object",
+                                        "properties": {
+                                            "sequence": {
+                                                "description": "Position of the block ordering",
+                                                "type": "integer",
+                                                "minimum": 1
+                                            },
+                                            "visibility": {
+                                                "type": "string"
+                                            },
+                                            "refId": {
+                                                "description": "The ref id used in ILIAS",
+                                                "type": "integer",
+                                                "minimum": 1
+                                            }
+                                        }
+                                    }
+                                },
+                                "feedback": {
+                                    "type": [ "object", "null" ],
+                                    "properties": {
+                                        "sequence": {
+                                            "description": "Position of the block ordering",
+                                            "type": "integer",
+                                            "minimum": 1
+                                        },
+                                        "visibility": {
+                                            "type": "string"
+                                        }
+                                    }
+                                },
+                                "pictureUpload": {
+                                    "type": [ "object", "null" ],
+                                    "properties": {
+                                        "sequence": {
+                                            "description": "Position of the block ordering",
+                                            "type": "integer",
+                                            "minimum": 1
+                                        },
+                                        "visibility": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+
+# Group picture
+
+All sort of pictures of a learnplace.
+
+## Picture for a gallery of a learnplace [/learnplace/{id}/gallery/picture]
+
+### Create a new picture [POST]
+You can create an new picture using this action. The picture is associated to the learnplace with
+the id used in the request url and will be added to a gallery.
+
++ Request (image/png)
+
+    + Body
+
+            11111111111111111111111111
+            11111100111111111100111111
+            11110001111100111110001111
+            11000001111000011110000011
+            10000000111000011100000001
+            10000000000000000000000001
+            00000000000000000000000000
+            00000000000000000000000000
+            10000000000000000000000001
+            10000110001000010001100001
+            11001111111100111111110011
+            11100111111100111111100111
+            11111111111111111111111111
+
++ Response 200 (application/json)
+
+    + Body
+
+            {
+                "message": "Picture was successsful created"
+            }
+
+    + Schema
+
+            {
+                "title": "message",
+                "type": "object"
+                "properties": {
+                    "message": {
+                        "description": "A message about the action",
+                        "type": "string"
+                    }
+                }
+            }
+
++ Response 400 (application/json)
+
+    + Body
+
+            {
+                "cause": "The binary data are invalid"
+            }
+
+    + Schema
+
+            {
+                "title": "cause",
+                "type": "object",
+                "properties": {
+                    "cause": {
+                        "description": "The reason why it was a bad request",
+                        "type": "string"
+                    }
+                }
+            }
+
