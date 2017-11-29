@@ -12,6 +12,7 @@ Resources that are directly related to a learnplace.
 ## A single learnplace [/learnplace/{id}]
 
 ### Get a single learnplace [GET]
+Information of a learnplace including the location.
 
 + Response 200 (application/json)
 
@@ -82,7 +83,8 @@ Resources that are directly related to a learnplace.
 
 ## Visit journal of a learnplace [/learnplace{id}/visit-journal]
 
-### List all visiter of a learnplace [GET]
+### List the visit journal of a learnplace [GET]
+The visit journal of a learnplace contains all users that visited the learnplace including their time.
 
 + Response 200 (application/json)
 
@@ -119,6 +121,73 @@ Resources that are directly related to a learnplace.
                 }
             }
 
+### Create a new entry to the learnplace visit journal [POST]
+You can create a new entry to the visit journal. The user is identified by the authentication process.
+
++ Request  (application/json)
+
+    + Body
+
+            {
+                "time": 1415687564
+            }
+
+    + Schema
+
+            {
+                "title": "visit journal",
+                "type": "object",
+                "properties": {
+                    "time": {
+                        "description": "The Unix time in milliseconds",
+                        "type": "long",
+                        "minimum": 0
+                    }
+                }
+            }
+
++ Response 200 (application/json)
+
+    + Body
+
+            {
+                "message": "Visit journal entry was successful created"
+            }
+
+    + Schema
+
+            {
+                "title": "message",
+                "type": "object",
+                "properties": {
+                    "message": {
+                        "description": "A message about the action",
+                        "type": "string"
+                    }
+                }
+            }
+
++ Response 400 (application/json)
+
+    + Body
+
+            {
+                "cause": "The request body does not match the json schema"
+            }
+
+    + Schema
+
+            {
+                "title": "cause",
+                "type": "object",
+                "properties": {
+                    "cause": {
+                        "description": "The reason why it was a bad request",
+                        "type": "string"
+                    }
+                }
+            }
+
 # Group Block
 
 Blocks are the content of a learnplace.
@@ -126,6 +195,10 @@ Blocks are the content of a learnplace.
 ## All blocks of a learnplace [/learnplace/{id}/blocks]
 
 ### Get all blocks of a single learnplace [GET]
+All common blocks that are related to the learnplace. Different block types are in different properties.
+There are special blocks, that can only exists once in a learnplace. These properties can also be null.
+
+The accordion block is a special block, that can contains all other block types.
 
 + Response 200 (application/json)
 
@@ -479,7 +552,7 @@ All sort of pictures of a learnplace.
 You can create an new picture using this action. The picture is associated to the learnplace with
 the id used in the request url and will be added to a gallery.
 
-+ Request (image/png)
++ Request  (image/png)
 
     + Body
 
