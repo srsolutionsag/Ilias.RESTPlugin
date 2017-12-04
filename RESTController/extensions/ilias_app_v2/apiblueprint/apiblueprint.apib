@@ -211,7 +211,7 @@ The accordion block is a special block, that can contains all other block types.
                         "visibility": "ALWAYS",
                         "title": "a fancy picture",
                         "description": "",
-                        "thumbnailUrl": "data/default/xsrl_5/iranetirrtni.jpg",
+                        "thumbnail": "",
                         "url": "data/default/xsrl_5/naeuvaner.jpg"
                     }
                 ],
@@ -247,7 +247,7 @@ The accordion block is a special block, that can contains all other block types.
                             "visibility": "ALWAYS",
                             "title": "a fancy picture",
                             "description": "",
-                            "thumbnailUrl": "data/default/xsrl_5/iranetirrtni.jpg",
+                            "thumbnail": "",
                             "url": "data/default/xsrl_5/naeuvaner.jpg"
                         }
                     ],
@@ -321,10 +321,9 @@ The accordion block is a special block, that can contains all other block types.
                                 "description": {
                                     "type": "string"
                                 },
-                                "thumbnailUrl": {
-                                    "description": "Relative path of the file. Thumbnail has a static width of 1280px",
-                                    "type": "string",
-                                    "pattern": "^(.*?\/){2,}.*?\.(jpg|png)$"
+                                "thumbnail": {
+                                    "description": "Base64 encoded image. Thumbnail has a static width of 1280px",
+                                    "type": "string"
                                 },
                                 "url": {
                                     "description": "Relative path of the file",
@@ -443,10 +442,9 @@ The accordion block is a special block, that can contains all other block types.
                                             "description": {
                                                 "type": "string"
                                             },
-                                            "thumbnailUrl": {
-                                                "description": "Relative path of the file. Thumbnail has a static width of 1280px",
-                                                "type": "string",
-                                                "pattern": "^(.*?\/){2,}.*?\.(jpg|png)$"
+                                            "thumbnail": {
+                                                "description": "Base64 encoded image. Thumbnail has a static width of 1280px",
+                                                "type": "string"
                                             },
                                             "url": {
                                                 "description": "Relative path of the file",
