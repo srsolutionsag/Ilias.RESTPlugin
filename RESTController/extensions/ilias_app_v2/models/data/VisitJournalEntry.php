@@ -16,9 +16,10 @@ final class VisitJournalEntry implements JsonSerializable {
 	use JsonSerializableAware;
 
 	/**
-	 * @var string $username
+	 * @var int $username
 	 */
-	private $username;
+	private $userId;
+
 	/**
 	 * @var int $timestamp
 	 */
@@ -28,11 +29,11 @@ final class VisitJournalEntry implements JsonSerializable {
 	/**
 	 * VisitJournalEntry constructor.
 	 *
-	 * @param string $username
-	 * @param int    $timestamp
+	 * @param int $userId
+	 * @param int $timestamp
 	 */
-	public function __construct($username, $timestamp) {
-		$this->username = $username;
+	public function __construct($userId, $timestamp) {
+		$this->userId = $userId;
 		$this->timestamp = $timestamp;
 	}
 
@@ -41,7 +42,7 @@ final class VisitJournalEntry implements JsonSerializable {
 	 * @return string
 	 */
 	public function getUsername() {
-		return $this->username;
+		return $this->userId;
 	}
 
 

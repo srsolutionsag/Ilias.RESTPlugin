@@ -18,23 +18,23 @@ final class ErrorAnswer implements JsonSerializable {
 	use JsonSerializableAware;
 
 	/**
-	 * @var string $reason
+	 * @var string $cause
 	 */
-	private $reason;
+	private $cause;
 
 
 	/**
 	 * ErrorAnswer constructor.
 	 *
-	 * @param string $reason
+	 * @param string $cause
 	 */
-	public function __construct($reason) { $this->reason = $reason; }
+	public function __construct($cause) { $this->cause = $cause; }
 
 
 	/**
 	 * @return string
 	 */
-	public function getReason() {
-		return $this->reason;
+	public function getCause() {
+		return $this->cause;
 	}
 }
