@@ -12,6 +12,7 @@ require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHoo
 require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/REST/RESTController/extensions/ilias_app_v2/models/data/block/Text.php';
 require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/REST/RESTController/extensions/ilias_app_v2/models/data/block/Video.php';
 
+use function base64_encode;
 use function count;
 use DateTime;
 use Generator;
@@ -19,6 +20,8 @@ use ilObjUser;
 use function intval;
 use function is_null;
 use function iterator_to_array;
+use League\Flysystem\FileNotFoundException;
+use League\Flysystem\FilesystemInterface;
 use RESTController\extensions\ILIASApp\V2\data\block\Accordion;
 use RESTController\extensions\ILIASApp\V2\data\block\IliasLink;
 use RESTController\extensions\ILIASApp\V2\data\block\Picture;
@@ -62,6 +65,10 @@ final class LearnplacePlugin {
 	 * @var VisitJournalService $visitJournalService
 	 */
 	private $visitJournalService;
+	/**
+	 * @var FilesystemInterface $filesystem
+	 */
+	private $filesystem;
 
 
 	/**
@@ -70,6 +77,7 @@ final class LearnplacePlugin {
 	public function __construct() {
 		$this->learnplaceService = PluginContainer::resolve(LearnplaceService::class);
 		$this->visitJournalService = PluginContainer::resolve(VisitJournalService::class);
+		$this->filesystem = PluginContainer::resolve(FilesystemInterface::class);
 	}
 
 
@@ -188,9 +196,31 @@ final class LearnplacePlugin {
 	private function fetchPictureBlocks(array $blocks) {
 		foreach ($blocks as $block) {
 			if($block instanceof PictureBlockModel) {
-				$picture = new Picture($block->getSequence(), $block->getVisibility(), $block->getTitle(), $block->getDescription(), $block->getPicture()->getPreviewPath(), $block->getPicture()->getOriginalPath());
+				$picture = new Picture(
+					$block->getSequence(),
+					$block->getVisibility(),
+					$block->getTitle(),
+					$block->getDescription(),
+					$this->base64encodeFile($block->getPicture()->getPreviewPath()),
+					$block->getPicture()->getOriginalPath()
+				);
 				yield $picture;
 			}
+		}
+	}
+
+
+	/**
+	 * @param string $filePath
+	 *
+	 * @return string base64 encoded content of the given file.
+	 */
+	private function base64encodeFile($filePath) {
+		try {
+			return base64_encode($this->filesystem->read($filePath));
+		}
+		catch (FileNotFoundException $exception) {
+			return "";
 		}
 	}
 
