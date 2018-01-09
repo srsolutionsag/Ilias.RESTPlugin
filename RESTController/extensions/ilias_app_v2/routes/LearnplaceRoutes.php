@@ -15,27 +15,29 @@ use RESTController\RESTController;
  */
 $app->group('/learnplace', function() use ($app) {
 
-	//bootstrap learnplaces plugin
-	require_once './Customizing/global/plugins/Services/Repository/RepositoryObject/Learnplaces/classes/bootstrap.php';
-	require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/REST/RESTController/extensions/ilias_app_v2/models/LearnplacePlugin.php';
-	require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/REST/RESTController/extensions/ilias_app_v2/models/data/ErrorAnswer.php';
-	require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/REST/RESTController/extensions/ilias_app_v2/models/data/BlockCollection.php';
+	$init = function() use ($app) {
+		//bootstrap learnplaces plugin
+		require_once './Customizing/global/plugins/Services/Repository/RepositoryObject/Learnplaces/classes/bootstrap.php';
+		require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/REST/RESTController/extensions/ilias_app_v2/models/LearnplacePlugin.php';
+		require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/REST/RESTController/extensions/ilias_app_v2/models/data/ErrorAnswer.php';
+		require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/REST/RESTController/extensions/ilias_app_v2/models/data/BlockCollection.php';
 
+		//set json content type for all sub routes
+		$app->response()->headers()->set('Content-Type', 'application/json');
+
+		$app->error(function($message) use ($app) {
+			print json_encode(new ErrorAnswer($message));
+		});
+	};
 
 	//only numeric values are valid
 	$condition = [
 		'objectId' => '[0-9]+'
 	];
 
-	//set json content type for all sub routes
-	$app->response()->headers()->set('Content-Type', 'application/json');
 
-	$app->error(function($message) use ($app) {
-		print json_encode(new ErrorAnswer($message));
-	});
-
-
-	$app->get('/:objectId', RESTAuth::checkAccess(RESTAuth::TOKEN), function($objectId) use ($app) {
+	$app->get('/:objectId', RESTAuth::checkAccess(RESTAuth::TOKEN), function($objectId) use ($app, $init) {
+		$init();
 		try {
 			$learnplacePlugin = new LearnplacePlugin();
 			$responseContent = json_encode($learnplacePlugin->fetchByObjectId($objectId));
@@ -49,7 +51,8 @@ $app->group('/learnplace', function() use ($app) {
 
 	$app->options('/:objectId', function ($objectId) {})->conditions($condition);
 
-	$app->get('/:objectId/journal-entries', RESTAuth::checkAccess(RESTAuth::TOKEN), function($objectId) use ($app) {
+	$app->get('/:objectId/journal-entries', RESTAuth::checkAccess(RESTAuth::TOKEN), function($objectId) use ($app, $init) {
+		$init();
 		try {
 			$learnplacePlugin = new LearnplacePlugin();
 			$responseContent = json_encode($learnplacePlugin->fetchVisitJournal($objectId));
@@ -62,8 +65,8 @@ $app->group('/learnplace', function() use ($app) {
 
 	$app->options('/:objectId/journal-entries', function ($objectId) {})->conditions($condition);
 
-	$app->post('/:objectId/journal-entry', RESTAuth::checkAccess(RESTAuth::TOKEN), function($objectId) use ($app) {
-
+	$app->post('/:objectId/journal-entry', RESTAuth::checkAccess(RESTAuth::TOKEN), function($objectId) use ($app, $init) {
+		$init();
 		try {
 			$learnplacePlugin = new LearnplacePlugin();
 
@@ -95,7 +98,8 @@ $app->group('/learnplace', function() use ($app) {
 
 	$app->options('/:objectId/journal-entry', function ($objectId) {})->conditions($condition);
 
-	$app->get('/:objectId/blocks', RESTAuth::checkAccess(RESTAuth::TOKEN), function($objectId) use ($app) {
+	$app->get('/:objectId/blocks', RESTAuth::checkAccess(RESTAuth::TOKEN), function($objectId) use ($app, $init) {
+		$init();
 		try {
 			$learnplacePlugin = new LearnplacePlugin();
 			$blocks = $learnplacePlugin->fetchBlocks($objectId);
