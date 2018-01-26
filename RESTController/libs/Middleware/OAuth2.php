@@ -55,6 +55,10 @@ class OAuth2 {
     }
   }
 
+  public static function NONE() {
+
+  }
+
 
   /**
    * Function: PERMISSION($route)

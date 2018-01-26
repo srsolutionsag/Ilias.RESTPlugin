@@ -22,6 +22,7 @@ class RESTAuth {
   const TOKEN       = 'RESTAuth::TOKEN';       // Check for valid token
   const PERMISSION  = 'RESTAuth::PERMISSION';  // TOKEN and check if allowed on route
   const ADMIN       = 'RESTAuth::ADMIN';       // TOKEN, PERMISSION and check if user has ILIAS admin-role
+  const NONE       = 'RESTAuth::NONE';       // TOKEN, PERMISSION and check if user has ILIAS admin-role
 
 
   /**
@@ -40,7 +41,8 @@ class RESTAuth {
    *  <String> - Reference (fully-quantified name of/) to the function that will be called
    */
   public static function checkAccess($level) {
-    // Select auth that matches given security-level
+
+	  // Select auth that matches given security-level
     switch($level) {
       default:
       case self::TOKEN:
@@ -49,6 +51,8 @@ class RESTAuth {
         return 'RESTController\\libs\\Middleware\\OAuth2::PERMISSION';
       case self::ADMIN:
         return 'RESTController\\libs\\Middleware\\ILIAS::ADMIN';
+      case self::NONE:
+		return 'RESTController\\libs\\Middleware\\OAuth2::NONE';
     }
   }
 

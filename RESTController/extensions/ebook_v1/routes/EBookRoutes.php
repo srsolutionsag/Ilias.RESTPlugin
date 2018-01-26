@@ -99,6 +99,30 @@ $app->group('/v1/ebook', function () use ($app) {
 	$app->options('/:refId/file', function() {});
 
 	/**
+	 * GET key
+	 */
+	$app->post('/log-error', RESTAuth::checkAccess(RESTAuth::NONE), function() use ($app) {
+		$model = new EBookModel(false);
+		$headers = getallheaders();
+		try {
+			$model->errorLog(
+				urldecode($headers['message']),
+				urldecode($headers['stack-trace']),
+				urldecode($headers['version']),
+				urldecode($headers['os'])
+			);
+
+			$app->response->body(json_encode(["success" => true]));
+		} catch (NoFileException $e) {
+			$app->halt(404, "No file uploaded yet.");
+		} catch (NoAccessException $e) {
+			$app->halt(401, "No access.");
+		}
+
+	});
+	$app->options('/error-log', function() {});
+
+	/**
 	 * GET if key is still valid
 	 *
 	 * returns success if the logged in user still has access to the ebook.

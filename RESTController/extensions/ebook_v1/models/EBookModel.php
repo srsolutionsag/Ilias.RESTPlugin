@@ -22,11 +22,13 @@ class EBookModel  extends Libs\RESTModel {
 	protected $access;
 
 
-	public function __construct()
+	public function __construct($load_user = true)
 	{
 		global $ilDB, $ilAccess;
-		Libs\RESTilias::loadIlUser();
-		Libs\RESTilias::initAccessHandling();
+		if($load_user) {
+			Libs\RESTilias::loadIlUser();
+			Libs\RESTilias::initAccessHandling();
+		}
 		$this->db = $ilDB;
 		$this->access = $ilAccess;
 	}
@@ -144,4 +146,26 @@ class EBookModel  extends Libs\RESTModel {
 		return true;
 
 	}
+
+
+	/**
+	 * @param $message string
+	 * @param $stackTrace string
+	 * @param $version string
+	 * @param $os string
+	 */
+	public function errorLog($message, $stackTrace, $version, $os) {
+		global $DIC;
+
+		$db = $DIC->database();
+		$query = "INSERT INTO rep_robj_xebk_errors (message, stack_trace, version, os, `timestamp`) VALUES (
+				{$db->quote($message, 'text')},
+				{$db->quote($stackTrace, 'text')},
+				{$db->quote($version, 'text')},
+				{$db->quote($os, 'text')},
+				{$db->quote('NOW', 'date')}
+			)";
+		$db->manipulate($query);
+	}
+
 }
