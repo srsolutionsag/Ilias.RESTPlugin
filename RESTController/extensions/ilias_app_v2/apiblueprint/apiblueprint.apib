@@ -497,3 +497,74 @@ The accordion block is a special block, that can contains all other block types.
                     }
                 }
             }
+
+# News Feed
+ILIAS provides a personalized news feed for users.
+
+## All news for the authenticated user [/news]
+
+### Fetches all news for the current authenticated user [GET]
+Fetches the personalized news of the current moth for the user which is
+associated with the used authorization token.
+
++ Response 200 (application/json)
+
+  + body
+
+    {
+      "newsId": 28,
+      "refId": 79,
+      "userRead": true,
+      "content": "Wiki page has been created.",
+      "title": "Wiki: Awesome wiki",
+      "subtitle": "Awesome page"
+      "createDate": 8040404,
+      "updateDate": 90202202
+    }
+
+  + Schema
+
+    {
+        "title": "News",
+        "type": "object",
+        "properties": {
+            "newsId": {
+                "description": "The numeric news identifier.",
+                "type": "integer",
+                "minimum": 1
+            },
+            "refId": {
+                "description": "The ILIAS object reference identifier.",
+                "type": "integer",
+                "minimum": 1
+            },
+            "userRead": {
+                "description": "True if the user has red the news content, otherwise false.",
+                "type": "boolean"
+            },
+            "title": {
+                "description": "The title of the news entry.",
+                "type": "string",
+                "pattern": "^.{1,}$"
+            },
+            "content": {
+                "description": "The content of the news entry.",
+                "type": "string"
+            },
+            "subtitle": {
+                "description": "The subtitle of the news entry",
+                "type": "string"
+            },
+            "createDate": {
+              "description": "The create date of the news entry as unix epoch time.",
+              "type": "integer",
+              "minimum": 1
+            },
+            "updateDate": {
+              "description": "The update date of the news entry as unix epoch time.",
+              "type": "integer",
+              "minimum": 1
+            }
+        },
+        "required": [ "newsId", "refId", "userRead", "title", "content", "subtitle", "createDate", "updateDate" ]
+    }
