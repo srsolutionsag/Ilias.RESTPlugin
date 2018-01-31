@@ -54,4 +54,7 @@ $app->group('/v2/ilias-app', function () use ($app) {
 
 	//add learnplace routes
 	require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/REST/RESTController/extensions/ilias_app_v2/routes/LearnplaceRoutes.php';
+
+	//add news routes
+	require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/REST/RESTController/extensions/ilias_app_v2/routes/NewsRoutes.php';
 });
