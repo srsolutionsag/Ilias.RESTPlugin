@@ -52,6 +52,19 @@ $app->group('/v2/ilias-app', function () use ($app) {
 
 	$app->options('/files/:refId', function() {});
 
+	/**
+	 * Returns a very short live token to log in via the ILIAS Pegasus Helper plugin.
+	 */
+	$app->get('/auth-token', RESTAuth::checkAccess(RESTAuth::TOKEN), function() use ($app) {
+		$iliasApp = new ILIASAppModel();
+		$accessToken = $app->request->getToken();
+		$userId = $accessToken->getUserId();
+		$token = $iliasApp->createToken($userId);
+		$app->response->body(json_encode("{\"token\":\"$token\"}"));
+	});
+
+	$app->options('/auth-token', function () {});
+
 	//add learnplace routes
 	require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/REST/RESTController/extensions/ilias_app_v2/routes/LearnplaceRoutes.php';
 
