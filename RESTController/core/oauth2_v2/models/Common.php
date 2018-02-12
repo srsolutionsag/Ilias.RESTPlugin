@@ -34,6 +34,8 @@ class Common extends Libs\RESTModel {
   const ID_BAD_SCOPE                    = 'RESTController\\core\\auth\\Common::MSG_BAD_SCOPE';
   const MSG_INVALID_CLIENT              = 'There is no client with api-key: {{api_key}}';
   const ID_INVALID_CLIENT               = 'RESTController\\core\\auth\\Common::ID_INVALID_CLIENT';
+  const MSG_REVOKED                     = '{{types}} has been revoked or expired from database.';
+  const ID_REVOKED                      = 'RESTController\\core\\auth\\Common::ID_REVOKED';
 
 
   /**
@@ -338,7 +340,8 @@ class Common extends Libs\RESTModel {
     $hash      = $refresh->getUniqueHash();
 
     // Used to catch if no existing refresh-key was found...
-    try {
+
+	/* try {
       // Check wether a refresh-token was already generated (throws on failure)
       $refreshDB = Database\RESTrefresh::fromHash($hash);
       $refreshDB->refreshed();
@@ -349,7 +352,8 @@ class Common extends Libs\RESTModel {
     }
     catch (Libs\Exceptions\Database $e) {
       
-    }
+    }*/
+
 // Store newly generated refresh-token in database
 	  $time       = date("Y-m-d H:i:s");
 	  $refreshDB  = Database\RESTrefresh::fromRow(array(
