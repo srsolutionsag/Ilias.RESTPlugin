@@ -255,8 +255,9 @@ The accordion block is a special block, that can contains all other block types.
                             "title": "a fancy picture",
                             "description": "",
                             "thumbnail": "",
+                            "thumbnailHash": "",
                             "url": "data/default/xsrl_5/naeuvaner.jpg",
-                            "hash": ""
+                            "hash": "5f0469e9c1ecfba013ed10800ec5c9e03ad42f27f7a72e107a21e8e9142f56d8"
                         }
                     ],
                     "video": [
@@ -265,7 +266,7 @@ The accordion block is a special block, that can contains all other block types.
                             "sequence": 3,
                             "visibility": "ALWAYS",
                             "url": "data/default/xsrl_6/enuiatrenuiar.mp4",
-                            "hash": ""
+                            "hash": "5f0469e9c1ecfba013ed10800ec5c9e03ad42f27f7a72e107a21e8e9142f56d8"
                         }
                     ],
                     "iliasLink": [
@@ -479,11 +480,15 @@ The accordion block is a special block, that can contains all other block types.
                                           "type": "string"
                                       },
                                       "thumbnail": {
-                                          "description": "Base64 encoded image. Thumbnail has a static width of 1280px",
+                                          "description": "Relative path of the thumbnail image file. Thumbnail has a static width of 1280px",
                                           "type": "string"
                                       },
+                                      "thumbnailHash": {
+                                        "description": "sha256 hash of the thumbnail image returned by the url property of this object",
+                                        "type": "string"
+                                      }
                                       "url": {
-                                          "description": "Relative path of the file",
+                                          "description": "Relative path of the image file",
                                           "type": "string",
                                           "pattern": "^(.*?\/){2,}.*?\.(jpg|png)$"
                                       },
