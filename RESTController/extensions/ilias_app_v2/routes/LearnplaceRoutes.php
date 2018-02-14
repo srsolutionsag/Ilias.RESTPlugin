@@ -1,7 +1,9 @@
 <?php
 
 use RESTController\extensions\ILIASApp\V2\data\ErrorAnswer;
+use RESTController\extensions\ILIASApp\V2\FileHashProviderFactory;
 use RESTController\extensions\ILIASApp\V2\LearnplacePlugin;
+use RESTController\extensions\ILIASApp\V2\SHA256FileHashProvider;
 use RESTController\libs\RESTAuth;
 use RESTController\RESTController;
 
@@ -19,6 +21,8 @@ $app->group('/learnplace', function() use ($app) {
 		require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/REST/RESTController/extensions/ilias_app_v2/models/LearnplacePlugin.php';
 		require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/REST/RESTController/extensions/ilias_app_v2/models/data/ErrorAnswer.php';
 		require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/REST/RESTController/extensions/ilias_app_v2/models/data/BlockCollection.php';
+		require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/REST/RESTController/extensions/ilias_app_v2/services/FileHashing/FileHashProvider.php';
+		require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/REST/RESTController/extensions/ilias_app_v2/services/FileHashing/FileHashProviderFactory.php';
 
 		//set json content type for all sub routes
 		$app->response()->headers()->set('Content-Type', 'application/json');
@@ -48,7 +52,7 @@ $app->group('/learnplace', function() use ($app) {
 	$app->get('/:objectId', RESTAuth::checkAccess(RESTAuth::TOKEN), function($objectId) use ($app, $init) {
 		try {
 			$init($app);
-			$learnplacePlugin = new LearnplacePlugin();
+			$learnplacePlugin = createLearnplacePlugin();
 			$responseContent = json_encode($learnplacePlugin->fetchByObjectId($objectId));
 			$app->response()->body($responseContent);
 		}
@@ -63,7 +67,7 @@ $app->group('/learnplace', function() use ($app) {
 	$app->get('/:objectId/journal-entries', RESTAuth::checkAccess(RESTAuth::TOKEN), function($objectId) use ($app, $init) {
 		try {
 			$init($app);
-			$learnplacePlugin = new LearnplacePlugin();
+			$learnplacePlugin = createLearnplacePlugin();
 			$responseContent = json_encode($learnplacePlugin->fetchVisitJournal($objectId));
 			$app->response()->body($responseContent);
 		}
@@ -77,7 +81,7 @@ $app->group('/learnplace', function() use ($app) {
 	$app->post('/:objectId/journal-entry', RESTAuth::checkAccess(RESTAuth::TOKEN), function($objectId) use ($app, $init) {
 		try {
 			$init($app);
-			$learnplacePlugin = new LearnplacePlugin();
+			$learnplacePlugin = createLearnplacePlugin();
 
 			/**
 			 * @var array $json
@@ -110,7 +114,7 @@ $app->group('/learnplace', function() use ($app) {
 	$app->get('/:objectId/blocks', RESTAuth::checkAccess(RESTAuth::TOKEN), function($objectId) use ($app, $init) {
 		try {
 			$init($app);
-			$learnplacePlugin = new LearnplacePlugin();
+			$learnplacePlugin = createLearnplacePlugin();
 			$blocks = $learnplacePlugin->fetchBlocks($objectId);
 			$app->response()->body($blocks);
 		}
@@ -121,4 +125,14 @@ $app->group('/learnplace', function() use ($app) {
 	})->conditions($condition);
 
 	$app->options('/:objectId/blocks', function ($objectId) {})->conditions($condition);
+
+	/**
+	 * Factory function for the learnplace plugin.
+	 *
+	 * @return LearnplacePlugin $learnplace
+	 */
+	function createLearnplacePlugin() {
+		return new LearnplacePlugin((new FileHashProviderFactory())->create());
+	}
 });
+

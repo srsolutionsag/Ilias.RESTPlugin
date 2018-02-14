@@ -11,6 +11,7 @@ require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHoo
 require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/REST/RESTController/extensions/ilias_app_v2/models/data/block/Picture.php';
 require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/REST/RESTController/extensions/ilias_app_v2/models/data/block/Text.php';
 require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/REST/RESTController/extensions/ilias_app_v2/models/data/block/Video.php';
+require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/REST/RESTController/extensions/ilias_app_v2/services/FileHashing/FileHashProvider.php';
 
 use function base64_encode;
 use function count;
@@ -69,15 +70,22 @@ final class LearnplacePlugin {
 	 * @var FilesystemInterface $filesystem
 	 */
 	private $filesystem;
+	/**
+	 * @var FileHashProvider $hashProvider
+	 */
+	private $hashProvider;
 
 
 	/**
 	 * LearnplacePlugin constructor.
+	 *
+	 * @param FileHashProvider $hashProvider    The hash provider which should be used to hash the pictures and videos.
 	 */
-	public function __construct() {
+	public function __construct(FileHashProvider $hashProvider) {
 		$this->learnplaceService = PluginContainer::resolve(LearnplaceService::class);
 		$this->visitJournalService = PluginContainer::resolve(VisitJournalService::class);
 		$this->filesystem = PluginContainer::resolve(FilesystemInterface::class);
+		$this->hashProvider = $hashProvider;
 	}
 
 
@@ -203,7 +211,9 @@ final class LearnplacePlugin {
 					$block->getTitle(),
 					$block->getDescription(),
 					$block->getPicture()->getPreviewPath(),
-					$block->getPicture()->getOriginalPath()
+					$block->getPicture()->getOriginalPath(),
+					$this->hashProvider->hash($block->getPicture()->getOriginalPath()),
+					$this->hashProvider->hash($block->getPicture()->getPreviewPath())
 				);
 				yield $picture;
 			}
@@ -232,7 +242,7 @@ final class LearnplacePlugin {
 	private function fetchVideoBlocks(array $blocks) {
 		foreach ($blocks as $block) {
 			if($block instanceof VideoBlockModel) {
-				$video = new Video($block->getId(), $block->getSequence(), $block->getVisibility(), $block->getPath());
+				$video = new Video($block->getId(), $block->getSequence(), $block->getVisibility(), $block->getPath(), $this->hashProvider->hash($block->getPath()));
 				yield $video;
 			}
 		}

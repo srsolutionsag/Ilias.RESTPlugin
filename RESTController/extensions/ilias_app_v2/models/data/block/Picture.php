@@ -29,9 +29,17 @@ final class Picture extends BaseBlock {
 	 */
 	private $thumbnail;
 	/**
+	 * @var string $thumbnailHash
+	 */
+	private $thumbnailHash;
+	/**
 	 * @var string $url
 	 */
 	private $url;
+	/**
+	 * @var string $hash
+	 */
+	private $hash;
 
 
 	/**
@@ -44,13 +52,17 @@ final class Picture extends BaseBlock {
 	 * @param string $description
 	 * @param string $thumbnail
 	 * @param string $url
+	 * @param string $hash
+	 * @param string $thumbnailHash
 	 */
-	public function __construct($id, $sequence, $visibility, $title, $description, $thumbnail, $url) {
+	public function __construct($id, $sequence, $visibility, $title, $description, $thumbnail, $url, $hash, $thumbnailHash) {
 		parent::__construct($id, $sequence, $visibility);
 		$this->title = $title;
 		$this->description = $description;
 		$this->thumbnail = $thumbnail;
 		$this->url = $url;
+		$this->hash = $hash;
+		$this->thumbnailHash = $thumbnailHash;
 	}
 
 

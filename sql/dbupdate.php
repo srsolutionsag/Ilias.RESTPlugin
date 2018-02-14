@@ -5,6 +5,7 @@
  * Authors: D.Schaefer and T.Hufschmidt <(schaefer|hufschmidt)@hrz.uni-marburg.de>
  * Since 2014
  */
+
 ?>
 <#1>
 <?php
@@ -482,4 +483,15 @@ $ilDB->addPrimaryKey('ui_uihk_rest_token',  array('user_id'));
 
 global $ilLog;
 $ilLog->write('Plugin REST -> DB-Update #10: Created ui_uihk_rest_token.');
+?>
+<#11>
+<?php
+
+require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/REST/RESTController/extensions/ilias_app_v2/services/FileHashing/entity/HashCacheEntry.php';
+use RESTController\extensions\ILIASApp\V2\HashCacheEntry;
+
+HashCacheEntry::installDB();
+
+global $ilLog;
+$ilLog->write('Plugin REST -> DB-Update #11: Created ui_uihk_rest_hashcache.');
 ?>
