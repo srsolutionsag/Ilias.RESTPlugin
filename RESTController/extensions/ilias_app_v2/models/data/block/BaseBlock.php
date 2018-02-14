@@ -12,6 +12,10 @@ use JsonSerializable;
 abstract class BaseBlock implements JsonSerializable {
 
 	/**
+	 * @var int $id
+	 */
+	protected $id;
+	/**
 	 * @var int $sequence
 	 */
 	protected $sequence;
@@ -24,10 +28,12 @@ abstract class BaseBlock implements JsonSerializable {
 	/**
 	 * BaseBlock constructor.
 	 *
+	 * @param int    $id
 	 * @param int    $sequence
 	 * @param string $visibility
 	 */
-	public function __construct($sequence, $visibility) {
+	public function __construct(int $id, int $sequence, string $visibility) {
+		$this->id = $id;
 		$this->sequence = $sequence;
 		$this->visibility = $visibility;
 	}
@@ -47,4 +53,14 @@ abstract class BaseBlock implements JsonSerializable {
 	public function getVisibility() {
 		return $this->visibility;
 	}
+
+
+	/**
+	 * @return int
+	 */
+	public function getId() {
+		return $this->id;
+	}
+
+
 }

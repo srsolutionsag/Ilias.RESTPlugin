@@ -183,7 +183,7 @@ final class LearnplacePlugin {
 	private function fetchTextBlocks(array $blocks) {
 		foreach ($blocks as $block) {
 			if($block instanceof RichTextBlockModel) {
-				$text = new Text($block->getSequence(), $block->getVisibility(), $block->getContent());
+				$text = new Text($block->getId(), $block->getSequence(), $block->getVisibility(), $block->getContent());
 				yield $text;
 			}
 		}
@@ -197,11 +197,12 @@ final class LearnplacePlugin {
 		foreach ($blocks as $block) {
 			if($block instanceof PictureBlockModel) {
 				$picture = new Picture(
+					$block->getId(),
 					$block->getSequence(),
 					$block->getVisibility(),
 					$block->getTitle(),
 					$block->getDescription(),
-					$this->base64encodeFile($block->getPicture()->getPreviewPath()),
+					$block->getPicture()->getPreviewPath(),
 					$block->getPicture()->getOriginalPath()
 				);
 				yield $picture;
@@ -231,7 +232,7 @@ final class LearnplacePlugin {
 	private function fetchVideoBlocks(array $blocks) {
 		foreach ($blocks as $block) {
 			if($block instanceof VideoBlockModel) {
-				$video = new Video($block->getSequence(), $block->getVisibility(), $block->getPath());
+				$video = new Video($block->getId(), $block->getSequence(), $block->getVisibility(), $block->getPath());
 				yield $video;
 			}
 		}
@@ -244,7 +245,7 @@ final class LearnplacePlugin {
 	private function fetchIliasLinkBlocks(array $blocks) {
 		foreach ($blocks as $block) {
 			if($block instanceof ILIASLinkBlockModel) {
-				$iliasLink = new IliasLink($block->getSequence(), $block->getVisibility(), $block->getRefId());
+				$iliasLink = new IliasLink($block->getId(), $block->getSequence(), $block->getVisibility(), $block->getRefId());
 				yield $iliasLink;
 			}
 		}
@@ -258,6 +259,7 @@ final class LearnplacePlugin {
 		foreach ($blocks as $block) {
 			if($block instanceof AccordionBlockModel) {
 				$accordion = new Accordion(
+					$block->getId(),
 					$block->getSequence(),
 					$block->getVisibility(),
 					iterator_to_array($this->fetchTextBlocks($block->getBlocks())),

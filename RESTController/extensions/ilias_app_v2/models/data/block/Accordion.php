@@ -36,15 +36,16 @@ final class Accordion extends BaseBlock {
 	/**
 	 * Accordion constructor.
 	 *
-	 * @param             $sequence
-	 * @param             $visibility
+	 * @param int         $id
+	 * @param int         $sequence
+	 * @param string      $visibility
 	 * @param Text[]      $text
 	 * @param Picture[]   $picture
 	 * @param Video[]     $video
 	 * @param IliasLink[] $iliasLink
 	 */
-	public function __construct($sequence, $visibility, array $text, array $picture, array $video, array $iliasLink) {
-		parent::__construct($sequence, $visibility);
+	public function __construct($id, $sequence, $visibility, array $text, array $picture, array $video, array $iliasLink) {
+		parent::__construct($id, $sequence, $visibility);
 		$this->text = $text;
 		$this->picture = $picture;
 		$this->video = $video;

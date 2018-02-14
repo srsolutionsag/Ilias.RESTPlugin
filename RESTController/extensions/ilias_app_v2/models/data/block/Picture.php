@@ -37,15 +37,16 @@ final class Picture extends BaseBlock {
 	/**
 	 * Picture constructor.
 	 *
-	 * @param        $sequence
-	 * @param        $visibility
+	 * @param int    $id
+	 * @param int    $sequence
+	 * @param string $visibility
 	 * @param string $title
 	 * @param string $description
 	 * @param string $thumbnail
 	 * @param string $url
 	 */
-	public function __construct($sequence, $visibility, $title, $description, $thumbnail, $url) {
-		parent::__construct($sequence, $visibility);
+	public function __construct($id, $sequence, $visibility, $title, $description, $thumbnail, $url) {
+		parent::__construct($id, $sequence, $visibility);
 		$this->title = $title;
 		$this->description = $description;
 		$this->thumbnail = $thumbnail;

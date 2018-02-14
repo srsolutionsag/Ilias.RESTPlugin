@@ -25,12 +25,13 @@ final class Video extends BaseBlock {
 	/**
 	 * Video constructor.
 	 *
-	 * @param        $sequence
-	 * @param        $visibility
-	 * @param string $url
+	 * @param int       $id
+	 * @param int       $sequence
+	 * @param string    $visibility
+	 * @param string    $url
 	 */
-	public function __construct($sequence, $visibility, $url) {
-		parent::__construct($sequence, $visibility);
+	public function __construct($id, $sequence, $visibility, $url) {
+		parent::__construct($id, $sequence, $visibility);
 		$this->url = $url;
 	}
 }

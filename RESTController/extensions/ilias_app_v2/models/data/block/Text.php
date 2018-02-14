@@ -25,12 +25,13 @@ final class Text extends BaseBlock {
 	/**
 	 * Text constructor.
 	 *
-	 * @param int       $sequence
-	 * @param int       $visibility
-	 * @param string    $content
+	 * @param int    $id
+	 * @param int    $sequence
+	 * @param int    $visibility
+	 * @param string $content
 	 */
-	public function __construct($sequence, $visibility, $content) {
-		parent::__construct($sequence, $visibility);
+	public function __construct($id, $sequence, $visibility, $content) {
+		parent::__construct($id, $sequence, $visibility);
 		$this->content = $content;
 	}
 }

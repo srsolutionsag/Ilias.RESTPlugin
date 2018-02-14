@@ -25,12 +25,13 @@ final class IliasLink extends BaseBlock {
 	/**
 	 * IliasLink constructor.
 	 *
-	 * @param     $sequence
-	 * @param     $visibility
-	 * @param int $refId
+	 * @param int       $id
+	 * @param int       $sequence
+	 * @param string    $visibility
+	 * @param int       $refId
 	 */
-	public function __construct($sequence, $visibility, $refId) {
-		parent::__construct($sequence, $visibility);
+	public function __construct($id, $sequence, $visibility, $refId) {
+		parent::__construct($id, $sequence, $visibility);
 		$this->refId = $refId;
 	}
 
