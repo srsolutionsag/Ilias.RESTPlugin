@@ -200,6 +200,7 @@ The accordion block is a special block, that can contains all other block types.
             {
                 "text": [
                     {
+                        "id": 1,
                         "sequence": 1,
                         "visibility": "ALWAYS",
                         "content": ""
@@ -207,33 +208,40 @@ The accordion block is a special block, that can contains all other block types.
                 ],
                 "picture": [
                     {
+                        "id": 1,
                         "sequence": 2,
                         "visibility": "ALWAYS",
                         "title": "a fancy picture",
                         "description": "",
                         "thumbnail": "",
-                        "url": "data/default/xsrl_5/naeuvaner.jpg"
+                        "url": "data/default/xsrl_5/naeuvaner.jpg",
+                        "hash": ""
                     }
                 ],
                 "video": [
                     {
+                        "id": 1,
                         "sequence": 3,
                         "visibility": "ALWAYS",
-                        "url": "data/default/xsrl_6/enuiatrenuiar.mp4"
+                        "url": "data/default/xsrl_6/enuiatrenuiar.mp4",
+                        "hash": ""
                     }
                 ],
                 "iliasLink": [
                     {
+                        "id": 1,
                         "sequence": 4,
                         "visibility": "ALWAYS",
                         "refId": 285
                     }
                 ],
                 "accordion": {
+                    "id": 1,
                     "sequence": 1,
                     "visibility": "ALWAYS",
                     "text": [
                         {
+                            "id": 1,
                             "sequence": 1,
                             "visibility": "ALWAYS",
                             "content": ""
@@ -241,23 +249,28 @@ The accordion block is a special block, that can contains all other block types.
                     ],
                     "picture": [
                         {
+                            "id": 1,
                             "sequence": 2,
                             "visibility": "ALWAYS",
                             "title": "a fancy picture",
                             "description": "",
                             "thumbnail": "",
-                            "url": "data/default/xsrl_5/naeuvaner.jpg"
+                            "url": "data/default/xsrl_5/naeuvaner.jpg",
+                            "hash": ""
                         }
                     ],
                     "video": [
                         {
+                            "id": 1,
                             "sequence": 3,
                             "visibility": "ALWAYS",
-                            "url": "data/default/xsrl_6/enuiatrenuiar.mp4"
+                            "url": "data/default/xsrl_6/enuiatrenuiar.mp4",
+                            "hash": ""
                         }
                     ],
                     "iliasLink": [
                         {
+                            "id": 1,
                             "sequence": 4,
                             "visibility": "ALWAYS",
                             "refId": 285
@@ -278,6 +291,10 @@ The accordion block is a special block, that can contains all other block types.
                         "items" {
                             "type": "object",
                             "properties": {
+                                "id": {
+                                    "type": "integer",
+                                    "minimum": 1
+                                },
                                 "sequence": {
                                     "description": "Position of the block ordering",
                                     "type": "integer",
@@ -300,6 +317,10 @@ The accordion block is a special block, that can contains all other block types.
                         "items" {
                             "type": "object",
                             "properties": {
+                                "id": {
+                                    "type": "integer",
+                                    "minimum": 1
+                                },
                                 "sequence": {
                                     "description": "Position of the block ordering",
                                     "type": "integer",
@@ -323,6 +344,10 @@ The accordion block is a special block, that can contains all other block types.
                                     "description": "Relative path of the file",
                                     "type": "string",
                                     "pattern": "^(.*?\/){2,}.*?\.(jpg|png)$"
+                                },
+                                "hash": {
+                                    "description": "sha256 hash of the image returned by the url property of this object",
+                                    "type": "string"
                                 }
                             }
                         }
@@ -333,6 +358,10 @@ The accordion block is a special block, that can contains all other block types.
                         "items" {
                             "type": "object",
                             "properties": {
+                                "id": {
+                                    "type": "integer",
+                                    "minimum": 1
+                                },
                                 "sequence": {
                                     "description": "Position of the block ordering",
                                     "type": "integer",
@@ -346,6 +375,10 @@ The accordion block is a special block, that can contains all other block types.
                                     "description": "Relative path of the file",
                                     "type": "string",
                                     "pattern": "^(.*?\/){2,}.*?\.mp4$"
+                                },
+                                "hash": {
+                                    "description": "sha256 hash of the video returned by the url property of this object",
+                                    "type": "string"
                                 }
                             }
                         }
@@ -356,6 +389,10 @@ The accordion block is a special block, that can contains all other block types.
                         "items" {
                             "type": "object",
                             "properties": {
+                                "id": {
+                                    "type": "integer",
+                                    "minimum": 1
+                                },
                                 "sequence": {
                                     "description": "Position of the block ordering",
                                     "type": "integer",
@@ -377,6 +414,10 @@ The accordion block is a special block, that can contains all other block types.
                         "description": "Contains collections of block types which can be nested."
                         "type": "object",
                         "properties": {
+                          "id": {
+                              "type": "integer",
+                              "minimum": 1
+                          },
                           "sequence": {
                               "description": "Position of the block ordering",
                               "type": "integer",
@@ -392,6 +433,10 @@ The accordion block is a special block, that can contains all other block types.
                               "items": {
                                   "type": "object",
                                   "properties": {
+                                      "id": {
+                                        "type": "integer",
+                                        "minimum": 1
+                                      },
                                       "sequence": {
                                           "description": "Position of the block ordering",
                                           "type": "integer",
@@ -414,6 +459,10 @@ The accordion block is a special block, that can contains all other block types.
                               "items" {
                                   "type": "object",
                                   "properties": {
+                                      "id": {
+                                          "type": "integer",
+                                          "minimum": 1
+                                      },
                                       "sequence": {
                                           "description": "Position of the block ordering",
                                           "type": "integer",
@@ -437,7 +486,11 @@ The accordion block is a special block, that can contains all other block types.
                                           "description": "Relative path of the file",
                                           "type": "string",
                                           "pattern": "^(.*?\/){2,}.*?\.(jpg|png)$"
-                                      }
+                                      },
+                                      "hash": {
+                                        "description": "sha256 hash of the image returned by the url property of this object",
+                                        "type": "string"
+                                    }
                                   }
                               }
                           },
@@ -447,6 +500,10 @@ The accordion block is a special block, that can contains all other block types.
                               "items" {
                                   "type": "object",
                                   "properties": {
+                                      "id": {
+                                          "type": "integer",
+                                          "minimum": 1
+                                      },
                                       "sequence": {
                                           "description": "Position of the block ordering",
                                           "type": "integer",
@@ -459,7 +516,11 @@ The accordion block is a special block, that can contains all other block types.
                                       "url": {
                                           "description": "Relative path of the file",
                                           "type": "string",
-                                           "pattern": "^(.*?\/){2,}.*?\.mp4$"
+                                          "pattern": "^(.*?\/){2,}.*?\.mp4$"
+                                      },
+                                      "hash": {
+                                          "description": "sha256 hash of the image returned by the url property of this object",
+                                          "type": "string"
                                       }
                                   }
                               }
@@ -470,6 +531,10 @@ The accordion block is a special block, that can contains all other block types.
                               "items" {
                                   "type": "object",
                                   "properties": {
+                                  "id": {
+                                    "type": "integer",
+                                    "minimum": 1
+                                },
                                       "sequence": {
                                           "description": "Position of the block ordering",
                                           "type": "integer",
@@ -487,12 +552,6 @@ The accordion block is a special block, that can contains all other block types.
                                   }
                               }
                           }
-                        }
-                        "items": {
-                            "type": "object",
-                            "properties": {
-
-                            }
                         }
                     }
                 }
