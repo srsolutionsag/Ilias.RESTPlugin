@@ -26,14 +26,6 @@ final class NewsItem implements JsonSerializable {
 	 */
 	private $newsContext = 0;
 	/**
-	 * @var int $refId
-	 */
-	private $refId = 0;
-	/**
-	 * @var bool $userRead
-	 */
-	private $userRead = false;
-	/**
 	 * @var string $title
 	 */
 	private $title = '';
@@ -90,46 +82,6 @@ final class NewsItem implements JsonSerializable {
 	 */
 	public function setNewsContext($newsContext) {
 		$this->newsContext = $newsContext;
-
-		return $this;
-	}
-
-
-	/**
-	 * @return int
-	 */
-	public function getRefId() {
-		return $this->refId;
-	}
-
-
-	/**
-	 * @param int $refId
-	 *
-	 * @return NewsItem
-	 */
-	public function setRefId($refId) {
-		$this->refId = $refId;
-
-		return $this;
-	}
-
-
-	/**
-	 * @return bool
-	 */
-	public function isUserRead() {
-		return $this->userRead;
-	}
-
-
-	/**
-	 * @param bool $userRead
-	 *
-	 * @return NewsItem
-	 */
-	public function setUserRead($userRead) {
-		$this->userRead = $userRead;
 
 		return $this;
 	}

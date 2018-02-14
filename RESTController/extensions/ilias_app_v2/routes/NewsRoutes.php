@@ -29,9 +29,10 @@ $app->group('/news', function() use ($app) {
 
 	$app->get('', RESTAuth::checkAccess(RESTAuth::TOKEN), function() use ($app, $init) {
 		try {
-			global $DIC;
-
 			$init($app);
+
+			 global $DIC;
+
 			$newsApi = new NewsAPI($DIC->language());
 			$responseContent = json_encode($newsApi->findAllNewsForAuthenticatedUser());
 			$app->response()->body($responseContent);

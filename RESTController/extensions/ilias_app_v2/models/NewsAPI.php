@@ -91,11 +91,9 @@ final class NewsAPI {
 			$newsEntry
 				->setNewsId(intval($rawNewsEntry['id']))
 				->setNewsContext((key_exists('agg_ref_id', $rawNewsEntry)) ? intval($rawNewsEntry['agg_ref_id']) : intval($rawNewsEntry['ref_id']))
-				->setRefId(intval($rawNewsEntry['ref_id']))
 				->setTitle($title)
 				->setSubtitle((is_null($subtitle)) ? '' : strval($subtitle))
 				->setContent((is_null($content)) ? '' : strval($content))
-				->setUserRead(!is_null($rawNewsEntry['user_read']))
 				->setCreateDate((new DateTime($rawNewsEntry['creation_date']))->getTimestamp())
 				->setUpdateDate((new DateTime($rawNewsEntry['update_date']))->getTimestamp());
 			$newsEntries[] = $newsEntry;

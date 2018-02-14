@@ -513,8 +513,7 @@ associated with the used authorization token.
 
     {
       "newsId": 28,
-      "refId": 79,
-      "userRead": true,
+      "newsContext": 79,
       "content": "Wiki page has been created.",
       "title": "Wiki: Awesome wiki",
       "subtitle": "Awesome page"
@@ -533,14 +532,10 @@ associated with the used authorization token.
                 "type": "integer",
                 "minimum": 1
             },
-            "refId": {
-                "description": "The ILIAS object reference identifier.",
+            "newsContext": {
+                "description": "The ref id of the news context.",
                 "type": "integer",
                 "minimum": 1
-            },
-            "userRead": {
-                "description": "True if the user has red the news content, otherwise false.",
-                "type": "boolean"
             },
             "title": {
                 "description": "The title of the news entry.",
@@ -566,5 +561,5 @@ associated with the used authorization token.
               "minimum": 1
             }
         },
-        "required": [ "newsId", "refId", "userRead", "title", "content", "subtitle", "createDate", "updateDate" ]
+        "required": [ "newsId", "newsContext", "title", "content", "subtitle", "createDate", "updateDate" ]
     }
