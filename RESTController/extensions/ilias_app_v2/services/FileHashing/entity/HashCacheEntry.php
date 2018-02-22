@@ -23,7 +23,7 @@ final class HashCacheEntry extends ActiveRecord {
 	 * @con_has_field  true
 	 * @con_is_notnull true
 	 * @con_fieldtype  text
-	 * @con_length     3072
+	 * @con_length     3000
 	 */
 	protected $path = '';
 	/**
