@@ -3,7 +3,6 @@
 require_once(dirname(__DIR__) . '/models/ILIASAppModel.php');
 require_once('./Services/Membership/classes/class.ilParticipants.php');
 
-use function json_encode;
 use \RESTController\libs\RESTAuth as RESTAuth;
 use RESTController\RESTController;
 

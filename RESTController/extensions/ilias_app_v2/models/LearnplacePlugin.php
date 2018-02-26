@@ -13,14 +13,9 @@ require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHoo
 require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/REST/RESTController/extensions/ilias_app_v2/models/data/block/Video.php';
 require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/REST/RESTController/extensions/ilias_app_v2/services/FileHashing/FileHashProvider.php';
 
-use function base64_encode;
-use function count;
 use DateTime;
 use Generator;
 use ilObjUser;
-use function intval;
-use function is_null;
-use function iterator_to_array;
 use League\Flysystem\FileNotFoundException;
 use League\Flysystem\FilesystemInterface;
 use RESTController\extensions\ILIASApp\V2\data\block\Accordion;

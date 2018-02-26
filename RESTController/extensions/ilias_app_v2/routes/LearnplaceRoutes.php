@@ -3,7 +3,6 @@
 use RESTController\extensions\ILIASApp\V2\data\ErrorAnswer;
 use RESTController\extensions\ILIASApp\V2\FileHashProviderFactory;
 use RESTController\extensions\ILIASApp\V2\LearnplacePlugin;
-use RESTController\extensions\ILIASApp\V2\SHA256FileHashProvider;
 use RESTController\libs\RESTAuth;
 use RESTController\RESTController;
 

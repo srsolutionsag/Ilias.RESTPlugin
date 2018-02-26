@@ -5,20 +5,12 @@ namespace RESTController\extensions\ILIASApp\V2;
 require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/REST/RESTController/libs/RESTilias.php';
 require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/REST/RESTController/extensions/ilias_app_v2/models/data/NewsItem.php';
 
-use function array_key_exists;
 use DateTime;
 use ilLanguage;
 use ilNewsItem;
 use ilObject;
-use function in_array;
-use function intval;
-use function is_null;
-use function key_exists;
-use function sprintf;
-use function strval;
 use RESTController\extensions\ILIASApp\V2\data\block\NewsItem;
 use RESTController\libs\RESTilias;
-use function usort;
 
 /**
  * Class NewsAPI

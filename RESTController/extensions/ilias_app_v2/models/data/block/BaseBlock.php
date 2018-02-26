@@ -32,7 +32,7 @@ abstract class BaseBlock implements JsonSerializable {
 	 * @param int    $sequence
 	 * @param string $visibility
 	 */
-	public function __construct(int $id, int $sequence, string $visibility) {
+	public function __construct($id, $sequence, $visibility) {
 		$this->id = $id;
 		$this->sequence = $sequence;
 		$this->visibility = $visibility;

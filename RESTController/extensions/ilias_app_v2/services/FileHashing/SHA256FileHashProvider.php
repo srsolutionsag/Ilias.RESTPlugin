@@ -2,7 +2,6 @@
 
 namespace RESTController\extensions\ILIASApp\V2;
 
-use function hash;
 use ilException;
 use League\Flysystem\FileNotFoundException;
 use League\Flysystem\FilesystemInterface;
