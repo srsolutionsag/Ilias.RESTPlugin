@@ -14,6 +14,10 @@ use \RESTController\libs as Libs;
 
 
 $app->group('/v1', function () use ($app) {
+
+
+	$app->options('/files/:id', function ($objectId) {});
+
     /**
      * Retrieves a user file provided its ref_id or obj_id.
      * @param meta_data - if this field exists, the endpoints returns only a description of the file.
