@@ -23,9 +23,9 @@ final class HashCacheEntry extends ActiveRecord {
 	 * @con_has_field  true
 	 * @con_is_notnull true
 	 * @con_fieldtype  text
-	 * @con_length     3000
+	 * @con_length     128
 	 */
-	protected $path = '';
+	protected $cache_id = '';
 	/**
 	 * @var string $hash
 	 *
@@ -45,16 +45,20 @@ final class HashCacheEntry extends ActiveRecord {
 	/**
 	 * @return string
 	 */
-	public function getPath() {
-		return $this->path;
+	public function getCacheId() {
+		return $this->cache_id;
 	}
 
 
 	/**
-	 * @param string $path
+	 * @param string $cache_id
+	 *
+	 * @return HashCacheEntry
 	 */
-	public function setPath($path) {
-		$this->path = $path;
+	public function setCacheId($cache_id) {
+		$this->cache_id = $cache_id;
+
+		return $this;
 	}
 
 
@@ -68,8 +72,12 @@ final class HashCacheEntry extends ActiveRecord {
 
 	/**
 	 * @param string $hash
+	 *
+	 * @return HashCacheEntry
 	 */
 	public function setHash($hash) {
 		$this->hash = $hash;
+
+		return $this;
 	}
 }

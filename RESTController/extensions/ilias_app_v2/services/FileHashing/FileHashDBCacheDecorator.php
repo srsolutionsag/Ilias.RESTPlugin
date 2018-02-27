@@ -38,10 +38,11 @@ final class FileHashDBCacheDecorator implements FileHashProvider {
 	 * @return string   The hexadecimal hash representation fetch from the cache.
 	 */
 	public function hash($filePath) {
-		$hash = $this->fetch($filePath);
+		$cacheId = hash('sha256', $filePath);
+		$hash = $this->fetch($cacheId);
 		if($hash === '') {
 			$hash = $this->fileHashProvider->hash($filePath);
-			$this->cache($filePath, $hash);
+			$this->cache($cacheId, $hash);
 		}
 
 		return $hash;
@@ -49,15 +50,18 @@ final class FileHashDBCacheDecorator implements FileHashProvider {
 
 
 	/**
-	 * Stores the hash and the hash in the db.
+	 * Stores the cache id and the hash in the db.
 	 *
-	 * @param string $filePath  The file path which was used to generate the hash.
-	 * @param string $hash      The hash of the file.
+	 * @param string $cacheId The cache id of the file path which was used to generate the hash.
+	 * @param string $hash    The hash of the file.
 	 *
 	 * @return void
 	 */
-	private function cache($filePath, $hash) {
-		$hashEntry = HashCacheEntry::findOrGetInstance($filePath);
+	private function cache($cacheId, $hash) {
+		/**
+		 * @var HashCacheEntry $hashEntry
+		 */
+		$hashEntry = HashCacheEntry::findOrGetInstance($cacheId);
 		$hashEntry->setHash($hash);
 		$hashEntry->save();
 	}
@@ -68,15 +72,15 @@ final class FileHashDBCacheDecorator implements FileHashProvider {
 	 * An empty string represents a cache miss and
 	 * an none empty string a cache hit.
 	 *
-	 * @param string $filePath The file path which will be used to fetch the stored hash.
+	 * @param string $cacheId The cache id which will be used to fetch the stored hash.
 	 *
 	 * @return string The hexadecimal hash representation or an empty string if a cache miss occurred.
 	 */
-	private function fetch($filePath) {
+	private function fetch($cacheId) {
 		/**
 		 * @var HashCacheEntry $hashEntry
 		 */
-		$hashEntry = HashCacheEntry::findOrGetInstance($filePath);
+		$hashEntry = HashCacheEntry::findOrGetInstance($cacheId);
 		return $hashEntry->getHash();
 	}
 }
