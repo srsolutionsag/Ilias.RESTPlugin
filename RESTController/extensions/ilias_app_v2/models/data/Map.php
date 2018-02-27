@@ -21,15 +21,25 @@ final class Map implements JsonSerializable {
 	 *
 	 * @see Visibility available constants
 	 */
-	private $visibility;
+	private $visibility = "";
+	/**
+	 * Zoom level between 0 and 18
+	 *
+	 * @var int $zoomLevel
+	 */
+	private $zoomLevel = 0;
 
 
 	/**
 	 * Map constructor.
 	 *
 	 * @param string $visibility
+	 * @param int    $zoomLevel
 	 */
-	public function __construct($visibility) { $this->visibility = $visibility; }
+	public function __construct($visibility, $zoomLevel) {
+		$this->visibility = $visibility;
+		$this->zoomLevel = $zoomLevel;
+	}
 
 
 	/**
@@ -37,5 +47,13 @@ final class Map implements JsonSerializable {
 	 */
 	public function getVisibility() {
 		return $this->visibility;
+	}
+
+
+	/**
+	 * @return int
+	 */
+	public function getZoomLevel() {
+		return $this->zoomLevel;
 	}
 }

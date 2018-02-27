@@ -27,7 +27,8 @@ Information of a learnplace including the location.
                     "radius": 15
                 },
                 "map": {
-                    "visibility": "ALWAYS"
+                    "visibility": "ALWAYS",
+                    "zoomLevel": 8
                 }
             }
 
@@ -66,6 +67,11 @@ Information of a learnplace including the location.
                             "visibility": {
                                 "type": "string",
                                 "pattern": "^ALWAYS$|^NEVER$|^ONLY_AT_PLACE$|^AFTER_PLACE_VISIT$"
+                            },
+                            "zoomLevel": {
+                                "type": integer,
+                                "minimum": 0,
+                                "maximum": 18
                             }
                         }
                     }

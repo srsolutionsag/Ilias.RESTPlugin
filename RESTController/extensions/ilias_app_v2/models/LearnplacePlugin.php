@@ -94,7 +94,8 @@ final class LearnplacePlugin {
 	public function fetchByObjectId($objectId) {
 		$learnplace = $this->learnplaceService->findByObjectId($objectId);
 		$location = $learnplace->getLocation();
-		$map = new Map($this->getMapVisibility($learnplace));
+		$configuration = $learnplace->getConfiguration();
+		$map = new Map($this->getMapVisibility($learnplace), $configuration->getMapZoomLevel());
 		$mappedLocation = new Location(
 			$location->getLatitude(),
 			$location->getLongitude(),
