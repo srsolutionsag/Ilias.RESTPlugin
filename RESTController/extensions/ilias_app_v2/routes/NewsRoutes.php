@@ -33,7 +33,7 @@ $app->group('/news', function() use ($app) {
 
 			 global $DIC;
 
-			$newsApi = new NewsAPI($DIC->language());
+			$newsApi = new NewsAPI($DIC->language(), $DIC['objDefinition']);
 			$responseContent = json_encode($newsApi->findAllNewsForAuthenticatedUser());
 			$app->response()->body($responseContent);
 		}
