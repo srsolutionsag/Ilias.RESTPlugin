@@ -11,7 +11,6 @@ use ilNewsItem;
 use ilObject;
 use ilObjectDefinition;
 use ilObjectPlugin;
-use function preg_match;
 use RESTController\extensions\ILIASApp\V2\data\block\NewsItem;
 use RESTController\libs\RESTilias;
 
