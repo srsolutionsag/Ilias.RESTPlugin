@@ -42,9 +42,9 @@ $app->group('/learnplace', function() use ($app) {
 		require_once './Customizing/global/plugins/Services/Repository/RepositoryObject/Learnplaces/classes/bootstrap.php';
 	};
 
-	//only numeric values are valid
+	//only numeric values without leading zeros are valid
 	$condition = [
-		'objectId' => '[0-9]+'
+		'objectId' => '(?!0)[0-9]+'
 	];
 
 
