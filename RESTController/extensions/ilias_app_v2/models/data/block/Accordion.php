@@ -14,7 +14,14 @@ require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHoo
 final class Accordion extends BaseBlock {
 
 	use JsonSerializableAware;
-
+	/**
+	 * @var string $title
+	 */
+	private $title;
+	/**
+	 * @var bool $expanded
+	 */
+	private $expanded;
 	/**
 	 * @var Text[] $text
 	 */
@@ -39,17 +46,37 @@ final class Accordion extends BaseBlock {
 	 * @param int         $id
 	 * @param int         $sequence
 	 * @param string      $visibility
+	 * @param string      $title
+	 * @param bool        $expanded
 	 * @param Text[]      $text
 	 * @param Picture[]   $picture
 	 * @param Video[]     $video
 	 * @param IliasLink[] $iliasLink
 	 */
-	public function __construct($id, $sequence, $visibility, array $text, array $picture, array $video, array $iliasLink) {
+	public function __construct($id, $sequence, $visibility, $title, $expanded, array $text, array $picture, array $video, array $iliasLink) {
 		parent::__construct($id, $sequence, $visibility);
+		$this->title = $title;
+		$this->expanded = $expanded;
 		$this->text = $text;
 		$this->picture = $picture;
 		$this->video = $video;
 		$this->iliasLink = $iliasLink;
+	}
+
+
+	/**
+	 * @return string
+	 */
+	public function getTitle() {
+		return $this->title;
+	}
+
+
+	/**
+	 * @return bool
+	 */
+	public function isExpanded() {
+		return $this->expanded;
 	}
 
 

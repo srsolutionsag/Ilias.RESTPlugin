@@ -290,6 +290,8 @@ final class LearnplacePlugin {
 					$block->getId(),
 					$block->getSequence(),
 					$block->getVisibility(),
+					$block->getTitle(),
+					$block->isExpand(),
 					iterator_to_array($this->fetchTextBlocks($block->getBlocks())),
 					iterator_to_array($this->fetchPictureBlocks($block->getBlocks())),
 					iterator_to_array($this->fetchVideoBlocks($block->getBlocks())),
