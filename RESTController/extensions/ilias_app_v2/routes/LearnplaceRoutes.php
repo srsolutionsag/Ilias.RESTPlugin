@@ -1,8 +1,10 @@
 <?php
 
+use RESTController\database\RESTaccess;
 use RESTController\extensions\ILIASApp\V2\data\ErrorAnswer;
 use RESTController\extensions\ILIASApp\V2\FileHashProviderFactory;
 use RESTController\extensions\ILIASApp\V2\LearnplacePlugin;
+use RESTController\libs\Exceptions\RBAC;
 use RESTController\libs\RESTAuth;
 use RESTController\RESTController;
 
@@ -55,6 +57,10 @@ $app->group('/learnplace', function() use ($app) {
 			$responseContent = json_encode($learnplacePlugin->fetchByObjectId($objectId));
 			$app->response()->body($responseContent);
 		}
+		catch (RBAC $exception) {
+			$app->response()->body(json_encode(new ErrorAnswer($exception->getMessage())));
+			$app->response()->status(RBAC::STATUS);
+		}
 		catch (\Exception $exception) {
 			$app->error($exception->getMessage());
 		}
@@ -69,6 +75,10 @@ $app->group('/learnplace', function() use ($app) {
 			$learnplacePlugin = createLearnplacePlugin();
 			$responseContent = json_encode($learnplacePlugin->fetchVisitJournal($objectId));
 			$app->response()->body($responseContent);
+		}
+		catch (RBAC $exception) {
+			$app->response()->body(json_encode(new ErrorAnswer($exception->getMessage())));
+			$app->response()->status(RBAC::STATUS);
 		}
 		catch (\Exception $exception) {
 			$app->error($exception->getMessage());
@@ -102,6 +112,10 @@ $app->group('/learnplace', function() use ($app) {
 				$app->response()->status($unprocessableEntity);
 			}
 		}
+		catch (RBAC $exception) {
+			$app->response()->body(json_encode(new ErrorAnswer($exception->getMessage())));
+			$app->response()->status(RBAC::STATUS);
+		}
 		catch (\Exception $exception) {
 			$app->error($exception->getMessage());
 		}
@@ -116,6 +130,10 @@ $app->group('/learnplace', function() use ($app) {
 			$learnplacePlugin = createLearnplacePlugin();
 			$blocks = $learnplacePlugin->fetchBlocks($objectId);
 			$app->response()->body($blocks);
+		}
+		catch (RBAC $exception) {
+			$app->response()->body(json_encode(new ErrorAnswer($exception->getMessage())));
+			$app->response()->status(RBAC::STATUS);
 		}
 		catch (\Exception $exception) {
 			$app->error($exception->getMessage());

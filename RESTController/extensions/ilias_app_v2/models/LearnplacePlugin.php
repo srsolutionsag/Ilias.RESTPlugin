@@ -15,6 +15,7 @@ require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHoo
 
 use DateTime;
 use Generator;
+use ilAccessHandler;
 use ilObjUser;
 use League\Flysystem\FileNotFoundException;
 use League\Flysystem\FilesystemInterface;
@@ -28,6 +29,7 @@ use RESTController\extensions\ILIASApp\V2\data\Learnplace;
 use RESTController\extensions\ILIASApp\V2\data\Location;
 use RESTController\extensions\ILIASApp\V2\data\Map;
 use RESTController\extensions\ILIASApp\V2\data\VisitJournalEntry;
+use RESTController\libs\Exceptions\RBAC;
 use RESTController\libs\RESTilias;
 use SplFixedArray;
 use SRAG\Learnplaces\container\PluginContainer;
@@ -69,6 +71,10 @@ final class LearnplacePlugin {
 	 * @var FileHashProvider $hashProvider
 	 */
 	private $hashProvider;
+	/**
+	 * @var ilAccessHandler $access
+	 */
+	private $access;
 
 
 	/**
@@ -77,9 +83,13 @@ final class LearnplacePlugin {
 	 * @param FileHashProvider $hashProvider    The hash provider which should be used to hash the pictures and videos.
 	 */
 	public function __construct(FileHashProvider $hashProvider) {
+		RESTilias::loadIlUser();
+		RESTilias::initAccessHandling();
+
 		$this->learnplaceService = PluginContainer::resolve(LearnplaceService::class);
 		$this->visitJournalService = PluginContainer::resolve(VisitJournalService::class);
 		$this->filesystem = PluginContainer::resolve(FilesystemInterface::class);
+		$this->access = PluginContainer::resolve('ilAccess');
 		$this->hashProvider = $hashProvider;
 	}
 
@@ -90,8 +100,12 @@ final class LearnplacePlugin {
 	 * @param int $objectId The object id of the learnplace which should be fetched.
 	 *
 	 * @return Learnplace   The learnplace with the given object id.
+	 *
+	 * @throws RBAC Thrown if the read access was denied for the currently authenticated user.
 	 */
 	public function fetchByObjectId($objectId) {
+		$this->checkReadAccessRight($objectId);
+
 		$learnplace = $this->learnplaceService->findByObjectId($objectId);
 		$location = $learnplace->getLocation();
 		$configuration = $learnplace->getConfiguration();
@@ -114,8 +128,12 @@ final class LearnplacePlugin {
 	 * @param int $timestamp    The timestmap of the visit.
 	 *
 	 * @return void
+	 *
+	 * @throws RBAC Thrown if the read access was denied for the currently authenticated user.
 	 */
 	public function visitLearnplace($objectId, $timestamp) {
+		$this->checkReadAccessRight($objectId);
+
 		/**
 		 * @var ilObjUser $currentUser
 		 */
@@ -166,8 +184,12 @@ final class LearnplacePlugin {
 	 * @param int $objectId
 	 *
 	 * @return BlockCollection
+	 *
+	 * @throws RBAC Thrown if the read access was denied for the currently authenticated user.
 	 */
 	public function fetchBlocks($objectId) {
+		$this->checkReadAccessRight($objectId);
+
 		$learnplace = $this->learnplaceService->findByObjectId($objectId);
 		$collection = new BlockCollection(
 			iterator_to_array($this->fetchTextBlocks($learnplace->getBlocks())),
@@ -285,8 +307,12 @@ final class LearnplacePlugin {
 	 * @param int $objectId             The object id of the learnplace which should be fetched.
 	 *
 	 * @return \SplFixedArray (VisitJournalEntry[])      All visit journal entries of the learnplace with the given object id.
+	 *
+	 * @throws RBAC Thrown if the read access was denied for the currently authenticated user.
 	 */
 	public function fetchVisitJournal($objectId) {
+		$this->checkReadAccessRight($objectId);
+
 		$rawJournalEntries = $this->visitJournalService->findByObjectId($objectId);
 		$mapped = new SplFixedArray(count($rawJournalEntries));
 		$index = 0;
@@ -316,5 +342,30 @@ final class LearnplacePlugin {
 				return $block->getVisibility();
 		}
 		return Visibility::NEVER;
+	}
+
+
+	/**
+	 * Checks the read access right of the object id for the current authenticated user.
+	 * If one ref id which is pointing towards the object has enough access rights the access
+	 * is granted.
+	 *
+	 * @param int $objectId The object id which should be checked.
+	 *
+	 * @throws RBAC Thrown if the read access was denied for the currently authenticated user.
+	 */
+	private function checkReadAccessRight($objectId) {
+		foreach (RESTilias::getRefIds($objectId) as $refId) {
+			if($this->access->checkAccess('read', '', $refId))
+				return;
+		}
+
+		throw new RBAC(
+			RESTilias::MSG_RBAC_READ_DENIED,
+			RESTilias::ID_RBAC_READ_DENIED,
+			[
+				'object' => 'learnplace'
+			]
+		);
 	}
 }
