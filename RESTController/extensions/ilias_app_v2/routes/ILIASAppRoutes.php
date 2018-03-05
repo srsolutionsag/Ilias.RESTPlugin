@@ -46,7 +46,13 @@ $app->group('/v2/ilias-app', function () use ($app) {
 
 		$userId = $accessToken->getUserId();
 		$app->response->headers->set('Content-Type', 'application/json');
-		$app->response->body(json_encode($iliasApp->getFileData($refId, $userId)));
+
+		//ensure type safety
+		$fileData = $iliasApp->getFileData($refId, $userId);
+		$fileData["fileVersion"] = strval($fileData["fileVersion"]);
+		$fileData["fileSize"] = strval($fileData["fileSize"]);
+
+		$app->response->body(json_encode($fileData));
 	});
 
 	$app->options('/files/:refId', function() {});
