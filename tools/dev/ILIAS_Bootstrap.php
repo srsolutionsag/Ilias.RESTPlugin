@@ -11,7 +11,6 @@ $ilInit = new ilInitialisation();
 $GLOBALS['ilInit'] = $ilInit;
 $ilInit->initILIAS();
 
-
 require_once('Services/User/classes/class.ilObjUser.php');
 
 setUserContext("root");
