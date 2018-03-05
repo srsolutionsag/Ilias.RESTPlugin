@@ -8,10 +8,13 @@
 namespace RESTController\extensions\files_v1;
 
 // This allows us to use shortcuts instead of full quantifier
+use ILIAS\HTTP\GlobalHttpState;
+use const ILIAS_VERSION_NUMERIC;
 use \RESTController\libs\RESTAuth as RESTAuth;
 use \RESTController\core\auth as Auth;
 use \RESTController\libs as Libs;
 use RESTController\RESTController;
+use function version_compare;
 
 /** @var RESTController $app */
 $app->group('/v1', function () use ($app) {
@@ -87,9 +90,24 @@ $app->group('/v1', function () use ($app) {
             else
             {
                 //the ILIAS file delivery will kill the request therefore set CORS header with the php function
-                header('Access-Control-Allow-Origin: *');
-                header('Access-Control-Allow-Headers: Authorization');
-                header('Access-Control-Allow-Methods: GET');
+                if(version_compare(ILIAS_VERSION_NUMERIC, '5.3', '>=')) {
+                    global $DIC;
+                    /**
+                     * @var GlobalHttpState $http
+                     */
+                    $http = $DIC["http"];
+                    $response = $http->response()
+                        ->withHeader('Access-Control-Allow-Origin', '*')
+                        ->withHeader('Access-Control-Allow-Headers', 'Authorization')
+                        ->withHeader('Access-Control-Allow-Methods', 'GET');
+
+                    $http->saveResponse($response);
+                }
+                else {
+                    header('Access-Control-Allow-Origin: *');
+                    header('Access-Control-Allow-Headers: Authorization');
+                    header('Access-Control-Allow-Methods: GET');
+                }
                 $fileObj->sendFile();
             }
 

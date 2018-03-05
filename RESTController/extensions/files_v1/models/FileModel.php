@@ -26,15 +26,8 @@ class FileModel extends Libs\RESTModel
     function getFileObjForUser($file_obj_id, $user_id)
     {
 
-        Libs\RESTilias::loadIlUser();
-        global    $ilUser;
-        $ilUser->setId($user_id);
-        $ilUser->read();
-        Libs\RESTilias::initAccessHandling();
-
+        Libs\RESTilias::loadIlUser($user_id);
         require_once('Services/Xml/classes/class.ilSaxParser.php');
-        Libs\RESTilias::initGlobal('objDefinition', 'ilObjectDefinition','./Services/Object/classes/class.ilObjectDefinition.php');
-        global $ilDB, $ilias, $ilPluginAdmin, $objDefinition;
         global $ilAccess;
 
         // Check access
