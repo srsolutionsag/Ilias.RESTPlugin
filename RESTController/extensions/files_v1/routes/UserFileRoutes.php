@@ -11,12 +11,20 @@ namespace RESTController\extensions\files_v1;
 use \RESTController\libs\RESTAuth as RESTAuth;
 use \RESTController\core\auth as Auth;
 use \RESTController\libs as Libs;
+use RESTController\RESTController;
 
-
+/** @var RESTController $app */
 $app->group('/v1', function () use ($app) {
 
 
-	$app->options('/files/:id', function ($objectId) {});
+
+
+    $app->options('/files/:id', function ($objectId) use($app) {
+        $app->response()->headers()->set('Access-Control-Allow-Origin', '*');
+        $app->response()->headers()->set('Access-Control-Allow-Headers', 'Authorization');
+        $app->response()->headers()->set('Access-Control-Allow-Methods', 'GET');
+        $app->response()->headers()->set('Access-Control-Max-Age', '600'); //chromium cap
+    });
 
     /**
      * Retrieves a user file provided its ref_id or obj_id.
@@ -25,6 +33,9 @@ $app->group('/v1', function () use ($app) {
      * @param id - the ref or obj_id of the file.
      */
     $app->get('/files/:id', RESTAuth::checkAccess(RESTAuth::PERMISSION),  function ($id) use ($app) {
+        $app->response()->headers()->set('Access-Control-Allow-Origin', '*');
+        $app->response()->headers()->set('Access-Control-Allow-Headers', 'Authorization');
+        $app->response()->headers()->set('Access-Control-Allow-Methods', 'GET');
         $accessToken = $app->request->getToken();
         $user_id = $accessToken->getUserId();
 
@@ -74,7 +85,14 @@ $app->group('/v1', function () use ($app) {
                 // TODO: Replace string with const class-variable und error-code too!
                 $app->halt(500, 'Could not retrieve file with obj_id = ' . $obj_id . '.', -1);
             else
+            {
+                //the ILIAS file delivery will kill the request therefore set CORS header with the php function
+                header('Access-Control-Allow-Origin: *');
+                header('Access-Control-Allow-Headers: Authorization');
+                header('Access-Control-Allow-Methods: GET');
                 $fileObj->sendFile();
+            }
+
         }
     });
 });
