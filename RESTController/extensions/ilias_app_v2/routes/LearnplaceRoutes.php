@@ -67,7 +67,9 @@ $app->group('/learnplace', function() use ($app) {
 
 	})->conditions($condition);
 
-	$app->options('/:objectId', function ($objectId) {})->conditions($condition);
+	$app->options('/:objectId', function ($objectId) use ($app) {
+		$app->response->headers->set('Access-Control-Max-Age', '600');
+	})->conditions($condition);
 
 	$app->get('/:objectId/journal-entries', RESTAuth::checkAccess(RESTAuth::TOKEN), function($objectId) use ($app, $init) {
 		try {
@@ -85,7 +87,9 @@ $app->group('/learnplace', function() use ($app) {
 		}
 	})->conditions($condition);
 
-	$app->options('/:objectId/journal-entries', function ($objectId) {})->conditions($condition);
+	$app->options('/:objectId/journal-entries', function ($objectId) use ($app) {
+		$app->response->headers->set('Access-Control-Max-Age', '600');
+	})->conditions($condition);
 
 	$app->post('/:objectId/journal-entry', RESTAuth::checkAccess(RESTAuth::TOKEN), function($objectId) use ($app, $init) {
 		try {
@@ -122,7 +126,9 @@ $app->group('/learnplace', function() use ($app) {
 
 	})->conditions($condition);
 
-	$app->options('/:objectId/journal-entry', function ($objectId) {})->conditions($condition);
+	$app->options('/:objectId/journal-entry', function ($objectId) use ($app) {
+		$app->response->headers->set('Access-Control-Max-Age', '600');
+	})->conditions($condition);
 
 	$app->get('/:objectId/blocks', RESTAuth::checkAccess(RESTAuth::TOKEN), function($objectId) use ($app, $init) {
 		try {
@@ -141,7 +147,9 @@ $app->group('/learnplace', function() use ($app) {
 
 	})->conditions($condition);
 
-	$app->options('/:objectId/blocks', function ($objectId) {})->conditions($condition);
+	$app->options('/:objectId/blocks', function ($objectId) use ($app) {
+		$app->response->headers->set('Access-Control-Max-Age', '600');
+	})->conditions($condition);
 
 	/**
 	 * Factory function for the learnplace plugin.
