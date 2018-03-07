@@ -214,7 +214,7 @@ final class LearnplacePlugin {
 	 */
 	private function fetchTextBlocks(array $blocks) {
 		foreach ($blocks as $block) {
-			if($block instanceof RichTextBlockModel) {
+			if($block instanceof RichTextBlockModel && $block->getVisibility() !== Visibility::NEVER) {
 				$text = new Text($block->getId(), $block->getSequence(), $block->getVisibility(), $block->getContent());
 				yield $text;
 			}
@@ -227,7 +227,7 @@ final class LearnplacePlugin {
 	 */
 	private function fetchPictureBlocks(array $blocks) {
 		foreach ($blocks as $block) {
-			if($block instanceof PictureBlockModel) {
+			if($block instanceof PictureBlockModel && $block->getVisibility() !== Visibility::NEVER) {
 				$picture = new Picture(
 					$block->getId(),
 					$block->getSequence(),
@@ -265,7 +265,7 @@ final class LearnplacePlugin {
 	 */
 	private function fetchVideoBlocks(array $blocks) {
 		foreach ($blocks as $block) {
-			if($block instanceof VideoBlockModel) {
+			if($block instanceof VideoBlockModel && $block->getVisibility() !== Visibility::NEVER) {
 				$video = new Video($block->getId(), $block->getSequence(), $block->getVisibility(), $block->getPath(), $this->hashProvider->hash($block->getPath()));
 				yield $video;
 			}
@@ -278,7 +278,7 @@ final class LearnplacePlugin {
 	 */
 	private function fetchIliasLinkBlocks(array $blocks) {
 		foreach ($blocks as $block) {
-			if($block instanceof ILIASLinkBlockModel) {
+			if($block instanceof ILIASLinkBlockModel && $block->getVisibility() !== Visibility::NEVER) {
 				$iliasLink = new IliasLink($block->getId(), $block->getSequence(), $block->getVisibility(), $block->getRefId());
 				yield $iliasLink;
 			}
@@ -291,7 +291,7 @@ final class LearnplacePlugin {
 	 */
 	private function fetchAccordionkBlocks(array $blocks) {
 		foreach ($blocks as $block) {
-			if($block instanceof AccordionBlockModel) {
+			if($block instanceof AccordionBlockModel && $block->getVisibility() !== Visibility::NEVER) {
 				$accordion = new Accordion(
 					$block->getId(),
 					$block->getSequence(),
