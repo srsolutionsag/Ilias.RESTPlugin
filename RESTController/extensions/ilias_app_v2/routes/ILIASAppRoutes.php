@@ -15,7 +15,7 @@ use RESTController\RESTController;
  */
 $app->group('/v2/ilias-app', function () use ($app) {
 	$app->response->headers->set('Access-Control-Allow-Origin', '*');
-	$app->response->headers->set('Access-Control-Allow-Headers', 'Authorization,XDEBUG_SESSION,XDEBUG_SESSION_START');
+	$app->response->headers->set('Access-Control-Allow-Headers', 'Authorization,XDEBUG_SESSION,XDEBUG_SESSION_START,Content-Type');
 	$app->response->headers->set('Access-Control-Allow-Methods', 'GET,POST');
 
 	$app->get('/desktop', RESTAuth::checkAccess(RESTAuth::TOKEN), function() use ($app) {
