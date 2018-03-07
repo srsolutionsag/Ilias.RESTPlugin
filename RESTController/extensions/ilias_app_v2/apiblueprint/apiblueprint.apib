@@ -241,49 +241,53 @@ The accordion block is a special block, that can contains all other block types.
                         "refId": 285
                     }
                 ],
-                "accordion": {
-                    "id": 1,
-                    "sequence": 1,
-                    "visibility": "ALWAYS",
-                    "text": [
-                        {
-                            "id": 1,
-                            "sequence": 1,
-                            "visibility": "ALWAYS",
-                            "content": ""
-                        }
-                    ],
-                    "picture": [
-                        {
-                            "id": 1,
-                            "sequence": 2,
-                            "visibility": "ALWAYS",
-                            "title": "a fancy picture",
-                            "description": "",
-                            "thumbnail": "",
-                            "thumbnailHash": "",
-                            "url": "data/default/xsrl_5/naeuvaner.jpg",
-                            "hash": "5f0469e9c1ecfba013ed10800ec5c9e03ad42f27f7a72e107a21e8e9142f56d8"
-                        }
-                    ],
-                    "video": [
-                        {
-                            "id": 1,
-                            "sequence": 3,
-                            "visibility": "ALWAYS",
-                            "url": "data/default/xsrl_6/enuiatrenuiar.mp4",
-                            "hash": "5f0469e9c1ecfba013ed10800ec5c9e03ad42f27f7a72e107a21e8e9142f56d8"
-                        }
-                    ],
-                    "iliasLink": [
-                        {
-                            "id": 1,
-                            "sequence": 4,
-                            "visibility": "ALWAYS",
-                            "refId": 285
-                        }
-                    ]
-                }
+                "accordion": [
+                    {
+                        "id": 1,
+                        "sequence": 1,
+                        "title": "",
+                        "expanded": false,
+                        "visibility": "ALWAYS",
+                        "text": [
+                            {
+                                "id": 1,
+                                "sequence": 1,
+                                "visibility": "ALWAYS",
+                                "content": ""
+                            }
+                        ],
+                        "picture": [
+                            {
+                                "id": 1,
+                                "sequence": 2,
+                                "visibility": "ALWAYS",
+                                "title": "a fancy picture",
+                                "description": "",
+                                "thumbnail": "",
+                                "thumbnailHash": "",
+                                "url": "data/default/xsrl_5/naeuvaner.jpg",
+                                "hash": "5f0469e9c1ecfba013ed10800ec5c9e03ad42f27f7a72e107a21e8e9142f56d8"
+                            }
+                        ],
+                        "video": [
+                            {
+                                "id": 1,
+                                "sequence": 3,
+                                "visibility": "ALWAYS",
+                                "url": "data/default/xsrl_6/enuiatrenuiar.mp4",
+                                "hash": "5f0469e9c1ecfba013ed10800ec5c9e03ad42f27f7a72e107a21e8e9142f56d8"
+                            }
+                        ],
+                        "iliasLink": [
+                            {
+                                "id": 1,
+                                "sequence": 4,
+                                "visibility": "ALWAYS",
+                                "refId": 285
+                            }
+                        ]
+                    }
+                ]
             }
 
     + Schema
@@ -418,151 +422,154 @@ The accordion block is a special block, that can contains all other block types.
                         }
                     },
                     "accordion": {
-                        "description": "Contains collections of block types which can be nested."
-                        "type": "object",
-                        "properties": {
-                          "id": {
-                              "type": "integer",
-                              "minimum": 1
-                          },
-                          "sequence": {
-                              "description": "Position of the block ordering",
-                              "type": "integer",
-                              "minimum": 1
-                          },
-                          "visibility": {
-                              "type": "string",
-                              "pattern": "^ALWAYS$|^NEVER$|^ONLY_AT_PLACE$|^AFTER_PLACE_VISIT$"
-                          },
-                          "text": {
-                              "description": "Contains all text blocks of the accordion"
-                              "type": "array",
-                              "items": {
-                                  "type": "object",
-                                  "properties": {
+                        "type": "array",
+                        "items": {
+                            "description": "Contains collections of block types which can be nested."
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                  "type": "integer",
+                                  "minimum": 1
+                              },
+                              "sequence": {
+                                  "description": "Position of the block ordering",
+                                  "type": "integer",
+                                  "minimum": 1
+                              },
+                              "visibility": {
+                                  "type": "string",
+                                  "pattern": "^ALWAYS$|^NEVER$|^ONLY_AT_PLACE$|^AFTER_PLACE_VISIT$"
+                              },
+                              "text": {
+                                  "description": "Contains all text blocks of the accordion"
+                                  "type": "array",
+                                  "items": {
+                                      "type": "object",
+                                      "properties": {
+                                          "id": {
+                                            "type": "integer",
+                                            "minimum": 1
+                                          },
+                                          "sequence": {
+                                              "description": "Position of the block ordering",
+                                              "type": "integer",
+                                              "minimum": 1
+                                          },
+                                          "visibility": {
+                                              "type": "string",
+                                              "pattern": "^ALWAYS$|^NEVER$|^ONLY_AT_PLACE$|^AFTER_PLACE_VISIT$"
+                                          },
+                                          "content": {
+                                              "description": "The text blocks content as html format",
+                                              "type": "string"
+                                          }
+                                      }
+                                  }
+                              },
+                              "picture": {
+                                   "description": "Contains all picture blocks of the accordion"
+                                  "type": "array",
+                                  "items" {
+                                      "type": "object",
+                                      "properties": {
+                                          "id": {
+                                              "type": "integer",
+                                              "minimum": 1
+                                          },
+                                          "sequence": {
+                                              "description": "Position of the block ordering",
+                                              "type": "integer",
+                                              "minimum": 1
+                                          },
+                                          "visibility": {
+                                              "type": "string",
+                                              "pattern": "^ALWAYS$|^NEVER$|^ONLY_AT_PLACE$|^AFTER_PLACE_VISIT$"
+                                          },
+                                          "title": {
+                                              "type": "string"
+                                          },
+                                          "description": {
+                                              "type": "string"
+                                          },
+                                          "thumbnail": {
+                                              "description": "Relative path of the thumbnail image file. Thumbnail has a static width of 1280px",
+                                              "type": "string"
+                                          },
+                                          "thumbnailHash": {
+                                            "description": "sha256 hash of the thumbnail image returned by the url property of this object",
+                                            "type": "string"
+                                          }
+                                          "url": {
+                                              "description": "Relative path of the image file",
+                                              "type": "string",
+                                              "pattern": "^(.*?\/){2,}.*?\.(jpg|png)$"
+                                          },
+                                          "hash": {
+                                            "description": "sha256 hash of the image returned by the url property of this object",
+                                            "type": "string"
+                                        }
+                                      }
+                                  }
+                              },
+                              "video": {
+                                  "description": "Contains all video blocks of the accordion"
+                                  "type": "array",
+                                  "items" {
+                                      "type": "object",
+                                      "properties": {
+                                          "id": {
+                                              "type": "integer",
+                                              "minimum": 1
+                                          },
+                                          "sequence": {
+                                              "description": "Position of the block ordering",
+                                              "type": "integer",
+                                              "minimum": 1
+                                          },
+                                          "visibility": {
+                                              "type": "string",
+                                              "pattern": "^ALWAYS$|^NEVER$|^ONLY_AT_PLACE$|^AFTER_PLACE_VISIT$"
+                                          },
+                                          "url": {
+                                              "description": "Relative path of the file",
+                                              "type": "string",
+                                              "pattern": "^(.*?\/){2,}.*?\.mp4$"
+                                          },
+                                          "hash": {
+                                              "description": "sha256 hash of the image returned by the url property of this object",
+                                              "type": "string"
+                                          }
+                                      }
+                                  }
+                              },
+                              "iliasLink": {
+                                  "description": "Contains all ILIAS link blocks of the accordion"
+                                  "type": "array",
+                                  "items" {
+                                      "type": "object",
+                                      "properties": {
                                       "id": {
                                         "type": "integer",
                                         "minimum": 1
-                                      },
-                                      "sequence": {
-                                          "description": "Position of the block ordering",
-                                          "type": "integer",
-                                          "minimum": 1
-                                      },
-                                      "visibility": {
-                                          "type": "string",
-                                          "pattern": "^ALWAYS$|^NEVER$|^ONLY_AT_PLACE$|^AFTER_PLACE_VISIT$"
-                                      },
-                                      "content": {
-                                          "description": "The text blocks content as html format",
-                                          "type": "string"
+                                    },
+                                          "sequence": {
+                                              "description": "Position of the block ordering",
+                                              "type": "integer",
+                                              "minimum": 1
+                                          },
+                                          "visibility": {
+                                              "type": "string",
+                                              "pattern": "^ALWAYS$|^NEVER$|^ONLY_AT_PLACE$|^AFTER_PLACE_VISIT$"
+                                          },
+                                          "refId": {
+                                              "description": "The ref id used in ILIAS",
+                                              "type": "integer",
+                                              "minimum": 1
+                                          }
                                       }
                                   }
                               }
-                          },
-                          "picture": {
-                               "description": "Contains all picture blocks of the accordion"
-                              "type": "array",
-                              "items" {
-                                  "type": "object",
-                                  "properties": {
-                                      "id": {
-                                          "type": "integer",
-                                          "minimum": 1
-                                      },
-                                      "sequence": {
-                                          "description": "Position of the block ordering",
-                                          "type": "integer",
-                                          "minimum": 1
-                                      },
-                                      "visibility": {
-                                          "type": "string",
-                                          "pattern": "^ALWAYS$|^NEVER$|^ONLY_AT_PLACE$|^AFTER_PLACE_VISIT$"
-                                      },
-                                      "title": {
-                                          "type": "string"
-                                      },
-                                      "description": {
-                                          "type": "string"
-                                      },
-                                      "thumbnail": {
-                                          "description": "Relative path of the thumbnail image file. Thumbnail has a static width of 1280px",
-                                          "type": "string"
-                                      },
-                                      "thumbnailHash": {
-                                        "description": "sha256 hash of the thumbnail image returned by the url property of this object",
-                                        "type": "string"
-                                      }
-                                      "url": {
-                                          "description": "Relative path of the image file",
-                                          "type": "string",
-                                          "pattern": "^(.*?\/){2,}.*?\.(jpg|png)$"
-                                      },
-                                      "hash": {
-                                        "description": "sha256 hash of the image returned by the url property of this object",
-                                        "type": "string"
-                                    }
-                                  }
-                              }
-                          },
-                          "video": {
-                              "description": "Contains all video blocks of the accordion"
-                              "type": "array",
-                              "items" {
-                                  "type": "object",
-                                  "properties": {
-                                      "id": {
-                                          "type": "integer",
-                                          "minimum": 1
-                                      },
-                                      "sequence": {
-                                          "description": "Position of the block ordering",
-                                          "type": "integer",
-                                          "minimum": 1
-                                      },
-                                      "visibility": {
-                                          "type": "string",
-                                          "pattern": "^ALWAYS$|^NEVER$|^ONLY_AT_PLACE$|^AFTER_PLACE_VISIT$"
-                                      },
-                                      "url": {
-                                          "description": "Relative path of the file",
-                                          "type": "string",
-                                          "pattern": "^(.*?\/){2,}.*?\.mp4$"
-                                      },
-                                      "hash": {
-                                          "description": "sha256 hash of the image returned by the url property of this object",
-                                          "type": "string"
-                                      }
-                                  }
-                              }
-                          },
-                          "iliasLink": {
-                              "description": "Contains all ILIAS link blocks of the accordion"
-                              "type": "array",
-                              "items" {
-                                  "type": "object",
-                                  "properties": {
-                                  "id": {
-                                    "type": "integer",
-                                    "minimum": 1
-                                },
-                                      "sequence": {
-                                          "description": "Position of the block ordering",
-                                          "type": "integer",
-                                          "minimum": 1
-                                      },
-                                      "visibility": {
-                                          "type": "string",
-                                          "pattern": "^ALWAYS$|^NEVER$|^ONLY_AT_PLACE$|^AFTER_PLACE_VISIT$"
-                                      },
-                                      "refId": {
-                                          "description": "The ref id used in ILIAS",
-                                          "type": "integer",
-                                          "minimum": 1
-                                      }
-                                  }
-                              }
-                          }
+                            }
                         }
                     }
                 }
