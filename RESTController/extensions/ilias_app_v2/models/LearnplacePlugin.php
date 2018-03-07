@@ -75,6 +75,10 @@ final class LearnplacePlugin {
 	 * @var ilAccessHandler $access
 	 */
 	private $access;
+	/**
+	 * @var ilObjUser $user
+	 */
+	private $user;
 
 
 	/**
@@ -83,14 +87,16 @@ final class LearnplacePlugin {
 	 * @param FileHashProvider $hashProvider    The hash provider which should be used to hash the pictures and videos.
 	 */
 	public function __construct(FileHashProvider $hashProvider) {
-		RESTilias::loadIlUser();
-		RESTilias::initAccessHandling();
+		global $DIC;
+		if(!$DIC->offsetExists('ilAccess'))
+			RESTilias::loadIlUser();
 
 		$this->learnplaceService = PluginContainer::resolve(LearnplaceService::class);
 		$this->visitJournalService = PluginContainer::resolve(VisitJournalService::class);
 		$this->filesystem = PluginContainer::resolve(FilesystemInterface::class);
 		$this->access = PluginContainer::resolve('ilAccess');
 		$this->hashProvider = $hashProvider;
+		$this->user = PluginContainer::resolve('ilUser');
 	}
 
 
@@ -137,7 +143,7 @@ final class LearnplacePlugin {
 		/**
 		 * @var ilObjUser $currentUser
 		 */
-		$userId = intval(RESTilias::loadIlUser()->getId()); //fetch current user.
+		$userId = intval($this->user->getId()); //fetch current user.
 
 		$time = new DateTime();
 		$time->setTimestamp($timestamp);
