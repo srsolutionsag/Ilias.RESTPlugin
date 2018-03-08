@@ -9,12 +9,9 @@ namespace RESTController\extensions\files_v1;
 
 // This allows us to use shortcuts instead of full quantifier
 use ILIAS\HTTP\GlobalHttpState;
-use const ILIAS_VERSION_NUMERIC;
 use \RESTController\libs\RESTAuth as RESTAuth;
-use \RESTController\core\auth as Auth;
 use \RESTController\libs as Libs;
 use RESTController\RESTController;
-use function version_compare;
 
 /** @var RESTController $app */
 $app->group('/v1', function () use ($app) {
