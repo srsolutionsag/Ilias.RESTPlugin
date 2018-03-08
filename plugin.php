@@ -8,10 +8,10 @@
 
 
 $id = "rest";
-$version = "1.6.4";
+$version = "1.6.5";
 
-$ilias_min_version = "5.0.0";
-$ilias_max_version = "5.2.99";
+$ilias_min_version = "5.2.0";
+$ilias_max_version = "5.3.99";
 
 $responsible = "D.Schaefer, T.Hufschmidt";
 $responsible_mail = "{schaefer|hufschmidt} at hrz.uni-marburg.de";

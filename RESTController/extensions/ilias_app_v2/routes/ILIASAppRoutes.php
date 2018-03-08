@@ -2,9 +2,8 @@
 
 require_once(dirname(__DIR__) . '/models/ILIASAppModel.php');
 require_once('./Services/Membership/classes/class.ilParticipants.php');
+
 use \RESTController\libs\RESTAuth as RESTAuth;
-use \RESTController\core\auth as Auth;
-use \RESTController\libs as Libs;
 use RESTController\RESTController;
 
 /** @var $app RESTController */
@@ -16,7 +15,7 @@ use RESTController\RESTController;
  */
 $app->group('/v2/ilias-app', function () use ($app) {
 	$app->response->headers->set('Access-Control-Allow-Origin', '*');
-	$app->response->headers->set('Access-Control-Allow-Headers', 'Authorization,XDEBUG_SESSION,XDEBUG_SESSION_START');
+	$app->response->headers->set('Access-Control-Allow-Headers', 'Authorization,XDEBUG_SESSION,XDEBUG_SESSION_START,Content-Type');
 	$app->response->headers->set('Access-Control-Allow-Methods', 'GET,POST');
 
 	$app->get('/desktop', RESTAuth::checkAccess(RESTAuth::TOKEN), function() use ($app) {
@@ -27,7 +26,9 @@ $app->group('/v2/ilias-app', function () use ($app) {
 		$app->response->body(json_encode($iliasApp->getDesktopData($userId)));
 	});
 
-	$app->options('/desktop', function() {});
+	$app->options('/desktop', function() use ($app) {
+		$app->response->headers->set('Access-Control-Max-Age', '600');
+	});
 
 	$app->get('/objects/:refId', RESTAuth::checkAccess(RESTAuth::TOKEN), function($refId) use ($app) {
 		$iliasApp = new ILIASAppModel();
@@ -39,30 +40,47 @@ $app->group('/v2/ilias-app', function () use ($app) {
 		$app->response->body(json_encode($data));
 	});
 
-	$app->options('/objects/:refId', function() {});
+	$app->options('/objects/:refId', function() use ($app) {
+		$app->response->headers->set('Access-Control-Max-Age', '600');
+	});
 
 	$app->get('/files/:refId', RESTAuth::checkAccess(RESTAuth::TOKEN), function($refId) use ($app) {
 		$iliasApp = new ILIASAppModel();
 		$accessToken = $app->request->getToken();
+
 		$userId = $accessToken->getUserId();
 		$app->response->headers->set('Content-Type', 'application/json');
-		$app->response->body(json_encode($iliasApp->getFileData($refId, $userId)));
+
+		//ensure type safety
+		$fileData = $iliasApp->getFileData($refId, $userId);
+		$fileData["fileVersion"] = strval($fileData["fileVersion"]);
+		$fileData["fileSize"] = strval($fileData["fileSize"]);
+
+		$app->response->body(json_encode($fileData));
 	});
 
-	$app->options('/files/:refId', function() {});
-
-	$app->options('/auth-token', function () {});
+	$app->options('/files/:refId', function() use ($app) {
+		$app->response->headers->set('Access-Control-Max-Age', '600');
+	});
 
 	/**
 	 * Returns a very short live token to log in via the ILIAS Pegasus Helper plugin.
 	 */
 	$app->get('/auth-token', RESTAuth::checkAccess(RESTAuth::TOKEN), function() use ($app) {
 		$iliasApp = new ILIASAppModel();
-
 		$accessToken = $app->request->getToken();
 		$userId = $accessToken->getUserId();
 		$token = $iliasApp->createToken($userId);
 		$app->response->body(json_encode("{\"token\":\"$token\"}"));
 	});
 
+	$app->options('/auth-token', function () use ($app) {
+		$app->response->headers->set('Access-Control-Max-Age', '600');
+	});
+
+	//add learnplace routes
+	require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/REST/RESTController/extensions/ilias_app_v2/routes/LearnplaceRoutes.php';
+
+	//add news routes
+	require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/REST/RESTController/extensions/ilias_app_v2/routes/NewsRoutes.php';
 });

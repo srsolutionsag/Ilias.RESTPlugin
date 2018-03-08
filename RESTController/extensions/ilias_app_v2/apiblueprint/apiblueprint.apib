@@ -1,0 +1,642 @@
+Format: 2.0.0-uncompleted
+
+# ILIAS Learnplace API
+
+Learnplace is an API for the ILIAS Plugin 'Lernorte'.
+It allows to view blocks and their setting, that are used in a learnplace.
+
+# Group Learnplace
+
+Resources that are directly related to a learnplace.
+
+## A single learnplace [/learnplace/{objectId}]
+
+### Get a single learnplace [GET]
+Information of a learnplace including the location.
+
++ Response 200 (application/json)
+
+    + Body
+
+            {
+                "objectId": 24,
+                "location": {
+                    "latitude": 501.0112,
+                    "longitude": -201.210,
+                    "elevation": 10.05,
+                    "radius": 15
+                },
+                "map": {
+                    "visibility": "ALWAYS",
+                    "zoomLevel": 8
+                }
+            }
+
+    + Schema
+
+            {
+                "title": "Learnplace",
+                "type": "object",
+                "properties": {
+                    "objectId": {
+                        "description": "The object id used in ILIAS to identify the object"
+                        "type": "integer",
+                        "minimum": 1
+                    },
+                    "location": {
+                        "type": "object",
+                        "properties": {
+                            "latitude": {
+                                "type": "float"
+                            },
+                            "longitude": {
+                                "type": "float"
+                            },
+                            "elevation": {
+                                "description": "The height of a geographic location",
+                                "type": "float"
+                            },
+                            "radius": {
+                                "type": "integer"
+                            }
+                        }
+                    },
+                    "map": {
+                        "type": [ "object", "null" ],
+                        "properties": {
+                            "visibility": {
+                                "type": "string",
+                                "pattern": "^ALWAYS$|^NEVER$|^ONLY_AT_PLACE$|^AFTER_PLACE_VISIT$"
+                            },
+                            "zoomLevel": {
+                                "type": integer,
+                                "minimum": 0,
+                                "maximum": 18
+                            }
+                        }
+                    }
+                }
+            }
+
+## Visit journal of a learnplace [/learnplace/{objectId}/journal-entries]
+
+### List the visit journal of a learnplace [GET]
+The visit journal of a learnplace contains all users that visited the learnplace including their time.
+
++ Response 200 (application/json)
+
+    + Body
+
+            [
+                {
+                    "username": "mmuster",
+                    "timestamp": 1415463675
+                },
+                {
+                    "username": "ssuster",
+                    "timestamp": 1415687564
+                }
+            ]
+
+    + Schema
+
+            {
+                "title": "visit journal",
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "username": {
+                            "type": "string"
+                        },
+                        "timestamp": {
+                            "description": "The unix time in seconds",
+                            "type": "long",
+                            "minimum": 0
+                        }
+                    }
+                }
+            }
+
+## Visit journal entry of a learnplace [/learnplace/{objectId}/journal-entry]
+
+### Create a new entry to the learnplace visit journal [POST]
+You can create a new entry to the visit journal. The user is identified by the rest api.
+
++ Request  (application/json)
+
+    + Body
+
+            {
+                "time": 1415687564
+            }
+
+    + Schema
+
+            {
+                "title": "visit journal",
+                "type": "object",
+                "properties": {
+                    "time": {
+                        "description": "The Unix time in seconds",
+                        "type": "long",
+                        "minimum": 0
+                    }
+                }
+            }
+
++ Response 200 (application/json)
+
+    + Body
+
+            {
+                "message": "Visit journal entry was successful created"
+            }
+
+    + Schema
+
+            {
+                "title": "message",
+                "type": "object",
+                "properties": {
+                    "message": {
+                        "description": "A message about the action",
+                        "type": "string"
+                    }
+                }
+            }
+
++ Response 400 (application/json)
+
+    + Body
+
+            {
+                "cause": "The request body does not match the json schema"
+            }
+
+    + Schema
+
+            {
+                "title": "cause",
+                "type": "object",
+                "properties": {
+                    "cause": {
+                        "description": "The reason why it was a bad request",
+                        "type": "string"
+                    }
+                }
+            }
+
+# Group Block
+
+Blocks are the content of a learnplace.
+
+## All blocks of a learnplace [/learnplace/{objectId}/blocks]
+
+### Get all blocks of a single learnplace [GET]
+All common blocks that are related to the learnplace. Different block types are in different properties.
+There are special blocks, that can only exists once in a learnplace. These properties can also be null.
+
+The accordion block is a special block, that can contains all other block types.
+
++ Response 200 (application/json)
+
+    + Body
+
+            {
+                "text": [
+                    {
+                        "id": 1,
+                        "sequence": 1,
+                        "visibility": "ALWAYS",
+                        "content": ""
+                    }
+                ],
+                "picture": [
+                    {
+                        "id": 1,
+                        "sequence": 2,
+                        "visibility": "ALWAYS",
+                        "title": "a fancy picture",
+                        "description": "",
+                        "thumbnail": "",
+                        "url": "data/default/xsrl_5/naeuvaner.jpg",
+                        "hash": ""
+                    }
+                ],
+                "video": [
+                    {
+                        "id": 1,
+                        "sequence": 3,
+                        "visibility": "ALWAYS",
+                        "url": "data/default/xsrl_6/enuiatrenuiar.mp4",
+                        "hash": ""
+                    }
+                ],
+                "iliasLink": [
+                    {
+                        "id": 1,
+                        "sequence": 4,
+                        "visibility": "ALWAYS",
+                        "refId": 285
+                    }
+                ],
+                "accordion": [
+                    {
+                        "id": 1,
+                        "sequence": 1,
+                        "title": "",
+                        "expanded": false,
+                        "visibility": "ALWAYS",
+                        "text": [
+                            {
+                                "id": 1,
+                                "sequence": 1,
+                                "visibility": "ALWAYS",
+                                "content": ""
+                            }
+                        ],
+                        "picture": [
+                            {
+                                "id": 1,
+                                "sequence": 2,
+                                "visibility": "ALWAYS",
+                                "title": "a fancy picture",
+                                "description": "",
+                                "thumbnail": "",
+                                "thumbnailHash": "",
+                                "url": "data/default/xsrl_5/naeuvaner.jpg",
+                                "hash": "5f0469e9c1ecfba013ed10800ec5c9e03ad42f27f7a72e107a21e8e9142f56d8"
+                            }
+                        ],
+                        "video": [
+                            {
+                                "id": 1,
+                                "sequence": 3,
+                                "visibility": "ALWAYS",
+                                "url": "data/default/xsrl_6/enuiatrenuiar.mp4",
+                                "hash": "5f0469e9c1ecfba013ed10800ec5c9e03ad42f27f7a72e107a21e8e9142f56d8"
+                            }
+                        ],
+                        "iliasLink": [
+                            {
+                                "id": 1,
+                                "sequence": 4,
+                                "visibility": "ALWAYS",
+                                "refId": 285
+                            }
+                        ]
+                    }
+                ]
+            }
+
+    + Schema
+
+            {
+                "title": "blocks",
+                "type": "object",
+                "properties": {
+                    "text": {
+                        "description": "Contains all text blocks of the learnplace"
+                        "type": "array",
+                        "items" {
+                            "type": "object",
+                            "properties": {
+                                "id": {
+                                    "type": "integer",
+                                    "minimum": 1
+                                },
+                                "sequence": {
+                                    "description": "Position of the block ordering",
+                                    "type": "integer",
+                                    "minimum": 1
+                                },
+                                "visibility": {
+                                    "type": "string",
+                                    "pattern": "^ALWAYS$|^NEVER$|^ONLY_AT_PLACE$|^AFTER_PLACE_VISIT$"
+                                },
+                                "content": {
+                                    "description": "The text blocks content as html format",
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "picture": {
+                        "description": "Contains all picture blocks of the learnplace"
+                        "type": "array",
+                        "items" {
+                            "type": "object",
+                            "properties": {
+                                "id": {
+                                    "type": "integer",
+                                    "minimum": 1
+                                },
+                                "sequence": {
+                                    "description": "Position of the block ordering",
+                                    "type": "integer",
+                                    "minimum": 1
+                                },
+                                "visibility": {
+                                    "type": "string",
+                                    "pattern": "^ALWAYS$|^NEVER$|^ONLY_AT_PLACE$|^AFTER_PLACE_VISIT$"
+                                },
+                                "title": {
+                                    "type": "string"
+                                },
+                                "description": {
+                                    "type": "string"
+                                },
+                                "thumbnail": {
+                                    "description": "Base64 encoded image. Thumbnail has a static width of 1280px",
+                                    "type": "string"
+                                },
+                                "url": {
+                                    "description": "Relative path of the file",
+                                    "type": "string",
+                                    "pattern": "^(.*?\/){2,}.*?\.(jpg|png)$"
+                                },
+                                "hash": {
+                                    "description": "sha256 hash of the image returned by the url property of this object",
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "video": {
+                        "description": "Contains all video blocks of the learnplace"
+                        "type": "array",
+                        "items" {
+                            "type": "object",
+                            "properties": {
+                                "id": {
+                                    "type": "integer",
+                                    "minimum": 1
+                                },
+                                "sequence": {
+                                    "description": "Position of the block ordering",
+                                    "type": "integer",
+                                    "minimum": 1
+                                },
+                                "visibility": {
+                                    "type": "string",
+                                    "pattern": "^ALWAYS$|^NEVER$|^ONLY_AT_PLACE$|^AFTER_PLACE_VISIT$"
+                                },
+                                "url": {
+                                    "description": "Relative path of the file",
+                                    "type": "string",
+                                    "pattern": "^(.*?\/){2,}.*?\.mp4$"
+                                },
+                                "hash": {
+                                    "description": "sha256 hash of the video returned by the url property of this object",
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "iliasLink": {
+                        "description": "Contains all ILIAS link blocks of the learnplace"
+                        "type": "array",
+                        "items" {
+                            "type": "object",
+                            "properties": {
+                                "id": {
+                                    "type": "integer",
+                                    "minimum": 1
+                                },
+                                "sequence": {
+                                    "description": "Position of the block ordering",
+                                    "type": "integer",
+                                    "minimum": 1
+                                },
+                                "visibility": {
+                                    "type": "string",
+                                    "pattern": "^ALWAYS$|^NEVER$|^ONLY_AT_PLACE$|^AFTER_PLACE_VISIT$"
+                                },
+                                "refId": {
+                                    "description": "The ref id used in ILIAS",
+                                    "type": "integer",
+                                    "minimum": 1
+                                }
+                            }
+                        }
+                    },
+                    "accordion": {
+                        "type": "array",
+                        "items": {
+                            "description": "Contains collections of block types which can be nested."
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                  "type": "integer",
+                                  "minimum": 1
+                              },
+                              "sequence": {
+                                  "description": "Position of the block ordering",
+                                  "type": "integer",
+                                  "minimum": 1
+                              },
+                              "visibility": {
+                                  "type": "string",
+                                  "pattern": "^ALWAYS$|^NEVER$|^ONLY_AT_PLACE$|^AFTER_PLACE_VISIT$"
+                              },
+                              "text": {
+                                  "description": "Contains all text blocks of the accordion"
+                                  "type": "array",
+                                  "items": {
+                                      "type": "object",
+                                      "properties": {
+                                          "id": {
+                                            "type": "integer",
+                                            "minimum": 1
+                                          },
+                                          "sequence": {
+                                              "description": "Position of the block ordering",
+                                              "type": "integer",
+                                              "minimum": 1
+                                          },
+                                          "visibility": {
+                                              "type": "string",
+                                              "pattern": "^ALWAYS$|^NEVER$|^ONLY_AT_PLACE$|^AFTER_PLACE_VISIT$"
+                                          },
+                                          "content": {
+                                              "description": "The text blocks content as html format",
+                                              "type": "string"
+                                          }
+                                      }
+                                  }
+                              },
+                              "picture": {
+                                   "description": "Contains all picture blocks of the accordion"
+                                  "type": "array",
+                                  "items" {
+                                      "type": "object",
+                                      "properties": {
+                                          "id": {
+                                              "type": "integer",
+                                              "minimum": 1
+                                          },
+                                          "sequence": {
+                                              "description": "Position of the block ordering",
+                                              "type": "integer",
+                                              "minimum": 1
+                                          },
+                                          "visibility": {
+                                              "type": "string",
+                                              "pattern": "^ALWAYS$|^NEVER$|^ONLY_AT_PLACE$|^AFTER_PLACE_VISIT$"
+                                          },
+                                          "title": {
+                                              "type": "string"
+                                          },
+                                          "description": {
+                                              "type": "string"
+                                          },
+                                          "thumbnail": {
+                                              "description": "Relative path of the thumbnail image file. Thumbnail has a static width of 1280px",
+                                              "type": "string"
+                                          },
+                                          "thumbnailHash": {
+                                            "description": "sha256 hash of the thumbnail image returned by the url property of this object",
+                                            "type": "string"
+                                          }
+                                          "url": {
+                                              "description": "Relative path of the image file",
+                                              "type": "string",
+                                              "pattern": "^(.*?\/){2,}.*?\.(jpg|png)$"
+                                          },
+                                          "hash": {
+                                            "description": "sha256 hash of the image returned by the url property of this object",
+                                            "type": "string"
+                                        }
+                                      }
+                                  }
+                              },
+                              "video": {
+                                  "description": "Contains all video blocks of the accordion"
+                                  "type": "array",
+                                  "items" {
+                                      "type": "object",
+                                      "properties": {
+                                          "id": {
+                                              "type": "integer",
+                                              "minimum": 1
+                                          },
+                                          "sequence": {
+                                              "description": "Position of the block ordering",
+                                              "type": "integer",
+                                              "minimum": 1
+                                          },
+                                          "visibility": {
+                                              "type": "string",
+                                              "pattern": "^ALWAYS$|^NEVER$|^ONLY_AT_PLACE$|^AFTER_PLACE_VISIT$"
+                                          },
+                                          "url": {
+                                              "description": "Relative path of the file",
+                                              "type": "string",
+                                              "pattern": "^(.*?\/){2,}.*?\.mp4$"
+                                          },
+                                          "hash": {
+                                              "description": "sha256 hash of the image returned by the url property of this object",
+                                              "type": "string"
+                                          }
+                                      }
+                                  }
+                              },
+                              "iliasLink": {
+                                  "description": "Contains all ILIAS link blocks of the accordion"
+                                  "type": "array",
+                                  "items" {
+                                      "type": "object",
+                                      "properties": {
+                                      "id": {
+                                        "type": "integer",
+                                        "minimum": 1
+                                    },
+                                          "sequence": {
+                                              "description": "Position of the block ordering",
+                                              "type": "integer",
+                                              "minimum": 1
+                                          },
+                                          "visibility": {
+                                              "type": "string",
+                                              "pattern": "^ALWAYS$|^NEVER$|^ONLY_AT_PLACE$|^AFTER_PLACE_VISIT$"
+                                          },
+                                          "refId": {
+                                              "description": "The ref id used in ILIAS",
+                                              "type": "integer",
+                                              "minimum": 1
+                                          }
+                                      }
+                                  }
+                              }
+                            }
+                        }
+                    }
+                }
+            }
+
+# News Feed
+ILIAS provides a personalized news feed for users.
+
+## All news for the authenticated user [/news]
+
+### Fetches all news for the current authenticated user [GET]
+Fetches the personalized news of the current moth for the user which is
+associated with the used authorization token.
+
++ Response 200 (application/json)
+
+  + body
+
+    {
+      "newsId": 28,
+      "newsContext": 79,
+      "content": "Wiki page has been created.",
+      "title": "Wiki: Awesome wiki",
+      "subtitle": "Awesome page"
+      "createDate": 8040404,
+      "updateDate": 90202202
+    }
+
+  + Schema
+
+    {
+        "title": "News",
+        "type": "object",
+        "properties": {
+            "newsId": {
+                "description": "The numeric news identifier.",
+                "type": "integer",
+                "minimum": 1
+            },
+            "newsContext": {
+                "description": "The ref id of the news context.",
+                "type": "integer",
+                "minimum": 1
+            },
+            "title": {
+                "description": "The title of the news entry.",
+                "type": "string",
+                "pattern": "^.{1,}$"
+            },
+            "content": {
+                "description": "The content of the news entry.",
+                "type": "string"
+            },
+            "subtitle": {
+                "description": "The subtitle of the news entry",
+                "type": "string"
+            },
+            "createDate": {
+              "description": "The create date of the news entry as unix epoch time.",
+              "type": "integer",
+              "minimum": 1
+            },
+            "updateDate": {
+              "description": "The update date of the news entry as unix epoch time.",
+              "type": "integer",
+              "minimum": 1
+            }
+        },
+        "required": [ "newsId", "newsContext", "title", "content", "subtitle", "createDate", "updateDate" ]
+    }
