@@ -4,6 +4,7 @@ namespace RESTController\extensions\ILIASApp\V2;
 
 require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/REST/RESTController/libs/RESTilias.php';
 require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/REST/RESTController/extensions/ilias_app_v2/models/data/NewsItem.php';
+require_once './Services/News/classes/class.ilNewsItem.php';
 
 use DateTime;
 use ilLanguage;
