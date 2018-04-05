@@ -11,9 +11,8 @@ namespace RESTController\extensions\files_v1;
 use \RESTController\libs as Libs;
 
 
-
-require_once('./Modules/File/classes/class.ilObjFile.php');
-require_once('./Services/User/classes/class.ilObjUser.php');
+require_once('Modules/File/classes/class.ilObjFile.php');
+require_once('Services/User/classes/class.ilObjUser.php');
 
 class FileModel extends Libs\RESTModel
 {
@@ -27,15 +26,8 @@ class FileModel extends Libs\RESTModel
     function getFileObjForUser($file_obj_id, $user_id)
     {
 
-        Libs\RESTilias::loadIlUser();
-        global    $ilUser;
-        $ilUser->setId($user_id);
-        $ilUser->read();
-        Libs\RESTilias::initAccessHandling();
-
-        require_once('./Services/Xml/classes/class.ilSaxParser.php');
-        Libs\RESTilias::initGlobal('objDefinition', 'ilObjectDefinition','./Services/Object/classes/class.ilObjectDefinition.php');
-        global $ilDB, $ilias, $ilPluginAdmin, $objDefinition;
+        Libs\RESTilias::loadIlUser($user_id);
+        require_once('Services/Xml/classes/class.ilSaxParser.php');
         global $ilAccess;
 
         // Check access
@@ -65,7 +57,7 @@ class FileModel extends Libs\RESTModel
     function getFileObj($obj_id)
     {
         //        //global $ilDB;
-        require_once('./Services/Xml/classes/class.ilSaxParser.php');
+        require_once('Services/Xml/classes/class.ilSaxParser.php');
         Libs\RESTilias::initGlobal('objDefinition', 'ilObjectDefinition','./Services/Object/classes/class.ilObjectDefinition.php');
         global $ilDB, $ilias, $ilPluginAdmin, $objDefinition;
         $fileObj=  \ilObjectFactory::getInstanceByObjId($obj_id);
@@ -91,7 +83,7 @@ class FileModel extends Libs\RESTModel
         define ('MAXLENGTH_OBJ_TITLE',125);
         define ('MAXLENGTH_OBJ_DESC',123);
 
-        require_once('./Services/Xml/classes/class.ilSaxParser.php');
+        require_once('Services/Xml/classes/class.ilSaxParser.php');
         Libs\RESTilias::initGlobal('objDefinition', 'ilObjectDefinition','./Services/Object/classes/class.ilObjectDefinition.php');
         Libs\RESTilias::initGlobal('ilAppEventHandler', 'ilAppEventHandler','./Services/EventHandling/classes/class.ilAppEventHandler.php');
         Libs\RESTilias::initGlobal('ilObjDataCache', 'ilObjectDataCache','./Services/Object/classes/class.ilObjectDataCache.php');
@@ -204,7 +196,7 @@ class FileModel extends Libs\RESTModel
             }
             else
             {
-                include_once('./Modules/File/classes/class.ilObjFileAccess.php');
+                include_once('Modules/File/classes/class.ilObjFileAccess.php');
                 // BEGIN WebDAV: Ensure that object title ends with the filename extension
                 $fileExtension = \ilObjFileAccess::_getFileExtension($filename);
                 $titleExtension = \ilObjFileAccess::_getFileExtension($title);
@@ -219,14 +211,14 @@ class FileModel extends Libs\RESTModel
             //var_dump($title);
 
             // create and insert file in grp_tree
-            include_once('./Modules/File/classes/class.ilObjFile.php');
+            include_once('Modules/File/classes/class.ilObjFile.php');
             $fileObj = new \ilObjFile();
             $fileObj->setOwner($owner_id);
             $fileObj->setTitle($title);
             $fileObj->setDescription($description);
             $fileObj->setFileName($filename);
 
-            include_once('./Services/Utilities/classes/class.ilMimeTypeUtil.php');
+            include_once('Services/Utilities/classes/class.ilMimeTypeUtil.php');
             $fileObj->setFileType(\ilMimeTypeUtil::getMimeType('', $filename, $type));
             $fileObj->setFileSize($size);
             $object_id = $fileObj->create();

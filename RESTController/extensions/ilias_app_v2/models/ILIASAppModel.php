@@ -25,9 +25,7 @@ class ILIASAppModel extends Libs\RESTModel
 	public function __construct()
 	{
 		global $ilDB, $ilAccess;
-		Libs\RESTilias::initILIAS();
 		Libs\RESTilias::loadIlUser();
-		Libs\RESTilias::initAccessHandling();
 		$this->db = $ilDB;
 		$this->access = $ilAccess;
 	}

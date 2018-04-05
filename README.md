@@ -2,9 +2,18 @@
 
 This is a plugin for the [ILIAS Learning Management System](<http://www.ilias.de>), which provides a customizable REST API.
 
+## Warning
+This is a modified version of the original [REST plugin](https://github.com/hrz-unimr/Ilias.RESTPlugin) 
+which contains changes required by the Pegasus mobile application. Only use this
+branch with the ILIAS Pegasus mobile application.
+
+## Requirements
+* Version: ILIAS 5.2 or 5.3
+* PHP 5.5.9 or higher or PHP 7
+
 ## Installation
 
-*   From within you ILIAS directory:
+*   From within your ILIAS directory:
 
 ```bash
 mkdir -p Customizing/global/plugins/Services/UIComponent/UserInterfaceHook
@@ -38,3 +47,6 @@ curl -X GET https://ilias.uni-marburg.de/Customizing/global/plugins/Services/UIC
 ```
 
 More examples can be found in the [wiki](https://github.com/hrz-unimr/Ilias.RESTPlugin/wiki/Examples).
+
+## License
+This project is licensed under the GNU GPLv3 License - see the LICENSE.md file for details.

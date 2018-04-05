@@ -19,7 +19,6 @@ require_once('Modules/LearningModule/classes/class.ilObjLearningModule.php');
 require_once('Modules/LearningModule/classes/class.ilLMPageObject.php');
 
 
-
 class CoursesModel extends Libs\RESTModel
 {
 

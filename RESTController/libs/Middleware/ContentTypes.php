@@ -65,6 +65,10 @@ class ContentTypes extends \Slim\Middleware {
    *  <Array> - Converted assoc-array payload
    */
   protected function parse($input, $contentType) {
+    // Early exit
+    if (!isset($input) || trim($input) == '')
+      return $input;
+
     // Convert JSON
     if (in_array($contentType, [ 'application/json', 'text/json' ])) {
       $result = $this->parseJSON($input);

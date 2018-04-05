@@ -12,7 +12,6 @@ use \RESTController\libs as Libs;
 
 
 
-
 class ReportingModel extends Libs\RESTModel {
 
     /**
