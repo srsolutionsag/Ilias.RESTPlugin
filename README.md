@@ -9,7 +9,7 @@ branch with the ILIAS Pegasus mobile application.
 
 ## Requirements
 * Version: ILIAS 5.2 or 5.3
-* PHP 5.5.9 or PHP 7
+* PHP 5.5.9 or higher or PHP 7
 
 ## Installation
 
