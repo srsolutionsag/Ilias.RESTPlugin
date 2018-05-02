@@ -1,14 +1,17 @@
 <?php namespace RESTController\extensions\ILIASApp\V2;
 
+use ilSessionAppointment;
+use RESTController\extensions\ILIASApp\V2\data\IliasTreeItem;
 use \RESTController\libs as Libs;
 
 require_once('./Services/Membership/classes/class.ilParticipants.php');
 require_once('./Modules/File/classes/class.ilObjFile.php');
 require_once('./Services/Link/classes/class.ilLink.php');
 require_once('./Services/Administration/classes/class.ilSetting.php');
+require_once __DIR__ . '/data/IliasTreeItem.php';
 
 
-class ILIASAppModel extends Libs\RESTModel
+final class ILIASAppModel extends Libs\RESTModel
 {
 
 	/**
@@ -135,7 +138,7 @@ class ILIASAppModel extends Libs\RESTModel
 	}
 
 
-	protected function getChildrenRecursiveOnMaterializedPath($refId, $userId)
+	private function getChildrenRecursiveOnMaterializedPath($refId, $userId)
 	{
 		$sql = "SELECT object_reference.obj_id FROM tree AS parent
                 INNER JOIN tree AS child ON child.path LIKE CONCAT(parent.path, '.%')
@@ -151,7 +154,7 @@ class ILIASAppModel extends Libs\RESTModel
 	}
 
 
-	protected function getChildrenRecursiveOnNestedSet($refId, $userId)
+	private function getChildrenRecursiveOnNestedSet($refId, $userId)
 	{
 		$sql = 'SELECT object_reference.obj_id FROM tree
                 INNER JOIN tree AS tree_children ON (tree_children.lft > tree.lft AND tree_children.rgt < tree.rgt)
@@ -167,7 +170,7 @@ class ILIASAppModel extends Libs\RESTModel
 	}
 
 
-	protected function isNestedSet()
+	private function isNestedSet()
 	{
 		$query = "SELECT * FROM settings WHERE keyword LIKE 'main_tree_impl'";
 		$set = $this->db->query($query);
@@ -181,7 +184,12 @@ class ILIASAppModel extends Libs\RESTModel
 	}
 
 
-	protected function fetchObjectData(array $objIds)
+    /**
+     * @param string[] $objIds
+     *
+     * @return IliasTreeItem[]
+     */
+	private function fetchObjectData(array $objIds)
 	{
 
 		if (!count($objIds)) {
@@ -192,14 +200,14 @@ class ILIASAppModel extends Libs\RESTModel
                 tree.child AS ref_id,
                 tree.parent AS parent_ref_id,
                 page_object.parent_id AS page_layout,
-				ni.context_obj_id AS timeline
-                FROM object_data 
-                INNER JOIN object_reference ON (object_reference.obj_id = object_data.obj_id AND object_reference.deleted IS NULL)
-                INNER JOIN tree ON (tree.child = object_reference.ref_Id)
-                LEFT JOIN page_object ON page_object.parent_id = object_data.obj_id
-                LEFT JOIN il_news_item AS ni ON ni.context_obj_id = object_data.obj_id
-                WHERE object_data.obj_id IN (" . implode(',', $objIds) . ") AND object_data.type NOT IN ('rolf', 'itgr')
-                GROUP BY object_data.obj_id";
+                cs.value AS timeline
+                FROM object_data
+                  INNER JOIN object_reference ON (object_reference.obj_id = object_data.obj_id AND object_reference.deleted IS NULL)
+                  INNER JOIN tree ON (tree.child = object_reference.ref_Id)
+                  LEFT JOIN page_object ON page_object.parent_id = object_data.obj_id
+                  LEFT JOIN container_settings AS cs ON cs.id = object_data.obj_id AND cs.keyword = 'news_timeline'
+                WHERE (object_data.obj_id IN (" . implode(',', $objIds) . ") AND object_data.type NOT IN ('rolf', 'itgr'))
+                GROUP BY object_data.obj_id;";
 		$set = $this->db->query($sql);
 		$return = array();
 
@@ -213,23 +221,37 @@ class ILIASAppModel extends Libs\RESTModel
 				continue;
 			}
 
-			$return[] = array(
-				'objId' => $row['obj_id'],
-				'title' => $row['title'],
-				'description' => $row['description'],
-				'hasPageLayout' => ($row['page_layout'] !== NULL),
-				'hasTimeline' => ($row['timeline'] !== NULL),
-				'permissionType' => $row['permissionType'],
-				'refId' => $row['ref_id'],
-				'parentRefId' => $row['parent_ref_id'],
-				'type' => $row['type'],
-				'link' => \ilLink::_getStaticLink($row['ref_id'], $row['type']),
-				'repoPath' => $this->createRepoPath($row['ref_id'])
-			);
+			$treeItem = new IliasTreeItem(
+                strval($row['obj_id']),
+                strval($row['title']),
+                strval($row['description']),
+                ($row['page_layout'] !== NULL),
+                (intval($row['timeline']) === 1),
+                strval($row['permissionType']),
+                strval($row['ref_id']),
+                strval($row['parent_ref_id']),
+                strval($row['type']),
+                strval(\ilLink::_getStaticLink($row['ref_id'], $row['type'])),
+                $this->createRepoPath($row['ref_id'])
+            );
+
+			$treeItem = $this->fixSessionTitle($treeItem);
+            $return[] = $treeItem;
 		}
 
 		return $return;
 	}
+
+	private function fixSessionTitle(IliasTreeItem $treeItem) {
+	    if($treeItem->getType() === "sess") {
+            $appointment = ilSessionAppointment::_lookupAppointment($treeItem->getObjId());
+            $title = strlen($treeItem->getTitle()) ? (': '. $treeItem->getTitle()) : '';
+            $title = ilSessionAppointment::_appointmentToString($appointment['start'], $appointment['end'],$appointment['fullday']) . $title;
+            return $treeItem->setTitle($title);
+        }
+
+        return $treeItem;
+    }
 
 
 	/**
@@ -241,7 +263,7 @@ class ILIASAppModel extends Libs\RESTModel
 		global $tree;
 		$path = array();
 		foreach ($tree->getPathFull($ref_id) as $node) {
-			$path[] = $node['title'];
+			$path[] = strval($node['title']);
 		}
 
 		return $path;
