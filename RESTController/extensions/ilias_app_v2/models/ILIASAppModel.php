@@ -244,6 +244,9 @@ final class ILIASAppModel extends Libs\RESTModel
 
 	private function fixSessionTitle(IliasTreeItem $treeItem) {
 	    if($treeItem->getType() === "sess") {
+	        // required for ILIAS 5.2
+	        require_once './Modules/Session/classes/class.ilSessionAppointment.php';
+
             $appointment = ilSessionAppointment::_lookupAppointment($treeItem->getObjId());
             $title = strlen($treeItem->getTitle()) ? (': '. $treeItem->getTitle()) : '';
             $title = ilSessionAppointment::_appointmentToString($appointment['start'], $appointment['end'],$appointment['fullday']) . $title;
