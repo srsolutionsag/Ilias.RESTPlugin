@@ -205,9 +205,8 @@ final class ILIASAppModel extends Libs\RESTModel
                   INNER JOIN object_reference ON (object_reference.obj_id = object_data.obj_id AND object_reference.deleted IS NULL)
                   INNER JOIN tree ON (tree.child = object_reference.ref_Id)
                   LEFT JOIN page_object ON page_object.parent_id = object_data.obj_id
-                  LEFT JOIN container_settings AS cs ON cs.id = object_data.obj_id
-                WHERE object_data.obj_id IN (" . implode(',', $objIds) . ") AND object_data.type NOT IN ('rolf', 'itgr') AND
-                  cs.keyword = 'news_timeline'
+                  LEFT JOIN container_settings AS cs ON cs.id = object_data.obj_id AND cs.keyword = 'news_timeline'
+                WHERE (object_data.obj_id IN (" . implode(',', $objIds) . ") AND object_data.type NOT IN ('rolf', 'itgr'))
                 GROUP BY object_data.obj_id;";
 		$set = $this->db->query($sql);
 		$return = array();
