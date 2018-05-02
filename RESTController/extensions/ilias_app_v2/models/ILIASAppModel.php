@@ -1,6 +1,5 @@
 <?php namespace RESTController\extensions\ILIASApp\V2;
 
-use ilObjSession;
 use ilSessionAppointment;
 use RESTController\extensions\ILIASApp\V2\data\IliasTreeItem;
 use \RESTController\libs as Libs;
@@ -201,14 +200,15 @@ final class ILIASAppModel extends Libs\RESTModel
                 tree.child AS ref_id,
                 tree.parent AS parent_ref_id,
                 page_object.parent_id AS page_layout,
-				ni.context_obj_id AS timeline
-                FROM object_data 
-                INNER JOIN object_reference ON (object_reference.obj_id = object_data.obj_id AND object_reference.deleted IS NULL)
-                INNER JOIN tree ON (tree.child = object_reference.ref_Id)
-                LEFT JOIN page_object ON page_object.parent_id = object_data.obj_id
-                LEFT JOIN il_news_item AS ni ON ni.context_obj_id = object_data.obj_id
-                WHERE object_data.obj_id IN (" . implode(',', $objIds) . ") AND object_data.type NOT IN ('rolf', 'itgr')
-                GROUP BY object_data.obj_id";
+                cs.value AS timeline
+                FROM object_data
+                  INNER JOIN object_reference ON (object_reference.obj_id = object_data.obj_id AND object_reference.deleted IS NULL)
+                  INNER JOIN tree ON (tree.child = object_reference.ref_Id)
+                  LEFT JOIN page_object ON page_object.parent_id = object_data.obj_id
+                  LEFT JOIN container_settings AS cs ON cs.id = object_data.obj_id
+                WHERE object_data.obj_id IN (" . implode(',', $objIds) . ") AND object_data.type NOT IN ('rolf', 'itgr') AND
+                  cs.keyword = 'news_timeline'
+                GROUP BY object_data.obj_id;";
 		$set = $this->db->query($sql);
 		$return = array();
 
@@ -227,7 +227,7 @@ final class ILIASAppModel extends Libs\RESTModel
                 strval($row['title']),
                 strval($row['description']),
                 ($row['page_layout'] !== NULL),
-                ($row['timeline'] !== NULL),
+                (intval($row['timeline']) === 1),
                 strval($row['permissionType']),
                 strval($row['ref_id']),
                 strval($row['parent_ref_id']),
