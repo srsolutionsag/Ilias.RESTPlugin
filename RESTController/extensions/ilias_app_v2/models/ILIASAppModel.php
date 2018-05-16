@@ -17,12 +17,12 @@ final class ILIASAppModel extends Libs\RESTModel
 	/**
 	 * @var \ilDB
 	 */
-	protected $db;
+	private $db;
 
 	/**
 	 * @var \ilAccessHandler
 	 */
-	protected $access;
+	private $access;
 
 
 	public function __construct()
@@ -261,7 +261,7 @@ final class ILIASAppModel extends Libs\RESTModel
 	 * @param $ref_id int
 	 * @return array
 	 */
-	protected function createRepoPath($ref_id)
+	private function createRepoPath($ref_id)
 	{
 		global $tree;
 		$path = array();
