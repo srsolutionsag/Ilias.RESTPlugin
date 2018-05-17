@@ -1,5 +1,7 @@
 <?php namespace RESTController\extensions\ILIASApp\V2;
 
+use ilContainerReference;
+use ilObject;
 use ilSessionAppointment;
 use RESTController\extensions\ILIASApp\V2\data\IliasTreeItem;
 use \RESTController\libs as Libs;
@@ -17,12 +19,23 @@ final class ILIASAppModel extends Libs\RESTModel
 	/**
 	 * @var \ilDB
 	 */
-	protected $db;
+	private $db;
 
 	/**
 	 * @var \ilAccessHandler
 	 */
-	protected $access;
+	private $access;
+	/**
+	 * Holds all reference types which may use the
+	 * title of the element they are referring to.
+	 *
+	 * @var string[]
+	 */
+	private static $REFERENCE_TYPES = [
+		'grpr',
+		'catr',
+		'crsr'
+	];
 
 
 	public function __construct()
@@ -236,10 +249,28 @@ final class ILIASAppModel extends Libs\RESTModel
             );
 
 			$treeItem = $this->fixSessionTitle($treeItem);
+			$treeItem = $this->fixReferenceTitle($treeItem);
             $return[] = $treeItem;
 		}
 
 		return $return;
+	}
+
+
+	/**
+	 * Fixes the title for reference repository objects.
+	 *
+	 * @param IliasTreeItem $treeItem   The item which may need a title fix.
+	 *
+	 * @return IliasTreeItem            A clone of the ilias tree item with the fixed title.
+	 */
+	private function fixReferenceTitle(IliasTreeItem $treeItem) {
+		if(in_array($treeItem->getType(), self::$REFERENCE_TYPES)) {
+			require_once './Services/ContainerReference/classes/class.ilContainerReference.php';
+			$targetTitle = ilContainerReference::_lookupTitle($treeItem->getObjId());
+			$treeItem = $treeItem->setTitle($targetTitle);
+		}
+		return $treeItem;
 	}
 
 	private function fixSessionTitle(IliasTreeItem $treeItem) {
@@ -261,7 +292,7 @@ final class ILIASAppModel extends Libs\RESTModel
 	 * @param $ref_id int
 	 * @return array
 	 */
-	protected function createRepoPath($ref_id)
+	private function createRepoPath($ref_id)
 	{
 		global $tree;
 		$path = array();
