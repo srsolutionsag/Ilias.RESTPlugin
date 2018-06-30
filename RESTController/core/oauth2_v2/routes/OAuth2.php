@@ -340,7 +340,7 @@ $app->group('/v2', function () use ($app) {
         $iliasClient  = Libs\RESTilias::FetchILIASClient();
 
         // Delete all tokens/sessions that where given
-        Misc::FlowDeleteToken($apiKey, $apiSecret, $apiCert, $iliasClient, $remoteIp, $accessCode);
+        Misc::FlowDeleteToken($apiKey, $apiSecret, $apiCert, $iliasClient, $remoteIp, $tokenCode);
 
         // Show result of all actions
         $app->success(null);
