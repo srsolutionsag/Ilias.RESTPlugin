@@ -6,9 +6,7 @@ require_once(dirname(__DIR__) . '/models/EBookModel.php');
 require_once("./Services/FileDelivery/classes/class.ilFileDelivery.php");
 require_once("./Customizing/global/plugins/Services/Repository/RepositoryObject/eBook/classes/class.ileBookAccessLog.php");
 
-
-use \RESTController\libs\RESTAuth as RESTAuth;
-use \RESTController\core\auth as Auth;
+use RESTController\libs\RESTAuth as RESTAuth;
 use RESTController\RESTController;
 
 /** @var $app RESTController */
@@ -21,22 +19,14 @@ use RESTController\RESTController;
 $app->group('/v1/ebook', function () use ($app) {
 
 	/**
-	 * set CORS Headers
-	 */
-	$app->response->headers->set('Access-Control-Allow-Origin', '*');
-	$app->response->headers->set('Access-Control-Allow-Headers', 'Authorization,XDEBUG_SESSION,XDEBUG_SESSION_START');
-	$app->response->headers->set('Access-Control-Allow-Methods', 'GET,POST');
-
-	/**
 	 * GET all files
 	 */
 	$app->get('/', RESTAuth::checkAccess(RESTAuth::TOKEN), function() use ($app) {
-		$accessToken = $app->request->getToken();
+		$accessToken = $app->request()->getToken();
 		$model = new EBookModel();
 		$userId = $accessToken->getUserId();
 		$app->response->body(json_encode($model->getEBooks($userId)));
 	});
-	$app->options('/', function() {});
 
 	/**
 	 * GET encoded file binary
@@ -62,7 +52,6 @@ $app->group('/v1/ebook', function () use ($app) {
 		$ilFileDelivery->setMimeType('application/pdf');
 		$ilFileDelivery->deliver();
 	});
-	$app->options('/:refId/file', function() {});
 
 	/**
 	 * GET key
@@ -96,7 +85,6 @@ $app->group('/v1/ebook', function () use ($app) {
 		}
 
 	});
-	$app->options('/:refId/file', function() {});
 
 	/**
 	 * GET key
@@ -120,7 +108,6 @@ $app->group('/v1/ebook', function () use ($app) {
 		}
 
 	});
-	$app->options('/error-log', function() {});
 
 	/**
 	 * GET if key is still valid
@@ -142,30 +129,4 @@ $app->group('/v1/ebook', function () use ($app) {
 		}
 
 	});
-	$app->options('/:refId/validateKey', function() {});
-
-
-
-	//	$app->get('/objects/:refId', RESTAuth::checkAccess(RESTAuth::TOKEN), function($refId) use ($app) {
-//		$iliasApp = new ILIASAppModel();
-//		$accessToken = $app->request->getToken();
-//		$userId = $accessToken->getUserId();
-//		$app->response->headers->set('Content-Type', 'application/json');
-//		$recursive = $app->request->get('recursive');
-//		$data = ($recursive) ? $iliasApp->getChildrenRecursive($refId, $userId) : $iliasApp->getChildren($refId, $userId);
-//		$app->response->body(json_encode($data));
-//	});
-//
-//	$app->options('/objects/:refId', function() {});
-//
-//	$app->get('/files/:refId', RESTAuth::checkAccess(RESTAuth::TOKEN), function($refId) use ($app) {
-//		$iliasApp = new ILIASAppModel();
-//		$accessToken = $app->request->getToken();
-//		$userId = $accessToken->getUserId();
-//		$app->response->headers->set('Content-Type', 'application/json');
-//		$app->response->body(json_encode($iliasApp->getFileData($refId, $userId)));
-//	});
-//
-//	$app->options('/files/:refId', function() {});
-
 });
