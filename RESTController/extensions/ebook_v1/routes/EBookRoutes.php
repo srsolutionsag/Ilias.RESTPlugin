@@ -57,7 +57,7 @@ $app->group('/v1/ebook', function () use ($app) {
 	 * GET key
 	 */
 	$app->post('/:refId/key', RESTAuth::checkAccess(RESTAuth::TOKEN), function($ref_id) use ($app) {
-		$accessToken = $app->request->getToken();
+		$accessToken = $app->request()->getToken();
 		$model = new EBookModel();
 		$userId = $accessToken->getUserId();
 
@@ -65,7 +65,7 @@ $app->group('/v1/ebook', function () use ($app) {
 			$key = $model->getKeyByRefId($userId, $ref_id);
 			$remote_address = $_SERVER['REMOTE_ADDR'];
 			$forwarded_for = $_SERVER['HTTP_X_FORWARDED_FOR'];
-			$hardware_id = $app->request->getParameter('hardware_id');
+			$hardware_id = $app->request()->getParameter('hardware_id');
 			$access = new \ileBookAccessLog();
 			$access->setUserId($userId);
 			$access->setEbookId($ref_id);
