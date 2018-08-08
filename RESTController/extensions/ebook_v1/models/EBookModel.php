@@ -111,7 +111,7 @@ class EBookModel  extends Libs\RESTModel {
 		if (!$object->hasFile())
 			throw new NoFileException();
 
-		return $object->getEncryptedFilePath();
+		return $object->getEncryptedLegacyFilePath();
 	}
 
 
@@ -124,7 +124,7 @@ class EBookModel  extends Libs\RESTModel {
 		if (!$object->hasFile())
 			throw new NoFileException("There's no key to this ref id.");
 
-		return $object->getSecret();
+		return $object->getLegacySecret();
 	}
 
 	private function checkAccessOfUser($user_id, $ref_id) {

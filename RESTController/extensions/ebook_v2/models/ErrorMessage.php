@@ -1,5 +1,9 @@
 <?php
 
+namespace RESTController\extensions\eBook\v2\models;
+
+use JsonSerializable;
+
 /**
  * Class ErrorMessage
  *
