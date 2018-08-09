@@ -7,6 +7,7 @@ use RESTController\extensions\eBook\v2\models\EBookModel;
 use RESTController\extensions\eBook\v2\models\ErrorMessage;
 use RESTController\extensions\eBook\v2\models\NoAccessException;
 use RESTController\extensions\eBook\v2\models\NoFileException;
+use RESTController\extensions\eBook\v2\services\JsonSchemaValidation;
 use RESTController\libs\RESTAuth;
 use RESTController\libs\RESTilias;
 use RESTController\RESTController;
@@ -22,8 +23,13 @@ $app->group('/v2/ebook', function () use ($app) {
 	$app->post('/sync', RESTAuth::checkAccess(RESTAuth::TOKEN), function() use ($app) {
 
 		try {
+			require_once __DIR__ . '/../services/JsonSchemaValidation.php';
+
 			$accessToken = $app->request()->getToken();
 			$userId = $accessToken->getUserId();
+
+			$env = $app->environment();
+			JsonSchemaValidation::validateSyncRequest(json_decode($env['slim.input_original']));
 
 			RESTilias::loadIlUser();
 			RESTilias::initAccessHandling();
@@ -54,6 +60,18 @@ $app->group('/v2/ebook', function () use ($app) {
 			require_once __DIR__ . '/../models/ErrorMessage.php';
 			$app->response()->setBody(json_encode(new ErrorMessage('Access violation one or more books are not accessible by the user.')));
 			$app->response()->setStatus(403);
+			return;
+		}
+		catch (\Swaggest\JsonSchema\InvalidValue $exception) {
+			require_once __DIR__ . '/../models/ErrorMessage.php';
+			$app->response()->setBody(json_encode(new ErrorMessage($exception->getMessage())));
+			$app->response()->setStatus(400);
+			return;
+		}
+		catch (\Swaggest\JsonSchema\Exception $exception) {
+			require_once __DIR__ . '/../models/ErrorMessage.php';
+			$app->response()->setBody(json_encode(new ErrorMessage("Request parsing failed, the server was not able to understand the request.")));
+			$app->response()->setStatus(400);
 			return;
 		}
 
