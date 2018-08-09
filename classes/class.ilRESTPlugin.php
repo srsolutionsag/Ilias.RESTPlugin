@@ -12,7 +12,7 @@ use RESTController\extensions\ILIASApp\V2\HashCacheEntry;
 
 require_once 'Services/UIComponent/classes/class.ilUserInterfaceHookPlugin.php';
 require_once 'Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/REST/RESTController/extensions/ilias_app_v2/services/FileHashing/entity/HashCacheEntry.php';
-
+require_once 'Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/REST/vendor/autoload.php';
 
 /**
  * REST Plugin
