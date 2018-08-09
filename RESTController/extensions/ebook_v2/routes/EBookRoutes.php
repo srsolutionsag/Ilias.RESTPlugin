@@ -25,6 +25,7 @@ $app->group('/v2/ebook', function () use ($app) {
 			$accessToken = $app->request()->getToken();
 			$userId = $accessToken->getUserId();
 
+			RESTilias::loadIlUser();
 			RESTilias::initAccessHandling();
 
 			/**
