@@ -1,4 +1,3 @@
-
 <?php
 $schema = <<<'JSON'
 {
@@ -7,11 +6,11 @@ $schema = <<<'JSON'
   "definitions": {},
   "$schema": "http://json-schema.org/draft-07/schema#",
   "required": [
-	"sync",
-	"notes",
-	"bookmarks",
-	"drawings",
-	"highlights"
+    "sync",
+    "notes",
+    "bookmarks",
+    "drawings",
+    "highlights"
   ],
   "properties": {
     "lastSyncTime": {
@@ -30,11 +29,11 @@ $schema = <<<'JSON'
         "$id": "/properties/sync/items",
         "type": "object",
           "required": [
-			"itemId",
-			"state",
-			"type",
-			"updateTime"
-		  ],
+            "itemId",
+            "state",
+            "type",
+            "updateTime"
+          ],
         "properties": {
           "itemId": {
             "$id": "/properties/sync/items/properties/itemId",
@@ -82,11 +81,11 @@ $schema = <<<'JSON'
         "$id": "/properties/notes/items",
         "type": "object",
         "required": [
-			"id",
-			"content",
-			"page",
-			"bookId"
-		  ],
+            "id",
+            "content",
+            "page",
+            "bookId"
+          ],
         "properties": {
           "id": {
             "$id": "/properties/notes/items/properties/id",
@@ -134,11 +133,11 @@ $schema = <<<'JSON'
         "$id": "/properties/bookmarks/items",
         "type": "object",
         "required": [
-			"id",
-			"name",
-			"page",
-			"bookId"
-		  ],
+            "id",
+            "name",
+            "page",
+            "bookId"
+          ],
         "properties": {
           "id": {
             "$id": "/properties/bookmarks/items/properties/id",
@@ -186,11 +185,11 @@ $schema = <<<'JSON'
         "$id": "/properties/drawings/items",
         "type": "object",
         "required": [
-			"id",
-			"elements",
-			"page",
-			"bookId"
-		  ],
+            "id",
+            "elements",
+            "page",
+            "bookId"
+         ],
         "properties": {
           "id": {
             "$id": "/properties/drawings/items/properties/id",
@@ -226,11 +225,11 @@ $schema = <<<'JSON'
               "$id": "/properties/drawings/items/properties/elements/items",
               "type": "object",
               "required": [
-              		"id",
-					"coordinates",
-					"borderColor",
-					"borderWidth"
-		        ],
+                    "id",
+                    "coordinates",
+                    "borderColor",
+                    "borderWidth"
+                ],
               "properties": {
                 "id": {
                   "$id": "/properties/drawings/items/properties/elements/items/properties/id",
@@ -248,9 +247,9 @@ $schema = <<<'JSON'
                     "$id": "/properties/drawings/items/properties/elements/items/properties/coordinates/items",
                     "type": "object",
                     "required": [
-	                    "x",
-						"y"
-			        ],
+                        "x",
+                        "y"
+                    ],
                     "properties": {
                       "x": {
                         "$id": "/properties/drawings/items/properties/elements/items/properties/coordinates/items/properties/x",
@@ -304,11 +303,11 @@ $schema = <<<'JSON'
         "$id": "/properties/highlights/items",
         "type": "object",
         "required": [
-			"id",
-			"elements",
-			"page",
-			"bookId"
-		  ],
+            "id",
+            "elements",
+            "page",
+            "bookId"
+          ],
         "properties": {
           "id": {
             "$id": "/properties/highlights/items/properties/id",
@@ -344,13 +343,13 @@ $schema = <<<'JSON'
               "$id": "/properties/highlights/items/properties/elements/items",
               "type": "object",
               "required": [
-				"id",
-				"color",
-				"width",
-				"height",
-				"x",
-				"y"
-			  ],
+                "id",
+                "color",
+                "width",
+                "height",
+                "x",
+                "y"
+              ],
               "properties": {
                 "id": {
                   "$id": "/properties/highlights/items/properties/elements/items/properties/id",
