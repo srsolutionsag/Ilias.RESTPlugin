@@ -1,0 +1,10 @@
+{
+    "name": "studerraimann/rest",
+    "description": "Ilias REST plugin fork.",
+    "type": "project",
+    "license": "gpl-v3",
+    "minimum-stability": "stable",
+    "require": {
+        "swaggest/json-schema": "^0.12.4"
+    }
+}

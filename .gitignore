@@ -3,3 +3,5 @@ Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/REST/apps/oaut
 
 # Excudle html output of api blueprint
 RESTController/extensions/ilias_app*/apiblueprint/*.html
+
+/vendor/
