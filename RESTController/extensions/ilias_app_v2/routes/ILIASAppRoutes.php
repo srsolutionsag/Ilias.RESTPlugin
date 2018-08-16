@@ -14,9 +14,6 @@ use RESTController\RESTController;
  * the TOKEN middleware is active.
  */
 $app->group('/v2/ilias-app', function () use ($app) {
-	$app->response->headers->set('Access-Control-Allow-Origin', '*');
-	$app->response->headers->set('Access-Control-Allow-Headers', 'Authorization,XDEBUG_SESSION,XDEBUG_SESSION_START,Content-Type');
-	$app->response->headers->set('Access-Control-Allow-Methods', 'GET,POST');
 
 	$app->get('/desktop', RESTAuth::checkAccess(RESTAuth::TOKEN), function() use ($app) {
 		$iliasApp = new ILIASAppModel();
@@ -24,10 +21,6 @@ $app->group('/v2/ilias-app', function () use ($app) {
 		$userId = $accessToken->getUserId();
 		$app->response->headers->set('Content-Type', 'application/json');
 		$app->response->body(json_encode($iliasApp->getDesktopData($userId)));
-	});
-
-	$app->options('/desktop', function() use ($app) {
-		$app->response->headers->set('Access-Control-Max-Age', '600');
 	});
 
 	$app->get('/objects/:refId', RESTAuth::checkAccess(RESTAuth::TOKEN), function($refId) use ($app) {
@@ -38,10 +31,6 @@ $app->group('/v2/ilias-app', function () use ($app) {
 		$recursive = $app->request->get('recursive');
 		$data = ($recursive) ? $iliasApp->getChildrenRecursive($refId, $userId) : $iliasApp->getChildren($refId, $userId);
 		$app->response->body(json_encode($data));
-	});
-
-	$app->options('/objects/:refId', function() use ($app) {
-		$app->response->headers->set('Access-Control-Max-Age', '600');
 	});
 
 	$app->get('/files/:refId', RESTAuth::checkAccess(RESTAuth::TOKEN), function($refId) use ($app) {
@@ -59,10 +48,6 @@ $app->group('/v2/ilias-app', function () use ($app) {
 		$app->response->body(json_encode($fileData));
 	});
 
-	$app->options('/files/:refId', function() use ($app) {
-		$app->response->headers->set('Access-Control-Max-Age', '600');
-	});
-
 	/**
 	 * Returns a very short live token to log in via the ILIAS Pegasus Helper plugin.
 	 */
@@ -72,10 +57,6 @@ $app->group('/v2/ilias-app', function () use ($app) {
 		$userId = $accessToken->getUserId();
 		$token = $iliasApp->createToken($userId);
 		$app->response->body(json_encode("{\"token\":\"$token\"}"));
-	});
-
-	$app->options('/auth-token', function () use ($app) {
-		$app->response->headers->set('Access-Control-Max-Age', '600');
 	});
 
 	//add learnplace routes

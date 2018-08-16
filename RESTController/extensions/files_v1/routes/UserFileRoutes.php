@@ -73,25 +73,6 @@ $app->group('/v1', function () use ($app) {
                 $app->halt(500, 'Could not retrieve file with obj_id = ' . $obj_id . '.', -1);
             else
             {
-                //the ILIAS file delivery will kill the request therefore set CORS header with the php function
-                if(version_compare(ILIAS_VERSION_NUMERIC, '5.3', '>=')) {
-                    global $DIC;
-                    /**
-                     * @var GlobalHttpState $http
-                     */
-                    $http = $DIC["http"];
-                    $response = $http->response()
-                        ->withHeader('Access-Control-Allow-Origin', '*')
-                        ->withHeader('Access-Control-Allow-Headers', 'Authorization')
-                        ->withHeader('Access-Control-Allow-Methods', 'GET');
-
-                    $http->saveResponse($response);
-                }
-                else {
-                    header('Access-Control-Allow-Origin: *');
-                    header('Access-Control-Allow-Headers: Authorization');
-                    header('Access-Control-Allow-Methods: GET');
-                }
                 $fileObj->sendFile();
             }
 

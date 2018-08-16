@@ -16,9 +16,6 @@ use RESTController\RESTController;
  * the TOKEN middleware is active.
  */
 $app->group('/v1/ilias-app', function () use ($app) {
-    $app->response->headers->set('Access-Control-Allow-Origin', '*');
-    $app->response->headers->set('Access-Control-Allow-Headers', 'Authorization,XDEBUG_SESSION,XDEBUG_SESSION_START');
-    $app->response->headers->set('Access-Control-Allow-Methods', 'GET,POST');
 
     $app->get('/desktop', RESTAuth::checkAccess(RESTAuth::TOKEN), function() use ($app) {
         $iliasApp = new ILIASAppModel();

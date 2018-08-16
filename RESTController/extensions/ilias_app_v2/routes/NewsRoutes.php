@@ -42,9 +42,4 @@ $app->group('/news', function() use ($app) {
 		}
 
 	});
-
-	$app->options('', function () use ($app) {
-		$app->response->headers->set('Access-Control-Max-Age', '600');
-	});
-
 });
