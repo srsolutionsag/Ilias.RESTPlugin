@@ -50,19 +50,6 @@ class CORS extends Middleware {
 	}
 
 	private function setHeader($key, $value) {
-		if(version_compare(ILIAS_VERSION_NUMERIC, '5.3', '>=')) {
-			global $DIC;
-			/**
-			 * @var GlobalHttpState $http
-			 */
-			$http = $DIC['http'];
-			$response = $http->response()
-				->withHeader($key, $value);
-
-			$http->saveResponse($response);
-		}
-		else {
-			header("$key: $value", true);
-		}
+		header("$key: $value", true);
 	}
 }
