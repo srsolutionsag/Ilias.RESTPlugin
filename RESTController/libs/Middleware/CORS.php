@@ -21,10 +21,14 @@ class CORS extends Middleware {
 	public function call() {
 		try {
 			$response = $this->app->response();
-			$response->headers->set("Access-Control-Allow-Origin", "*");
-			$response->headers->set("Access-Control-Expose-Headers", "ETag");
+
+			// We can not use $response->headers->set() because ilFileDelivery may kills the request.
+			header("Access-Control-Allow-Origin: *");
+			header("Access-Control-Expose-Headers: ETag");
 
 			if ($this->app->request()->getMethod() === "OPTIONS" && $this->app->request()->headers("Access-Control-Request-Method") !== NULL) {
+
+				// $response->headers->set() can be used while serving the CORS preflight request.
 				$requestedHeader = $this->app->request()->headers("Access-Control-Request-Headers");
 				$response->headers->set("Access-Control-Allow-Headers", $requestedHeader !== NULL ? $requestedHeader : '');
 
