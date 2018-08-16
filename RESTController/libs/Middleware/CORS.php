@@ -2,6 +2,7 @@
 
 namespace RESTController\libs\Middleware;
 
+use ILIAS\HTTP\GlobalHttpState;
 use Slim\Middleware;
 
 /**
@@ -23,17 +24,17 @@ class CORS extends Middleware {
 			$response = $this->app->response();
 
 			// We can not use $response->headers->set() because ilFileDelivery may kills the request.
-			header("Access-Control-Allow-Origin: *");
-			header("Access-Control-Expose-Headers: ETag");
+			$this->setHeader('Access-Control-Allow-Origin', '*');
+			$this->setHeader('Access-Control-Expose-Headers', 'ETag');
 
 			if ($this->app->request()->getMethod() === "OPTIONS" && $this->app->request()->headers("Access-Control-Request-Method") !== NULL) {
 
-				// $response->headers->set() can be used while serving the CORS preflight request.
 				$requestedHeader = $this->app->request()->headers("Access-Control-Request-Headers");
-				$response->headers->set("Access-Control-Allow-Headers", $requestedHeader !== NULL ? $requestedHeader : '');
+				$this->setHeader("Access-Control-Allow-Headers", $requestedHeader !== NULL ? $requestedHeader : '');
 
-				$response->headers->set("Access-Control-Allow-Methods", "GET,POST,PUT,PATCH,DELETE");
-				$response->headers->set("Access-Control-Max-Age", 600);
+				$this->setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,PATCH,DELETE");
+				$this->setHeader("Access-Control-Max-Age", 600);
+
 				$response->setStatus(200);
 				return;
 			}
@@ -45,6 +46,23 @@ class CORS extends Middleware {
 			$response = $this->app->response();
 			$response->setStatus(422);
 			$response->setBody($e->responseObject());
+		}
+	}
+
+	private function setHeader($key, $value) {
+		if(version_compare(ILIAS_VERSION_NUMERIC, '5.3', '>=')) {
+			global $DIC;
+			/**
+			 * @var GlobalHttpState $http
+			 */
+			$http = $DIC['http'];
+			$response = $http->response()
+				->withHeader($key, $value);
+
+			$http->saveResponse($response);
+		}
+		else {
+			header("$key: $value", true);
 		}
 	}
 }
