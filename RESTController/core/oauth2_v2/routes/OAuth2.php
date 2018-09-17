@@ -146,10 +146,11 @@ $app->group('/v2', function () use ($app) {
             'response_type'   => $responseType,
             'redirect_uri'    => $redirectUri,
             'api_key'         => $apiKey,
+	          'api_secret'      => $apiSecret,
             'scope'           => $scope,
             'state'           => $state,
-            'username'        => $userName,
-            'password'        => $passWord
+            'username'        => 'username',
+            'password'        => 'password'
           ),
           $e
         );
@@ -162,10 +163,11 @@ $app->group('/v2', function () use ($app) {
             'response_type'   => $responseType,
             'redirect_uri'    => $redirectUri,
             'api_key'         => $apiKey,
+	          'api_secret'      => $apiSecret,
             'scope'           => $scope,
             'state'           => $state,
-            'username'        => $userName,
-            'password'        => $passWord
+            'username'        => 'username',
+            'password'        => 'password'
           ),
           $e
         );
