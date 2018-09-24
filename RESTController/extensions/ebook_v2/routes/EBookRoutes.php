@@ -13,6 +13,8 @@ use RESTController\libs\RESTilias;
 use RESTController\RESTController;
 use SRAG\Plugin\eBook\Container\EBookPluginContainer;
 use SRAG\Plugin\eBook\Security\Exception\AccessViolationException;
+use SRAG\Plugin\eBook\Security\Exception\MutexOperationException;
+use SRAG\Plugin\eBook\Security\Service\CollisionDetection\UserRequestMutex;
 use SRAG\Plugin\eBook\Synchronization\Service\SynchronizationManager;
 use SRAG\Plugin\eBook\Synchronization\Service\SynchronizationMapper;
 
@@ -22,7 +24,14 @@ $app->group('/v2/ebook', function () use ($app) {
 
 	$app->post('/sync', RESTAuth::checkAccess(RESTAuth::TOKEN), function() use ($app) {
 
+		/**
+		 * @var UserRequestMutex $mutex
+		 */
+		$mutex = NULL;
+		$doubleAcquired = false;
+
 		try {
+
 			require_once __DIR__ . '/../services/JsonSchemaValidation.php';
 
 			$accessToken = $app->request()->getToken();
@@ -33,6 +42,9 @@ $app->group('/v2/ebook', function () use ($app) {
 
 			RESTilias::loadIlUser();
 			RESTilias::initAccessHandling();
+
+			$mutex = EBookPluginContainer::resolve(UserRequestMutex::class);
+			$mutex->acquire();
 
 			/**
 			 * @var  array $body
@@ -65,7 +77,7 @@ $app->group('/v2/ebook', function () use ($app) {
 		catch (\Swaggest\JsonSchema\InvalidValue $exception) {
 			require_once __DIR__ . '/../models/ErrorMessage.php';
 			$app->response()->setBody(json_encode(new ErrorMessage($exception->getMessage())));
-			$app->response()->setStatus(400);
+			$app->response()->setStatus(422);
 			return;
 		}
 		catch (\Swaggest\JsonSchema\Exception $exception) {
@@ -73,6 +85,18 @@ $app->group('/v2/ebook', function () use ($app) {
 			$app->response()->setBody(json_encode(new ErrorMessage("Request parsing failed, the server was not able to understand the request.")));
 			$app->response()->setStatus(400);
 			return;
+		}
+		catch (MutexOperationException $exception) {
+			require_once __DIR__ . '/../models/ErrorMessage.php';
+			$app->response()->setBody(json_encode(new ErrorMessage("The user already syncs data from another client please try again later.")));
+			$app->response()->setStatus(423);
+			$doubleAcquired = true;
+			return;
+		}
+		finally {
+			if ($mutex !== NULL && $doubleAcquired === false) {
+				$mutex->release();
+			}
 		}
 
 		$app->response()->setBody('Server was unable to calculate the sync response.');
