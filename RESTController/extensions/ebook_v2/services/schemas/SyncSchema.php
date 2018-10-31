@@ -263,7 +263,7 @@ $schema = <<<'JSON'
                 },
                 "borderWidth": {
                   "$id": "/properties/drawings/items/properties/elements/items/properties/borderWidth",
-                  "type": "integer",
+                  "type": "number",
                   "title": "The Borderwidth Schema ",
                   "examples": [
                     1
