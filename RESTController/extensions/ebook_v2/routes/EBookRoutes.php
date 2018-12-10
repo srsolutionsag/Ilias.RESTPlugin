@@ -22,6 +22,16 @@ use SRAG\Plugin\eBook\Synchronization\Service\SynchronizationMapper;
 
 $app->group('/v2/ebook', function () use ($app) {
 
+	/**
+	 * GET all files
+	 */
+	$app->get('/', RESTAuth::checkAccess(RESTAuth::TOKEN), function() use ($app) {
+		$accessToken = $app->request()->getToken();
+		$model = new EBookModel();
+		$userId = $accessToken->getUserId();
+		$app->response->body(json_encode($model->getEBooks($userId)));
+	});
+
 	$app->post('/sync', RESTAuth::checkAccess(RESTAuth::TOKEN), function() use ($app) {
 
 		/**

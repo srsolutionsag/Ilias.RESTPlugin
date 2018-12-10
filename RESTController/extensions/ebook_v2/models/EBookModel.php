@@ -33,6 +33,65 @@ final class EBookModel  extends Libs\RESTModel {
 	}
 
 	/**
+	 * @param $user_id int
+	 *
+	 * @return mixed
+	 */
+	public function getEBooks($user_id) {
+		global $DIC;
+
+		$access = $DIC->access();
+		$config = new \ileBookConfig($DIC->database());
+		$root_ref = $config->get('library_root_ref_id');
+
+
+		$query = "
+				SELECT id, ref.ref_id, data.title, data.description, data.create_date, data.last_update, language_code, key_words FROM rep_robj_xebk_data AS book
+				INNER JOIN object_data AS data ON data.obj_id = book.id 
+				INNER JOIN object_reference AS ref ON ref.obj_id = data.obj_id 
+				WHERE is_online = 1 AND ref.deleted is NULL 
+				";
+		$set = $this->db->query($query);
+		$books = [];
+		while($res = $this->db->fetchAssoc($set)) {
+			if(!$access->checkAccessOfUser($user_id, "read", "", $res['ref_id']))
+				continue;
+			$path = $this->createPath($res, $root_ref);
+			$res['id'] = (int) $res['id'];
+			$res['ref_id'] = (int) $res['ref_id'];
+			$res['path'] = $path;
+			// Path must contain root ref. otherwise we are not in scope.
+			if(0 == count(array_filter($path, function ($element) use ($root_ref) {
+					return $element['ref_id'] == $root_ref;
+				})))
+				continue;
+			$books[] = $res;
+		}
+		return $books;
+	}
+
+	/**
+	 * @param $res  array
+	 * @param $root_ref
+	 *
+	 * @return \array[]
+	 */
+	private function createPath($res, $root_ref) {
+		global $tree;
+		$path = $tree->getNodePath($res['ref_id']);
+		$path = array_map(function($element) {
+			return ["ref_id"=> $element['child'], "title" =>$element['title']];
+		}, $path);
+		$path_ids = array_map(function($e) {
+			return $e['ref_id'];
+		}, $path);
+		$slice_id = array_search($root_ref, $path_ids);
+		if($slice_id === false)
+			return [];
+		return array_slice($path, $slice_id, -1);
+	}
+
+	/**
 	 * @param $user_id
 	 * @param $ref_id
 	 *
