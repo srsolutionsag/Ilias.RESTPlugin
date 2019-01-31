@@ -175,7 +175,7 @@ final class ILIASAppModel extends Libs\RESTModel
 			$arr_or[] = " LIKE '%.".$refId.".%'";
 		}
 
-		$sql .= implode("OR",$arr_or);
+		$sql .= implode(" OR ",$arr_or);
 
 		$set = $this->db->query($sql);
 
