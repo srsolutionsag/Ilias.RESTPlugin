@@ -172,7 +172,7 @@ final class ILIASAppModel extends Libs\RESTModel
 
 		$arr_or = [];
 		foreach($arr_refId as $refId) {
-			$arr_or[] = " LIKE '%.".$refId.".%'";
+			$arr_or[] = " tree.path LIKE '%.".$refId.".%'";
 		}
 
 		$sql .= implode(" OR ",$arr_or);
