@@ -33,6 +33,13 @@ $app->group('/v2/ilias-app', function () use ($app) {
 		$app->response->body(json_encode($data));
 	});
 
+	$app->get('/objectsfromlist/:refIds', RESTAuth::checkAccess(RESTAuth::TOKEN), function($refIds) use ($app) {
+		$iliasApp = new ILIASAppModel();
+		$app->response->headers->set('Content-Type', 'application/json');
+		$data = $iliasApp->getChildrenRecursiveFromRefIdList(explode(",",$refIds));
+		$app->response->body(json_encode($data));
+	});
+
 	$app->get('/files/:refId', RESTAuth::checkAccess(RESTAuth::TOKEN), function($refId) use ($app) {
 		$iliasApp = new ILIASAppModel();
 		$accessToken = $app->request->getToken();

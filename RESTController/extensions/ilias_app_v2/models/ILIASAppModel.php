@@ -150,6 +150,68 @@ final class ILIASAppModel extends Libs\RESTModel
 
 	}
 
+	/**
+	 * @param array $arr_refId
+	 *
+	 * @return array
+	 */
+	public function getChildrenRecursiveFromRefIdList(array $arr_refId)
+	{
+		//Todo Nested Set
+		$sql = "select 
+				obj.*,
+				ref.ref_id AS ref_id,
+				tree.parent AS parent_ref_id,
+				page_object.parent_id AS page_layout,
+				ni.context_obj_id AS timeline
+				from tree 
+				inner join object_reference as ref on ref.ref_id = tree.child
+				inner join object_data as obj on obj.obj_id =  ref.obj_id AND obj.type NOT IN ('rolf', 'itgr','role')
+				LEFT JOIN page_object ON page_object.parent_id = obj.obj_id
+				LEFT JOIN il_news_item AS ni ON ni.context_obj_id = obj.obj_id ";
+
+		$arr_or = [];
+		foreach($arr_refId as $refId) {
+			$arr_or[] = " LIKE '%.".$refId.".%'";
+		}
+
+		$sql .= implode("OR",$arr_or);
+
+		$set = $this->db->query($sql);
+
+		$return = [];
+		while ($row = $this->db->fetchObject($set)) {
+			if ($this->isRead($row['ref_id'])) {
+				$row['permissionType'] = "read";
+			} elseif ($this->isVisible($row['ref_id'])) {
+				$row['permissionType'] = "visible";
+			} else {
+				continue;
+			}
+
+			$treeItem = new IliasTreeItem(
+				strval($row['obj_id']),
+				strval($row['title']),
+				strval($row['description']),
+				($row['page_layout'] !== NULL),
+				(intval($row['timeline']) === 1),
+				strval($row['permissionType']),
+				strval($row['ref_id']),
+				strval($row['parent_ref_id']),
+				strval($row['type']),
+				strval(\ilLink::_getStaticLink($row['ref_id'], $row['type'])),
+				$this->createRepoPath($row['ref_id'])
+			);
+
+			$treeItem = $this->fixSessionTitle($treeItem);
+			$treeItem = $this->fixReferenceTitle($treeItem);
+			$return[] = $treeItem;
+
+		}
+
+		return $return;
+	}
+
 
 	private function getChildrenRecursiveOnMaterializedPath($refId, $userId)
 	{
