@@ -8,7 +8,7 @@
 
 
 $id = "rest";
-$version = "1.6.5";
+$version = "1.7.0";
 
 $ilias_min_version = "5.2.0";
 $ilias_max_version = "5.3.99";

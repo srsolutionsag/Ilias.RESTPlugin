@@ -146,10 +146,11 @@ $app->group('/v2', function () use ($app) {
             'response_type'   => $responseType,
             'redirect_uri'    => $redirectUri,
             'api_key'         => $apiKey,
+	          'api_secret'      => $apiSecret,
             'scope'           => $scope,
             'state'           => $state,
-            'username'        => $userName,
-            'password'        => $passWord
+            'username'        => 'username',
+            'password'        => 'password'
           ),
           $e
         );
@@ -162,10 +163,11 @@ $app->group('/v2', function () use ($app) {
             'response_type'   => $responseType,
             'redirect_uri'    => $redirectUri,
             'api_key'         => $apiKey,
+	          'api_secret'      => $apiSecret,
             'scope'           => $scope,
             'state'           => $state,
-            'username'        => $userName,
-            'password'        => $passWord
+            'username'        => 'username',
+            'password'        => 'password'
           ),
           $e
         );
@@ -340,7 +342,7 @@ $app->group('/v2', function () use ($app) {
         $iliasClient  = Libs\RESTilias::FetchILIASClient();
 
         // Delete all tokens/sessions that where given
-        Misc::FlowDeleteToken($apiKey, $apiSecret, $apiCert, $iliasClient, $remoteIp, $accessCode);
+        Misc::FlowDeleteToken($apiKey, $apiSecret, $apiCert, $iliasClient, $remoteIp, $tokenCode);
 
         // Show result of all actions
         $app->success(null);

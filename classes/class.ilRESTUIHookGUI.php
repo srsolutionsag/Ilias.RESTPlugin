@@ -9,6 +9,7 @@
  
 // Include GUI-Class of UIHook plugin-slot
 include_once('Services/UIComponent/classes/class.ilUIHookPluginGUI.php');
+require_once 'Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/REST/vendor/autoload.php';
 
 
 /**
