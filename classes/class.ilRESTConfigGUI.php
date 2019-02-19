@@ -9,6 +9,8 @@
 
 // Include core configuration UI class
 require_once('Services/Component/classes/class.ilPluginConfigGUI.php');
+require_once 'Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/REST/vendor/autoload.php';
+
 // Requires <$tpl>, <$ilUser>, <$ilCtrl>, <$ilTabs>
 
 

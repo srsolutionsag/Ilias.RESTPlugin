@@ -1,5 +1,8 @@
-Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/REST/apps/admin/config.ini.php
-Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/REST/apps/oauth2demo/config.ini.php
+apps/admin/config.ini.php
+apps/oauth2demo/config.ini.php
 
 # Excudle html output of api blueprint
 RESTController/extensions/ilias_app*/apiblueprint/*.html
+
+# Deliver vendor directory as temporary work around in order to ease deployment.
+# /vendor/

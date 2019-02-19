@@ -19,6 +19,7 @@ branch with the ILIAS Pegasus mobile application.
 mkdir -p Customizing/global/plugins/Services/UIComponent/UserInterfaceHook
 cd Customizing/global/plugins/Services/UIComponent/UserInterfaceHook
 git clone https://github.com/hrz-unimr/Ilias.RESTPlugin.git REST
+php composer.phar install --no-dev
 ```
 
 *   Open ILIAS Administration &gt; Plugins from the drop-down menu

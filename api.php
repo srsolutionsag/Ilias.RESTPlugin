@@ -6,6 +6,9 @@
  * Since 2014
  */
 
+// Include composer autoloader
+require_once 'vendor/autoload.php';
+
 // Include the RESTController application
 require_once('RESTController/RESTController.php');
 
