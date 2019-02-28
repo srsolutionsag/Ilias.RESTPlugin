@@ -2,11 +2,6 @@
 
 namespace RESTController\extensions\eBook;
 
-require_once("./Customizing/global/plugins/Services/Repository/RepositoryObject/eBook/classes/class.ilObjeBook.php");
-require_once("./Customizing/global/plugins/Services/Repository/RepositoryObject/eBook/classes/class.ileBookConfig.php");
-require_once(__DIR__ . "/NoAccessException.php");
-require_once(__DIR__ . "/NoFileException.php");
-
 use \RESTController\libs as Libs;
 
 class EBookModel  extends Libs\RESTModel {
