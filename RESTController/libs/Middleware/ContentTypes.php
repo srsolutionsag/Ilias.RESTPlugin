@@ -18,7 +18,7 @@ use \RESTController\libs\Exceptions as LibExceptions;
  *  But this actually returns  arrays for JSON
  *  and XML content...
  */
-class ContentTypes extends \Slim\Middleware {
+class ContentTypes extends \SlimRestPlugin\Middleware {
   // Allow to re-use status messages and codes
   const MSG_DECODE_ERROR = 'There was an error when trying to decode request parameters with Content-Type {{contentype}}.';
   const ID_DECODE_ERROR  = 'RESTController\\libs\\Middleware\\ContentTypes::ID_DECODE_ERROR';

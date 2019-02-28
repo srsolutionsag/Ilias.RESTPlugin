@@ -15,7 +15,7 @@ namespace RESTController\libs;
  *  Extends the Slim-Framework Router with a method to iterate over
  *  all routes, even if they don't have a name.
  */
-class RESTRouter extends \Slim\Router {
+class RESTRouter extends \SlimRestPlugin\Router {
   /**
    * Constructor
    * @param array $settings
@@ -46,7 +46,7 @@ class RESTRouter extends \Slim\Router {
    * @param  string               $httpMethod   The HTTP method to match against
    * @param  string               $resourceUri  The resource URI to match against
    * @param  bool                 $reload       Should matching routes be re-parsed?
-   * @return array[\Slim\Route]
+   * @return array[\SlimRestPlugin\Route]
    */
   public function getMatchedRoutes($httpMethod, $resourceUri, $reload = false) {
     # Fetch default matched routes

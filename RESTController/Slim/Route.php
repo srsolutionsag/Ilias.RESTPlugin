@@ -30,7 +30,7 @@
  * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-namespace Slim;
+namespace SlimRestPlugin;
 
 /**
  * Route
@@ -296,7 +296,7 @@ class Route
 
     /**
      * Append supported HTTP methods (alias for Route::appendHttpMethods)
-     * @return \Slim\Route
+     * @return \SlimRestPlugin\Route
      */
     public function via()
     {
@@ -339,7 +339,7 @@ class Route
      * and an InvalidArgumentException is thrown immediately if it isn't.
      *
      * @param  Callable|array[Callable]
-     * @return \Slim\Route
+     * @return \SlimRestPlugin\Route
      * @throws \InvalidArgumentException If argument is not callable or not an array of callables.
      */
     public function setMiddleware($middleware)
@@ -429,7 +429,7 @@ class Route
     /**
      * Set route name
      * @param  string $name The name of the route
-     * @return \Slim\Route
+     * @return \SlimRestPlugin\Route
      */
     public function name($name)
     {
@@ -441,7 +441,7 @@ class Route
     /**
      * Merge route conditions
      * @param  array $conditions Key-value array of URL parameter conditions
-     * @return \Slim\Route
+     * @return \SlimRestPlugin\Route
      */
     public function conditions(array $conditions)
     {

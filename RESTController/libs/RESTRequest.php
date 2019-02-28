@@ -20,7 +20,7 @@ use \RESTController\core\oauth2_v2\Tokens as Tokens;
  *  support params via HEADER as well as JSON
  *  inside the request BODY.
  */
-class RESTRequest extends \Slim\Http\Request {
+class RESTRequest extends \SlimRestPlugin\Http\Request {
   // Allow to re-use status messages and codes
   const MSG_MISSING     = 'Mandatory parameter missing, \'{{key}}\' not set in header, GET or POST (JSON/x-www-form-urlencoded) parameters.';
   const ID_MISSING      = 'RESTController\\libs\\RESTRequest::ID_MISSING';
@@ -39,9 +39,9 @@ class RESTRequest extends \Slim\Http\Request {
    *  request parsing.
    *
    * Parameters:
-   *  @See \Slim\Http\Request::__construct(...)
+   *  @See \SlimRestPlugin\Http\Request::__construct(...)
    */
-  public function __construct(\Slim\Environment $env) {
+  public function __construct(\SlimRestPlugin\Environment $env) {
     // Call parent constrcutor
     parent::__construct($env);
 
