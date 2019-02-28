@@ -30,13 +30,13 @@
  * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-namespace Slim;
+namespace SlimRestPlugin;
 
 /**
  * View
  *
  * The view is responsible for rendering a template. The view
- * should subclass \Slim\View and implement this interface:
+ * should subclass \SlimRestPlugin\View and implement this interface:
  *
  * public render(string $template);
  *
@@ -51,7 +51,7 @@ class View
 {
     /**
      * Data available to the view templates
-     * @var \Slim\Helper\Set
+     * @var \SlimRestPlugin\Helper\Set
      */
     protected $data;
 
@@ -66,7 +66,7 @@ class View
      */
     public function __construct()
     {
-        $this->data = new \Slim\Helper\Set();
+        $this->data = new \SlimRestPlugin\Helper\Set();
     }
 
     /********************************************************************************

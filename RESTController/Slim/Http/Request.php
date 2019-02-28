@@ -30,7 +30,7 @@
  * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-namespace Slim\Http;
+namespace SlimRestPlugin\Http;
 
 /**
  * Slim HTTP Request
@@ -60,31 +60,31 @@ class Request
 
     /**
      * Application Environment
-     * @var \Slim\Environment
+     * @var \SlimRestPlugin\Environment
      */
     protected $env;
 
     /**
      * HTTP Headers
-     * @var \Slim\Http\Headers
+     * @var \SlimRestPlugin\Http\Headers
      */
     public $headers;
 
     /**
      * HTTP Cookies
-     * @var \Slim\Helper\Set
+     * @var \SlimRestPlugin\Helper\Set
      */
     public $cookies;
 
     /**
      * Constructor
-     * @param \Slim\Environment $env
+     * @param \SlimRestPlugin\Environment $env
      */
-    public function __construct(\Slim\Environment $env)
+    public function __construct(\SlimRestPlugin\Environment $env)
     {
         $this->env = $env;
-        $this->headers = new \Slim\Http\Headers(\Slim\Http\Headers::extract($env));
-        $this->cookies = new \Slim\Helper\Set(\Slim\Http\Util::parseCookieHeader($env['HTTP_COOKIE']));
+        $this->headers = new \SlimRestPlugin\Http\Headers(\SlimRestPlugin\Http\Headers::extract($env));
+        $this->cookies = new \SlimRestPlugin\Helper\Set(\SlimRestPlugin\Http\Util::parseCookieHeader($env['HTTP_COOKIE']));
     }
 
     /**
@@ -278,7 +278,7 @@ class Request
     }
 
     /**
-     * Fetch PUT data (alias for \Slim\Http\Request::post)
+     * Fetch PUT data (alias for \SlimRestPlugin\Http\Request::post)
      * @param  string           $key
      * @param  mixed            $default Default return value when key does not exist
      * @return array|mixed|null
@@ -289,7 +289,7 @@ class Request
     }
 
     /**
-     * Fetch PATCH data (alias for \Slim\Http\Request::post)
+     * Fetch PATCH data (alias for \SlimRestPlugin\Http\Request::post)
      * @param  string           $key
      * @param  mixed            $default Default return value when key does not exist
      * @return array|mixed|null
@@ -300,7 +300,7 @@ class Request
     }
 
     /**
-     * Fetch DELETE data (alias for \Slim\Http\Request::post)
+     * Fetch DELETE data (alias for \SlimRestPlugin\Http\Request::post)
      * @param  string           $key
      * @param  mixed            $default Default return value when key does not exist
      * @return array|mixed|null

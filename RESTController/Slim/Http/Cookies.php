@@ -30,9 +30,9 @@
  * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-namespace Slim\Http;
+namespace SlimRestPlugin\Http;
 
-class Cookies extends \Slim\Helper\Set
+class Cookies extends \SlimRestPlugin\Helper\Set
 {
     /**
      * Default cookie settings
@@ -74,7 +74,7 @@ class Cookies extends \Slim\Helper\Set
     /**
      * Remove cookie
      *
-     * Unlike \Slim\Helper\Set, this will actually *set* a cookie with
+     * Unlike \SlimRestPlugin\Helper\Set, this will actually *set* a cookie with
      * an expiration date in the past. This expiration date will force
      * the client-side cache to remove its cookie with the given name
      * and settings.

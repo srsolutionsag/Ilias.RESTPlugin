@@ -3,7 +3,7 @@
 namespace RESTController\libs\Middleware;
 
 use ILIAS\HTTP\GlobalHttpState;
-use Slim\Middleware;
+use SlimRestPlugin\Middleware;
 
 /**
  * Class CORS

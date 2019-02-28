@@ -30,7 +30,7 @@
  * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-namespace Slim\Middleware;
+namespace SlimRestPlugin\Middleware;
 
  /**
   * Flash
@@ -45,7 +45,7 @@ namespace Slim\Middleware;
   * @author     Josh Lockhart
   * @since      1.6.0
   */
-class Flash extends \Slim\Middleware implements \ArrayAccess, \IteratorAggregate, \Countable
+class Flash extends \SlimRestPlugin\Middleware implements \ArrayAccess, \IteratorAggregate, \Countable
 {
     /**
      * @var array

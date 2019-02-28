@@ -30,7 +30,7 @@
  * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-namespace Slim\Http;
+namespace SlimRestPlugin\Http;
 
 /**
  * Response
@@ -51,12 +51,12 @@ class Response implements \ArrayAccess, \Countable, \IteratorAggregate
     protected $status;
 
     /**
-     * @var \Slim\Http\Headers
+     * @var \SlimRestPlugin\Http\Headers
      */
     public $headers;
 
     /**
-     * @var \Slim\Http\Cookies
+     * @var \SlimRestPlugin\Http\Cookies
      */
     public $cookies;
 
@@ -137,14 +137,14 @@ class Response implements \ArrayAccess, \Countable, \IteratorAggregate
      * Constructor
      * @param string                   $body   The HTTP response body
      * @param int                      $status The HTTP response status
-     * @param \Slim\Http\Headers|array $headers The HTTP response headers
+     * @param \SlimRestPlugin\Http\Headers|array $headers The HTTP response headers
      */
     public function __construct($body = '', $status = 200, $headers = array())
     {
         $this->setStatus($status);
-        $this->headers = new \Slim\Http\Headers(array('Content-Type' => 'text/html'));
+        $this->headers = new \SlimRestPlugin\Http\Headers(array('Content-Type' => 'text/html'));
         $this->headers->replace($headers);
-        $this->cookies = new \Slim\Http\Cookies();
+        $this->cookies = new \SlimRestPlugin\Http\Cookies();
         $this->write($body);
     }
 
@@ -195,7 +195,7 @@ class Response implements \ArrayAccess, \Countable, \IteratorAggregate
      * DEPRECATION WARNING! Access `headers` property directly.
      *
      * Get headers
-     * @return \Slim\Http\Headers
+     * @return \SlimRestPlugin\Http\Headers
      */
     public function headers()
     {
@@ -441,7 +441,7 @@ class Response implements \ArrayAccess, \Countable, \IteratorAggregate
     }
 
     /**
-     * DEPRECATION WARNING! ArrayAccess interface will be removed from \Slim\Http\Response.
+     * DEPRECATION WARNING! ArrayAccess interface will be removed from \SlimRestPlugin\Http\Response.
      * Iterate `headers` or `cookies` properties directly.
      */
 
@@ -478,7 +478,7 @@ class Response implements \ArrayAccess, \Countable, \IteratorAggregate
     }
 
     /**
-     * DEPRECATION WARNING! Countable interface will be removed from \Slim\Http\Response.
+     * DEPRECATION WARNING! Countable interface will be removed from \SlimRestPlugin\Http\Response.
      * Call `count` on `headers` or `cookies` properties directly.
      *
      * Countable: Count
@@ -489,15 +489,15 @@ class Response implements \ArrayAccess, \Countable, \IteratorAggregate
     }
 
     /**
-     * DEPRECATION WARNING! IteratorAggregate interface will be removed from \Slim\Http\Response.
+     * DEPRECATION WARNING! IteratorAggregate interface will be removed from \SlimRestPlugin\Http\Response.
      * Iterate `headers` or `cookies` properties directly.
      *
      * Get Iterator
      *
-     * This returns the contained `\Slim\Http\Headers` instance which
+     * This returns the contained `\SlimRestPlugin\Http\Headers` instance which
      * is itself iterable.
      *
-     * @return \Slim\Http\Headers
+     * @return \SlimRestPlugin\Http\Headers
      */
     public function getIterator()
     {

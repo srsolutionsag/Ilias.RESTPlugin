@@ -30,7 +30,7 @@
  * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-namespace Slim\Http;
+namespace SlimRestPlugin\Http;
 
  /**
   * HTTP Headers
@@ -39,7 +39,7 @@ namespace Slim\Http;
   * @author  Josh Lockhart
   * @since   1.6.0
   */
-class Headers extends \Slim\Helper\Set
+class Headers extends \SlimRestPlugin\Helper\Set
 {
     /********************************************************************************
     * Static interface

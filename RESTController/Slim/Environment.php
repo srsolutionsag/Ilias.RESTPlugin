@@ -30,7 +30,7 @@
  * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-namespace Slim;
+namespace SlimRestPlugin;
 
 /**
  * Environment
@@ -56,7 +56,7 @@ class Environment implements \ArrayAccess, \IteratorAggregate
     protected $properties;
 
     /**
-     * @var \Slim\Environment
+     * @var \SlimRestPlugin\Environment
      */
     protected static $environment;
 
@@ -65,10 +65,10 @@ class Environment implements \ArrayAccess, \IteratorAggregate
      *
      * This creates and/or returns an environment instance (singleton)
      * derived from $_SERVER variables. You may override the global server
-     * variables by using `\Slim\Environment::mock()` instead.
+     * variables by using `\SlimRestPlugin\Environment::mock()` instead.
      *
      * @param  bool             $refresh Refresh properties using global server variables?
-     * @return \Slim\Environment
+     * @return \SlimRestPlugin\Environment
      */
     public static function getInstance($refresh = false)
     {
@@ -83,7 +83,7 @@ class Environment implements \ArrayAccess, \IteratorAggregate
      * Get mock environment instance
      *
      * @param  array       $userSettings
-     * @return \Slim\Environment
+     * @return \SlimRestPlugin\Environment
      */
     public static function mock($userSettings = array())
     {
@@ -158,7 +158,7 @@ class Environment implements \ArrayAccess, \IteratorAggregate
             $env['SERVER_PORT'] = isset($_SERVER['SERVER_PORT']) ? $_SERVER['SERVER_PORT'] : 80;
 
             //HTTP request headers (retains HTTP_ prefix to match $_SERVER)
-            $headers = \Slim\Http\Headers::extract($_SERVER);
+            $headers = \SlimRestPlugin\Http\Headers::extract($_SERVER);
             foreach ($headers as $key => $value) {
                 $env[$key] = $value;
             }

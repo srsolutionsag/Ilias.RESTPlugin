@@ -30,12 +30,12 @@
  * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-namespace Slim;
+namespace SlimRestPlugin;
 
 /**
  * Router
  *
- * This class organizes, iterates, and dispatches \Slim\Route objects.
+ * This class organizes, iterates, and dispatches \SlimRestPlugin\Route objects.
  *
  * @package Slim
  * @author  Josh Lockhart
@@ -79,7 +79,7 @@ class Router
 
     /**
      * Get Current Route object or the first matched one if matching has been performed
-     * @return \Slim\Route|null
+     * @return \SlimRestPlugin\Route|null
      */
     public function getCurrentRoute()
     {
@@ -99,7 +99,7 @@ class Router
      * @param  string               $httpMethod   The HTTP method to match against
      * @param  string               $resourceUri  The resource URI to match against
      * @param  bool                 $reload       Should matching routes be re-parsed?
-     * @return array[\Slim\Route]
+     * @return array[\SlimRestPlugin\Route]
      */
     public function getMatchedRoutes($httpMethod, $resourceUri, $reload = false)
     {
@@ -121,9 +121,9 @@ class Router
 
     /**
      * Add a route object to the router
-     * @param  \Slim\Route     $route      The Slim Route
+     * @param  \SlimRestPlugin\Route     $route      The Slim Route
      */
-    public function map(\Slim\Route $route)
+    public function map(\SlimRestPlugin\Route $route)
     {
         list($groupPattern, $groupMiddleware) = $this->processGroups();
 
@@ -199,10 +199,10 @@ class Router
     /**
      * Add named route
      * @param  string            $name   The route name
-     * @param  \Slim\Route       $route  The route object
+     * @param  \SlimRestPlugin\Route       $route  The route object
      * @throws \RuntimeException         If a named route already exists with the same name
      */
-    public function addNamedRoute($name, \Slim\Route $route)
+    public function addNamedRoute($name, \SlimRestPlugin\Route $route)
     {
         if ($this->hasNamedRoute($name)) {
             throw new \RuntimeException('Named route already exists with name: ' . $name);
@@ -225,7 +225,7 @@ class Router
     /**
      * Get named route
      * @param  string           $name
-     * @return \Slim\Route|null
+     * @return \SlimRestPlugin\Route|null
      */
     public function getNamedRoute($name)
     {

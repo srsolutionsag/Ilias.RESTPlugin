@@ -27,7 +27,7 @@ namespace RESTController\libs;
  * Additionally all non 200-responses should additionally contain a
  * more detailed REST-Code (machine-readable).
  */
-class RESTResponse extends \Slim\Http\Response {
+class RESTResponse extends \SlimRestPlugin\Http\Response {
   // Allow to re-use status messages and codes
   const MSG_UNSOPPORTED_RESPONSE_CONTENT  = 'Cannot send non-string RESTResponse when using \'{{format}}\' format.';
   const ID_UNSOPPORTED_RESPONSE_CONTENT   = 'RESTController\\libs\\RESTResponse::ID_UNSOPPORTED_RESPONSE_CONTENT';
@@ -54,7 +54,7 @@ class RESTResponse extends \Slim\Http\Response {
    * Function: write($body, $replace)
    *  Extends default write method with JSON support.
    *
-   *  @See \Slim\Http\Response->write(...) for more details
+   *  @See \SlimRestPlugin\Http\Response->write(...) for more details
    */
   public function write($body, $replace = false) {
     // Keep normal mode of operation for HTML/RAW
@@ -93,7 +93,7 @@ class RESTResponse extends \Slim\Http\Response {
    * Function finalize()
    *  Extends default finalize() method with JSON support.
    *
-   *  @See \Slim\Http\Response->finalize() for more details
+   *  @See \SlimRestPlugin\Http\Response->finalize() for more details
    */
   public function finalize()  {
     // Notiz: Aus irgendeinem grund ist body hier doppelt, obwohl es in write (und überall sonstwo einfach ist)
