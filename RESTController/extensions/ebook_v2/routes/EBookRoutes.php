@@ -1,8 +1,5 @@
 <?php
 
-require_once(dirname(__DIR__) . '/models/EBookModel.php');
-require_once("./Customizing/global/plugins/Services/Repository/RepositoryObject/eBook/classes/class.ileBookAccessLog.php");
-
 use RESTController\extensions\eBook\v2\models\EBookModel;
 use RESTController\extensions\eBook\v2\models\ErrorMessage;
 use RESTController\extensions\eBook\v2\models\NoAccessException;

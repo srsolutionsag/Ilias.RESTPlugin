@@ -2,9 +2,6 @@
 
 namespace RESTController\extensions\eBook;
 
-require_once(dirname(__DIR__) . '/models/EBookModel.php');
-require_once("./Customizing/global/plugins/Services/Repository/RepositoryObject/eBook/classes/class.ileBookAccessLog.php");
-
 use RESTController\libs\RESTAuth as RESTAuth;
 use RESTController\RESTController;
 
