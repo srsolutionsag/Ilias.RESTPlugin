@@ -30,7 +30,7 @@
  * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-namespace Slim\Middleware;
+namespace SlimRestPlugin\Middleware;
 
 /**
  * Pretty Exceptions
@@ -42,7 +42,7 @@ namespace Slim\Middleware;
  * @author  Josh Lockhart
  * @since   1.0.0
  */
-class PrettyExceptions extends \Slim\Middleware
+class PrettyExceptions extends \SlimRestPlugin\Middleware
 {
     /**
      * @var array

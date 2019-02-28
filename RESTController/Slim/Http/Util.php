@@ -30,7 +30,7 @@
  * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-namespace Slim\Http;
+namespace SlimRestPlugin\Http;
 
 /**
  * Slim HTTP Utilities
@@ -178,11 +178,11 @@ class Util
 
     /**
      * Serialize Response cookies into raw HTTP header
-     * @param  \Slim\Http\Headers $headers The Response headers
-     * @param  \Slim\Http\Cookies $cookies The Response cookies
+     * @param  \SlimRestPlugin\Http\Headers $headers The Response headers
+     * @param  \SlimRestPlugin\Http\Cookies $cookies The Response cookies
      * @param  array              $config  The Slim app settings
      */
-    public static function serializeCookies(\Slim\Http\Headers &$headers, \Slim\Http\Cookies $cookies, array $config)
+    public static function serializeCookies(\SlimRestPlugin\Http\Headers &$headers, \SlimRestPlugin\Http\Cookies $cookies, array $config)
     {
         if ($config['cookies.encrypt']) {
             foreach ($cookies as $name => $settings) {

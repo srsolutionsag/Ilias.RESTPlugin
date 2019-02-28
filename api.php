@@ -9,12 +9,6 @@
 // Include composer autoloader
 require_once 'vendor/autoload.php';
 
-// Include the RESTController application
-require_once('RESTController/RESTController.php');
-
-// Register the RESTController Class-AutoLoader
-\RESTController\RESTController::registerAutoloader();
-
 // Ensure all ILIAS includes still work
 $directory = strstr($_SERVER['SCRIPT_FILENAME'], 'Customizing', true);
 if (is_file('path.conf'))

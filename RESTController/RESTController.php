@@ -28,7 +28,7 @@ use \RESTController\libs\Exceptions as LibExceptions;
  *  $app = new \RESTController\RESTController("<PATH-TO-THIS-FILE>");
  *  $app->run();
  */
-class RESTController extends \Slim\Slim {
+class RESTController extends \SlimRestPlugin\Slim {
   // Allow to re-use status messages and codes
   const MSG_NO_ROUTE  = 'There is no route matching URI \'{{URI}}\' using method \'{{method}}\'; see \'/v2/util/routes\' for a list of all available routes.';
   const ID_NO_ROUTE   = 'RESTController\RESTController::ID_NO_ROUTE';
@@ -38,7 +38,7 @@ class RESTController extends \Slim\Slim {
    * Function: autoload($classname)
    *  PSR-0 autoloader for RESTController classes.
    *  Automatically adds a "models" subname into the namespace of \RESTController\core und
-   *  @See \Slim\Slim::autoload(...)
+   *  @See \SlimRestPlugin\Slim::autoload(...)
    *  Register this outload via RESTController::registerAutoloader().
    *
    * Parameters:
@@ -247,7 +247,7 @@ class RESTController extends \Slim\Slim {
     $when    = date('d/m/Y, H:i:s', time());
 
     // Log additional information in debug-mode (with parameters)
-    if ($log->getLevel() == \Slim\Log::DEBUG) {
+    if ($log->getLevel() == \SlimRestPlugin\Log::DEBUG) {
       $parameters = $request->getParameter();
       $log->debug(sprintf(
         "[%s]: REST was called from '%s' on route '%s' [%s] with Parameters:\n%s",
@@ -280,7 +280,7 @@ class RESTController extends \Slim\Slim {
     $log     = $this->getLog();
 
     // Log additional information in debug-mode (with parameters)
-    if ($log->getLevel() == \Slim\Log::DEBUG) {
+    if ($log->getLevel() == \SlimRestPlugin\Log::DEBUG) {
       // Fetch all information that should be logged
       $request  = $this->request();
       $response = $this->response();
@@ -337,22 +337,22 @@ class RESTController extends \Slim\Slim {
       $app->halt(500, sprintf('Can\'t write to log-file: %s (Make sure file exists and is writeable by the PHP process)', $logFile));
 
     // Open the logfile for writing to using Slim
-    $logWriter = new \Slim\LogWriter(fopen($logFile, 'a'));
+    $logWriter = new \SlimRestPlugin\LogWriter(fopen($logFile, 'a'));
     $log       = $this->getLog();
     $log->setWriter($logWriter);
 
     // Set logging level
     switch (strtoupper($logLevel)) {
-      case 'EMERGENCY':  $log->setLevel(\Slim\Log::EMERGENCY);  break;
-      case 'ALERT':      $log->setLevel(\Slim\Log::ALERT);      break;
-      case 'CRITICAL':   $log->setLevel(\Slim\Log::CRITICAL);   break;
-      case 'FATAL':      $log->setLevel(\Slim\Log::FATAL);      break;
-      case 'ERROR':      $log->setLevel(\Slim\Log::ERROR);      break;
+      case 'EMERGENCY':  $log->setLevel(\SlimRestPlugin\Log::EMERGENCY);  break;
+      case 'ALERT':      $log->setLevel(\SlimRestPlugin\Log::ALERT);      break;
+      case 'CRITICAL':   $log->setLevel(\SlimRestPlugin\Log::CRITICAL);   break;
+      case 'FATAL':      $log->setLevel(\SlimRestPlugin\Log::FATAL);      break;
+      case 'ERROR':      $log->setLevel(\SlimRestPlugin\Log::ERROR);      break;
       default:
-      case 'WARN':       $log->setLevel(\Slim\Log::WARN);       break;
-      case 'NOTICE':     $log->setLevel(\Slim\Log::NOTICE);     break;
-      case 'INFO':       $log->setLevel(\Slim\Log::INFO);       break;
-      case 'DEBUG':     $log->setLevel(\Slim\Log::DEBUG);       break;
+      case 'WARN':       $log->setLevel(\SlimRestPlugin\Log::WARN);       break;
+      case 'NOTICE':     $log->setLevel(\SlimRestPlugin\Log::NOTICE);     break;
+      case 'INFO':       $log->setLevel(\SlimRestPlugin\Log::INFO);       break;
+      case 'DEBUG':     $log->setLevel(\SlimRestPlugin\Log::DEBUG);       break;
     }
   }
 

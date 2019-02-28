@@ -30,7 +30,7 @@
  * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-namespace Slim\Helper;
+namespace SlimRestPlugin\Helper;
 
 class Set implements \ArrayAccess, \Countable, \IteratorAggregate
 {
@@ -54,7 +54,7 @@ class Set implements \ArrayAccess, \Countable, \IteratorAggregate
      *
      * Used to transform data key into the necessary
      * key format for this set. Used in subclasses
-     * like \Slim\Http\Headers.
+     * like \SlimRestPlugin\Http\Headers.
      *
      * @param  string $key The data key
      * @return mixed       The transformed/normalized data key
