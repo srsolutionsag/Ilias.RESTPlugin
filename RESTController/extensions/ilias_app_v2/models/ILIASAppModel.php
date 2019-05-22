@@ -226,12 +226,14 @@ final class ILIASAppModel extends Libs\RESTModel
 
 		while ($row = $this->db->fetchAssoc($set)) {
 
+			if(!$this->isVisible($row['ref_id'])) {
+				continue;
+			}
+
 			if ($this->isRead($row['ref_id'])) {
 				$row['permissionType'] = "read";
-			} elseif ($this->isVisible($row['ref_id'])) {
-				$row['permissionType'] = "visible";
 			} else {
-				continue;
+				$row['permissionType'] = "visible";
 			}
 
 			$treeItem = new IliasTreeItem(
