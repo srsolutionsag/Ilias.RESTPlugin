@@ -139,6 +139,13 @@ class RESTRequest extends \SlimRestPlugin\Http\Request {
       if (array_key_exists($key, $parameters))
         return $parameters[$key];
 
+        // In PHP-FPM and other environments, underscores in headers get replaced
+	      // by a hyphen; however the REST plugin assumes keys like api_key
+	      $keyWithHyphens = str_replace('_', '-', $key);
+	      if (array_key_exists($keyWithHyphens, $parameters))
+	        return $parameters[$keyWithHyphens];
+	
+
       // Throw exception when enabled
       elseif ($throw)
         throw new Exceptions\Parameter(
