@@ -13,7 +13,7 @@ use SRAG\Plugin\eBook\Security\Exception\AccessViolationException;
 use SRAG\Plugin\eBook\Security\Exception\MutexOperationException;
 use SRAG\Plugin\eBook\Security\Service\CollisionDetection\UserRequestMutex;
 use SRAG\Plugin\eBook\Synchronization\Service\SynchronizationManager;
-use SRAG\Plugin\eBook\Synchronization\Service\SynchronizationMapper;
+use SRAG\Plugin\eBook\Synchronization\Service\Mapper\v1\SynchronizationMapper;
 
 /** @var $app RESTController */
 
