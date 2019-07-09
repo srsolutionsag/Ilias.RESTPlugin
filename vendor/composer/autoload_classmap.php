@@ -288,6 +288,7 @@ return array(
     'RESTController\\extensions\\eBook\\v2\\models\\NoAccessException' => $baseDir . '/RESTController/extensions/ebook_v2/models/NoAccessException.php',
     'RESTController\\extensions\\eBook\\v2\\models\\NoFileException' => $baseDir . '/RESTController/extensions/ebook_v2/models/NoFileException.php',
     'RESTController\\extensions\\eBook\\v2\\services\\JsonSchemaValidation' => $baseDir . '/RESTController/extensions/ebook_v2/services/JsonSchemaValidation.php',
+    'RESTController\\extensions\\eBook\\v3\\services\\JsonSchemaValidation' => $baseDir . '/RESTController/extensions/ebook_v3/services/JsonSchemaValidation.php',
     'RESTController\\extensions\\files_v1\\FileModel' => $baseDir . '/RESTController/extensions/files_v1/models/FileModel.php',
     'RESTController\\extensions\\files_v1\\PersonalFileSpaceModel' => $baseDir . '/RESTController/extensions/files_v1/models/PersonalFileSpaceModel.php',
     'RESTController\\extensions\\groups_v1\\Exceptions\\CancelationFailed' => $baseDir . '/RESTController/extensions/groups_v1/models/Exceptions/CancelationFailed.php',

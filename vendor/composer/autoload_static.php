@@ -316,6 +316,7 @@ class ComposerStaticInit6937ff6f1bfff7b517cdc08273ae6b97
         'RESTController\\extensions\\eBook\\v2\\models\\NoAccessException' => __DIR__ . '/../..' . '/RESTController/extensions/ebook_v2/models/NoAccessException.php',
         'RESTController\\extensions\\eBook\\v2\\models\\NoFileException' => __DIR__ . '/../..' . '/RESTController/extensions/ebook_v2/models/NoFileException.php',
         'RESTController\\extensions\\eBook\\v2\\services\\JsonSchemaValidation' => __DIR__ . '/../..' . '/RESTController/extensions/ebook_v2/services/JsonSchemaValidation.php',
+        'RESTController\\extensions\\eBook\\v3\\services\\JsonSchemaValidation' => __DIR__ . '/../..' . '/RESTController/extensions/ebook_v3/services/JsonSchemaValidation.php',
         'RESTController\\extensions\\files_v1\\FileModel' => __DIR__ . '/../..' . '/RESTController/extensions/files_v1/models/FileModel.php',
         'RESTController\\extensions\\files_v1\\PersonalFileSpaceModel' => __DIR__ . '/../..' . '/RESTController/extensions/files_v1/models/PersonalFileSpaceModel.php',
         'RESTController\\extensions\\groups_v1\\Exceptions\\CancelationFailed' => __DIR__ . '/../..' . '/RESTController/extensions/groups_v1/models/Exceptions/CancelationFailed.php',
