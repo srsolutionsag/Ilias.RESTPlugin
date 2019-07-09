@@ -69,25 +69,25 @@ $app->group('/v3/ebook', function () use ($app) {
 			}
 		}
 		catch (AccessViolationException $exception) {
-			require_once __DIR__ . '/../models/ErrorMessage.php';
+			require_once __DIR__ . '/../../ebook_v2/models/ErrorMessage.php';
 			$app->response()->setBody(json_encode(new ErrorMessage('Access violation one or more books are not accessible by the user.')));
 			$app->response()->setStatus(403);
 			return;
 		}
 		catch (\Swaggest\JsonSchema\InvalidValue $exception) {
-			require_once __DIR__ . '/../models/ErrorMessage.php';
+			require_once __DIR__ . '/../../ebook_v2/models/ErrorMessage.php';
 			$app->response()->setBody(json_encode(new ErrorMessage($exception->getMessage())));
 			$app->response()->setStatus(422);
 			return;
 		}
 		catch (\Swaggest\JsonSchema\Exception $exception) {
-			require_once __DIR__ . '/../models/ErrorMessage.php';
+			require_once __DIR__ . '/../../ebook_v2/models/ErrorMessage.php';
 			$app->response()->setBody(json_encode(new ErrorMessage("Request parsing failed, the server was not able to understand the request.")));
 			$app->response()->setStatus(400);
 			return;
 		}
 		catch (MutexOperationException $exception) {
-			require_once __DIR__ . '/../models/ErrorMessage.php';
+			require_once __DIR__ . '/../../ebook_v2/models/ErrorMessage.php';
 			$app->response()->setBody(json_encode(new ErrorMessage("The user already syncs data from another client please try again later.")));
 			$app->response()->setStatus(423);
 			$doubleAcquired = true;
