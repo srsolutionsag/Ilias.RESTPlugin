@@ -252,7 +252,8 @@ $schema = <<<'JSON'
                 "id",
                 "coordinates",
                 "borderColor",
-                "borderWidth"
+                "borderWidth",
+                "rotation"
               ],
               "properties": {
                 "id": {
@@ -326,6 +327,15 @@ $schema = <<<'JSON'
                   "default": 0.0,
                   "examples": [
                     1.3
+                  ]
+                },
+                "rotation": {
+                  "$id": "#/properties/drawings/items/properties/content/items/properties/rotation",
+                  "type": "number",
+                  "title": "The Rotation Schema",
+                  "default": 0.0,
+                  "examples": [
+                    1.4
                   ]
                 }
               }
@@ -516,7 +526,8 @@ $schema = <<<'JSON'
                 "height",
                 "x",
                 "y",
-                "z"
+                "z",
+                "rotation"
               ],
               "properties": {
                 "id": {
@@ -573,7 +584,7 @@ $schema = <<<'JSON'
                   "title": "The Height Schema",
                   "default": 0.0,
                   "examples": [
-                    87.12
+                    87.45
                   ]
                 },
                 "x": {
@@ -601,6 +612,15 @@ $schema = <<<'JSON'
                   "default": 0,
                   "examples": [
                     1
+                  ]
+                },
+                "rotation": {
+                  "$id": "#/properties/rectangles/items/properties/content/items/properties/rotation",
+                  "type": "number",
+                  "title": "The Rotation Schema",
+                  "default": 0.0,
+                  "examples": [
+                    45.2
                   ]
                 }
               }
@@ -669,7 +689,8 @@ $schema = <<<'JSON'
                 "height",
                 "x",
                 "y",
-                "z"
+                "z",
+                "rotation"
               ],
               "properties": {
                 "id": {
@@ -755,6 +776,15 @@ $schema = <<<'JSON'
                   "examples": [
                     1
                   ]
+                },
+                "rotation": {
+                  "$id": "#/properties/ellipses/items/properties/content/items/properties/rotation",
+                  "type": "number",
+                  "title": "The Rotation Schema",
+                  "default": 0.0,
+                  "examples": [
+                    -34.5
+                  ]
                 }
               }
             }
@@ -821,7 +851,8 @@ $schema = <<<'JSON'
                 "diameter",
                 "x",
                 "y",
-                "z"
+                "z",
+                "rotation"
               ],
               "properties": {
                 "id": {
@@ -898,6 +929,15 @@ $schema = <<<'JSON'
                   "examples": [
                     1
                   ]
+                },
+                "rotation": {
+                  "$id": "#/properties/circles/items/properties/content/items/properties/rotation",
+                  "type": "number",
+                  "title": "The Rotation Schema",
+                  "default": 0.0,
+                  "examples": [
+                    44.235
+                  ]
                 }
               }
             }
@@ -965,7 +1005,8 @@ $schema = <<<'JSON'
                 "startZ",
                 "endX",
                 "endY",
-                "endZ"
+                "endZ",
+                "rotation"
               ],
               "properties": {
                 "id": {
@@ -1049,6 +1090,15 @@ $schema = <<<'JSON'
                   "default": 0,
                   "examples": [
                     2
+                  ]
+                },
+                "rotation": {
+                  "$id": "#/properties/lines/items/properties/content/items/properties/rotation",
+                  "type": "number",
+                  "title": "The Rotation Schema",
+                  "default": 0.0,
+                  "examples": [
+                    -12.5678
                   ]
                 }
               }
