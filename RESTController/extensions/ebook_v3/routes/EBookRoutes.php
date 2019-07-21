@@ -7,7 +7,10 @@
  * @since   EDIT_SINCE
  */
 
+use RESTController\extensions\eBook\v2\models\EBookModel;
 use RESTController\extensions\eBook\v2\models\ErrorMessage;
+use RESTController\extensions\eBook\v2\models\NoAccessException;
+use RESTController\extensions\eBook\v2\models\NoFileException;
 use RESTController\extensions\eBook\v3\services\JsonSchemaValidation;
 use RESTController\libs\RESTAuth;
 use RESTController\libs\RESTilias;
@@ -22,6 +25,66 @@ use SRAG\Plugin\eBook\Synchronization\Service\Mapper\v2\SynchronizationMapper;
 /** @var $app RESTController */
 
 $app->group('/v3/ebook', function () use ($app) {
+
+	$app->group('/analytic', function () use ($app) {
+		$app->post('/book-download', function () use ($app) {
+
+			try {
+				require_once __DIR__ . '/../services/JsonSchemaValidation.php';
+
+				$accessToken = $app->request()->getToken();
+				$model = new EBookModel();
+				$userId = $accessToken->getUserId();
+				$refId = $app->request()->getParameter('book_ref_id');
+
+				$env = $app->environment();
+				JsonSchemaValidation::validateAnalyticDownloadBookRequest(json_decode($env['slim.input_original']));
+
+				$model->getKeyByRefId($userId, $refId);
+				$remote_address = $_SERVER['REMOTE_ADDR'];
+				$forwarded_for = $_SERVER['HTTP_X_FORWARDED_FOR'];
+				$hardware_id = $app->request()->getParameter('hardware_id');
+				$access = new \ileBookAccessLog();
+				$access->setUserId($userId);
+				$access->setEbookId($refId);
+				$access->setRemoteAddress($remote_address);
+				$access->setXForwardedFor($forwarded_for);
+				$access->setHardwareId($hardware_id);
+				$access->updateTimestamp();
+				$access->setAction(\ileBookAccessLog::ACTION_DOWNLOAD_TOKEN);
+				$access->create();
+				$access->triggerCheck();
+
+				if(json_last_error() === JSON_ERROR_NONE) {
+					$app->response()->setStatus(200);
+					return;
+				}
+			}
+			catch (\Swaggest\JsonSchema\InvalidValue $exception) {
+				require_once __DIR__ . '/../../ebook_v2/models/ErrorMessage.php';
+				$app->response()->setBody(json_encode(new ErrorMessage($exception->getMessage())));
+				$app->response()->setStatus(422);
+				return;
+			}
+			catch (\Swaggest\JsonSchema\Exception $exception) {
+				require_once __DIR__ . '/../../ebook_v2/models/ErrorMessage.php';
+				$app->response()->setBody(json_encode(new ErrorMessage("Request parsing failed, the server was not able to understand the request.")));
+				$app->response()->setStatus(400);
+				return;
+			}
+			catch (NoFileException $e) {
+				$app->halt(404, "No file uploaded yet.");
+				return;
+			} catch (NoAccessException $e) {
+				$app->halt(401, "No access.");
+				return;
+			}
+
+			$app->response()->setBody('Internal Server Error.');
+			$app->response()->setStatus(500);
+		});
+	});
+
 	$app->post('/sync', RESTAuth::checkAccess(RESTAuth::TOKEN), function() use ($app) {
 
 		/**

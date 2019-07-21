@@ -2552,3 +2552,56 @@ Resources related to a synchronisation. Containes things like the snapshot of th
 + Response 401 (application/json)
 + Response 403 (application/json)
 + Response 500 (application/json)
+
+# Group Analytics
+
+## Report Bookdownload [/book-download]
+
+### Send Bookdownload Report [POST]
++ Request (application/json)
+
+    + Body
+      {
+        "book_ref_id": 287,
+        "hardware_id": "asdfadsfadfda"
+      }
+    + Schema
+      {
+        "definitions": {},
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "$id": "http://example.com/root.json",
+        "type": "object",
+        "title": "The Root Schema",
+        "required": [
+          "book_id",
+          "hardware_id"
+        ],
+        "properties": {
+          "book_ref_id": {
+            "$id": "#/properties/book_ref_id",
+            "type": "integer",
+            "title": "The Book_ref_id Schema",
+            "default": 0,
+            "examples": [
+              287
+            ],
+            "exclusiveMinimum": 0.0
+          },
+          "hardware_id": {
+            "$id": "#/properties/hardware_id",
+            "type": "string",
+            "title": "The Hardware_id Schema",
+            "default": "",
+            "examples": [
+              "asdfadsfadfda"
+            ],
+            "pattern": "^(.+)$"
+          }
+        }
+      }
++ Response 200 (application/json)
++ Response 400 (application/json)
++ Response 401 (application/json)
++ Response 403 (application/json)
++ Response 422 (application/json)
++ Response 500 (application/json)
