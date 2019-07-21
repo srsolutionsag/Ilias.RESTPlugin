@@ -148,6 +148,19 @@ $app->group('/v2/ebook', function () use ($app) {
 		try {
 			$key = $model->getKeyByRefId($userId, $ref_id);
 			$iv = $model->getIVByRefId($userId, $ref_id);
+			$remote_address = $_SERVER['REMOTE_ADDR'];
+			$forwarded_for = $_SERVER['HTTP_X_FORWARDED_FOR'];
+			$hardware_id = $app->request()->getParameter('hardware_id');
+			$access = new \ileBookAccessLog();
+			$access->setUserId($userId);
+			$access->setEbookId($ref_id);
+			$access->setRemoteAddress($remote_address);
+			$access->setXForwardedFor($forwarded_for);
+			$access->setHardwareId($hardware_id);
+			$access->updateTimestamp();
+			$access->setAction(\ileBookAccessLog::ACTION_DOWNLOAD_TOKEN);
+			$access->create();
+			$access->triggerCheck();
 
 			$app->response->body(json_encode([
 				"key" => $key,
