@@ -165,4 +165,28 @@ $app->group('/v3/ebook', function () use ($app) {
 		$app->response()->setBody('Server was unable to calculate the sync response.');
 		$app->response()->setStatus(500);
 	});
+
+	/**
+	 * GET key
+	 */
+	$app->post('/:refId/key', RESTAuth::checkAccess(RESTAuth::TOKEN), function($ref_id) use ($app) {
+		$accessToken = $app->request()->getToken();
+		$model = new EBookModel();
+		$userId = $accessToken->getUserId();
+
+		try {
+			$key = $model->getKeyByRefId($userId, $ref_id);
+			$iv = $model->getIVByRefId($userId, $ref_id);
+
+			$app->response->body(json_encode([
+				"key" => $key,
+				"iv" => $iv
+			]));
+		} catch (NoFileException $e) {
+			$app->halt(404, "No file uploaded yet.");
+		} catch (NoAccessException $e) {
+			$app->halt(401, "No access.");
+		}
+
+	});
 });
