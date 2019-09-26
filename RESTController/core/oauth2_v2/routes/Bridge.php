@@ -49,7 +49,7 @@ $app->group('/v2', function () use ($app) {
         $userId       = $request->getParameter('user', null, true);
         $token        = $request->getParameter('token', null, true);
         $sessionID    = $request->getParameter('session', null, true);
-        $remoteIp     = $request->getIp();
+        $remoteIp     = $request->getClientIp();
         $apiCert      = Libs\RESTLib::FetchClientCertificate();
         $iliasClient  = Libs\RESTilias::FetchILIASClient();
 
@@ -119,7 +119,7 @@ $app->group('/v2', function () use ($app) {
         $apiSecret    = $request->getParameter('api_secret');
         $accessCode   = $request->getParameter('access_token', null, true);
         $goto         = $request->getParameter('goto');
-        $remoteIp     = $request->getIp();
+        $remoteIp     = $request->getClientIp();
         $apiCert      = Libs\RESTLib::FetchClientCertificate();
         $iliasClient  = Libs\RESTilias::FetchILIASClient();
 
@@ -194,7 +194,7 @@ $app->group('/v2', function () use ($app) {
         $userId       = $request->getParameter('user', null, true);
         $token        = $request->getParameter('token', null, true);
         $sessionID    = $request->getParameter('session', null, true);
-        $remoteIp     = $request->getIp();
+        $remoteIp     = $request->getClientIp();
         $apiCert      = Libs\RESTLib::FetchClientCertificate();
         $iliasClient  = Libs\RESTilias::FetchILIASClient();
 
