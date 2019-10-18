@@ -136,6 +136,7 @@ final class ILIASAppModel extends Libs\RESTModel
 			'fileType' => $file->getFileType(),
 			'fileVersion' => $file->getVersion(),
 			'fileVersionDate' => $file->getLastUpdateDate(),
+            'fileLearningProgress' => boolval(sizeof($file->getUsages())),
 		);
 	}
 
