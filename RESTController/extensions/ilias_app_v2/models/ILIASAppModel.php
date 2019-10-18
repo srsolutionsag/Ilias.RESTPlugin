@@ -1,7 +1,12 @@
 <?php namespace RESTController\extensions\ILIASApp\V2;
 
 use ilContainerReference;
+use ilCustomInputGUI;
+use ilLPObjSettings;
+use ilLPStatus;
+use ilLPStatusFactory;
 use ilObject;
+use ilObjectLP;
 use ilSessionAppointment;
 use RESTController\extensions\ILIASApp\V2\data\IliasTreeItem;
 use \RESTController\libs as Libs;
@@ -129,6 +134,31 @@ final class ILIASAppModel extends Libs\RESTModel
 		$fileName = mb_strtolower($file->getFileName());
 		$fileName = preg_replace('/[^a-z0-9\-_\.]+/', '', $fileName);
 
+        /**/
+        $coll_items = array();
+
+        include_once './Services/Object/classes/class.ilObjectLP.php';
+        $olp = ilObjectLP::getInstance($file->getId());
+        $collection = $olp->getCollectionInstance();
+        if($collection) {
+            $coll_items = $collection->getItems();
+            $possible_items = $collection->getPossibleItems($refId);
+        }
+
+        include_once "Services/Tracking/classes/class.ilLPStatusFactory.php";
+        $class = ilLPStatusFactory::_getClassById($file->getId(), ilLPObjSettings::LP_MODE_COLLECTION_TLT);
+        $info = $class::_getStatusInfo($file->getId(), true);
+
+        $lp = false;
+        foreach($coll_items as $item_id) {
+            if(!array_key_exists($item_id, $possible_items))
+                continue;
+
+            $lp |= (isset($info["completed"][$item_id]) && in_array($userId, $info["completed"][$item_id])) ||
+                (isset($info["in_progress"][$item_id]) && in_array($userId, $info["in_progress"][$item_id]));
+        }
+        /**/
+
 		return array(
 			'fileExtension' => $file->getFileExtension(),
 			'fileName' => $fileName,
@@ -136,7 +166,7 @@ final class ILIASAppModel extends Libs\RESTModel
 			'fileType' => $file->getFileType(),
 			'fileVersion' => $file->getVersion(),
 			'fileVersionDate' => $file->getLastUpdateDate(),
-            'fileLearningProgress' => boolval(sizeof($file->getUsages())),
+            'fileLearningProgress' => $lp,
 		);
 	}
 
