@@ -131,33 +131,21 @@ final class ILIASAppModel extends Libs\RESTModel
 	public function getFileData($refId, $userId)
 	{
 		$file = new \ilObjFile($refId);
+		$objId = $file->getId();
 		$fileName = mb_strtolower($file->getFileName());
 		$fileName = preg_replace('/[^a-z0-9\-_\.]+/', '', $fileName);
 
-        /**/
-        $coll_items = array();
+		// lp-mode
+		include_once './Services/Object/classes/class.ilObjectLP.php';
+		$olp = ilObjectLP::getInstance($objId);
+		$modeDownloaded = boolval($olp->getCurrentMode());
 
-        include_once './Services/Object/classes/class.ilObjectLP.php';
-        $olp = ilObjectLP::getInstance($file->getId());
-        $collection = $olp->getCollectionInstance();
-        if($collection) {
-            $coll_items = $collection->getItems();
-            $possible_items = $collection->getPossibleItems($refId);
-        }
-
-        include_once "Services/Tracking/classes/class.ilLPStatusFactory.php";
-        $class = ilLPStatusFactory::_getClassById($file->getId(), ilLPObjSettings::LP_MODE_COLLECTION_TLT);
-        $info = $class::_getStatusInfo($file->getId(), true);
-
-        $lp = false;
-        foreach($coll_items as $item_id) {
-            if(!array_key_exists($item_id, $possible_items))
-                continue;
-
-            $lp |= (isset($info["completed"][$item_id]) && in_array($userId, $info["completed"][$item_id])) ||
-                (isset($info["in_progress"][$item_id]) && in_array($userId, $info["in_progress"][$item_id]));
-        }
-        /**/
+		// status
+		global $DIC;
+		$ilDB = $DIC['ilDB'];
+		$q = "SELECT status FROM ut_lp_marks WHERE obj_id=" . $objId . " AND usr_id=" . $userId;
+		$ret = $ilDB->query($q);
+		$status = boolval($ilDB->fetchAssoc($ret)["status"]);
 
 		return array(
 			'fileExtension' => $file->getFileExtension(),
@@ -166,7 +154,8 @@ final class ILIASAppModel extends Libs\RESTModel
 			'fileType' => $file->getFileType(),
 			'fileVersion' => $file->getVersion(),
 			'fileVersionDate' => $file->getLastUpdateDate(),
-            'fileLearningProgress' => $lp,
+			'lpModeDownloaded' => $modeDownloaded,
+			'lpStatus' => $status,
 		);
 	}
 
