@@ -1,12 +1,7 @@
 <?php namespace RESTController\extensions\ILIASApp\V2;
 
 use ilContainerReference;
-use ilCustomInputGUI;
-use ilLPObjSettings;
 use ilLPStatus;
-use ilLPStatusFactory;
-use ilObject;
-use ilObjectLP;
 use ilSessionAppointment;
 use RESTController\extensions\ILIASApp\V2\data\IliasTreeItem;
 use \RESTController\libs as Libs;
@@ -131,21 +126,17 @@ final class ILIASAppModel extends Libs\RESTModel
 	public function getFileData($refId, $userId)
 	{
 		$file = new \ilObjFile($refId);
-		$objId = $file->getId();
+
+		// file name
 		$fileName = mb_strtolower($file->getFileName());
 		$fileName = preg_replace('/[^a-z0-9\-_\.]+/', '', $fileName);
-
-		// lp-mode
-		include_once './Services/Object/classes/class.ilObjectLP.php';
-		$olp = ilObjectLP::getInstance($objId);
-		$modeDownloaded = boolval($olp->getCurrentMode());
 
 		// status
 		global $DIC;
 		$ilDB = $DIC['ilDB'];
-		$q = "SELECT status FROM ut_lp_marks WHERE obj_id=" . $objId . " AND usr_id=" . $userId;
+		$q = "SELECT status FROM ut_lp_marks WHERE obj_id=" . $file->getId() . " AND usr_id=" . $userId;
 		$ret = $ilDB->query($q);
-		$status = boolval($ilDB->fetchAssoc($ret)["status"]);
+		$fileLearningProgress = boolval($ilDB->fetchAssoc($ret)["status"]);
 
 		return array(
 			'fileExtension' => $file->getFileExtension(),
@@ -154,10 +145,25 @@ final class ILIASAppModel extends Libs\RESTModel
 			'fileType' => $file->getFileType(),
 			'fileVersion' => $file->getVersion(),
 			'fileVersionDate' => $file->getLastUpdateDate(),
-			'lpModeDownloaded' => $modeDownloaded,
-			'lpStatus' => $status,
+			'fileLearningProgress' => $fileLearningProgress
 		);
 	}
+
+    /**
+     * sets the lp-status for an object $objId and user $userId to completed
+     *
+     * @param $objId
+     * @param $userId
+     */
+	public function setFileLearningProgressToDone($objId, $userId) {
+        global $DIC;
+        $ilDB = $DIC['ilDB'];
+        $status = ilLPStatus::LP_STATUS_COMPLETED_NUM;
+        $q = "INSERT INTO ut_lp_marks (obj_id, usr_id, status) VALUES({$objId}, {$userId}, {$status})
+              ON DUPLICATE KEY UPDATE status={$status}";
+        $ilDB->query($q);
+        //TODO return value dependant on success
+    }
 
 
 	public function getChildrenRecursive($refId, $userId)

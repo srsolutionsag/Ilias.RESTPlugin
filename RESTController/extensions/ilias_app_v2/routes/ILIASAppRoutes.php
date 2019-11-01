@@ -48,6 +48,20 @@ $app->group('/v2/ilias-app', function () use ($app) {
 		$app->response->body(json_encode($fileData));
 	});
 
+    $app->post('/files/:objectId/learning-progress-to-done', RESTAuth::checkAccess(RESTAuth::TOKEN), function($objectId) use ($app) {
+        $iliasApp = new ILIASAppModel();
+        $accessToken = $app->request->getToken();
+
+        $userId = $accessToken->getUserId();
+        $app->response->headers->set('Content-Type', 'application/json');
+
+        $iliasApp->setFileLearningProgressToDone($objectId, $userId);
+        $app->response->body('{"message": "Learning progress was successfully set to done"}');
+        //$unprocessableEntity = 422; TODO add failing-response
+        //$app->response()->body(json_encode(new ErrorAnswer('Invalid post data.')));
+        //$app->response()->status($unprocessableEntity);
+    });
+
 	/**
 	 * Returns a very short live token to log in via the ILIAS Pegasus Helper plugin.
 	 */
