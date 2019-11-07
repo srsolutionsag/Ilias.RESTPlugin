@@ -149,21 +149,23 @@ final class ILIASAppModel extends Libs\RESTModel
 		);
 	}
 
-    /**
-     * sets the lp-status for an object $objId and user $userId to completed
-     *
-     * @param $objId
-     * @param $userId
-     */
+	/**
+	 * sets the lp-status for an object $objId and user $userId to completed
+	 *
+	 * @param $objId
+	 * @param $userId
+	 * @return bool
+	 */
 	public function setFileLearningProgressToDone($objId, $userId) {
-        global $DIC;
-        $ilDB = $DIC['ilDB'];
-        $status = ilLPStatus::LP_STATUS_COMPLETED_NUM;
-        $q = "INSERT INTO ut_lp_marks (obj_id, usr_id, status) VALUES({$objId}, {$userId}, {$status})
-              ON DUPLICATE KEY UPDATE status={$status}";
-        $ilDB->query($q);
-        //TODO return value dependant on success
-    }
+		global $DIC;
+		$ilDB = $DIC['ilDB'];
+		$status = ilLPStatus::LP_STATUS_COMPLETED_NUM;
+		$q = "INSERT INTO ut_lp_marks (obj_id, usr_id, status) VALUES({$objId}, {$userId}, {$status})
+		      ON DUPLICATE KEY UPDATE status={$status}";
+		$result = $ilDB->query($q);
+		$success = $result !== false;
+		return $success;
+	}
 
 
 	public function getChildrenRecursive($refId, $userId)
