@@ -1,7 +1,7 @@
 <?php namespace RESTController\extensions\ILIASApp\V2;
 
 use ilContainerReference;
-use ilLPStatus;
+use ilObject;
 use ilSessionAppointment;
 use RESTController\extensions\ILIASApp\V2\data\IliasTreeItem;
 use \RESTController\libs as Libs;
@@ -126,17 +126,8 @@ final class ILIASAppModel extends Libs\RESTModel
 	public function getFileData($refId, $userId)
 	{
 		$file = new \ilObjFile($refId);
-
-		// file name
 		$fileName = mb_strtolower($file->getFileName());
 		$fileName = preg_replace('/[^a-z0-9\-_\.]+/', '', $fileName);
-
-		// status
-		global $DIC;
-		$ilDB = $DIC['ilDB'];
-		$q = "SELECT status FROM ut_lp_marks WHERE obj_id=" . $file->getId() . " AND usr_id=" . $userId;
-		$ret = $ilDB->query($q);
-		$fileLearningProgress = boolval($ilDB->fetchAssoc($ret)["status"]);
 
 		return array(
 			'fileExtension' => $file->getFileExtension(),
@@ -145,26 +136,7 @@ final class ILIASAppModel extends Libs\RESTModel
 			'fileType' => $file->getFileType(),
 			'fileVersion' => $file->getVersion(),
 			'fileVersionDate' => $file->getLastUpdateDate(),
-			'fileLearningProgress' => $fileLearningProgress
 		);
-	}
-
-	/**
-	 * sets the lp-status for an object $objId and user $userId to completed
-	 *
-	 * @param $objId
-	 * @param $userId
-	 * @return bool
-	 */
-	public function setFileLearningProgressToDone($objId, $userId) {
-		global $DIC;
-		$ilDB = $DIC['ilDB'];
-		$status = ilLPStatus::LP_STATUS_COMPLETED_NUM;
-		$q = "INSERT INTO ut_lp_marks (obj_id, usr_id, status) VALUES({$objId}, {$userId}, {$status})
-		      ON DUPLICATE KEY UPDATE status={$status}";
-		$result = $ilDB->query($q);
-		$success = $result !== false;
-		return $success;
 	}
 
 
