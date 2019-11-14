@@ -25,12 +25,12 @@ class RESTLib {
   public static function FetchClientCertificate() {
     // Build a more readable ssl client-certificate array...
     return array(
-      verify  => $_SERVER['SSL_CLIENT_VERIFY'],
-      serial  => $_SERVER['SSL_CLIENT_M_SERIAL'],
-      issuer  => $_SERVER['SSL_CLIENT_I_DN'],
-      subject => $_SERVER['SSL_CLIENT_S_DN'],
-      expires => $_SERVER['SSL_CLIENT_V_END'],
-      ttl     => $_SERVER['SSL_CLIENT_V_REMAIN']
+      'verify'  => $_SERVER['SSL_CLIENT_VERIFY'],
+      'serial'  => $_SERVER['SSL_CLIENT_M_SERIAL'],
+      'issuer'  => $_SERVER['SSL_CLIENT_I_DN'],
+      'subject' => $_SERVER['SSL_CLIENT_S_DN'],
+      'expires' => $_SERVER['SSL_CLIENT_V_END'],
+      'ttl'     => $_SERVER['SSL_CLIENT_V_REMAIN']
     );
   }
 

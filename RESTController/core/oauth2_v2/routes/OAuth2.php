@@ -47,7 +47,7 @@ $app->group('/v2', function () use ($app) {
         $apiKey       = $request->getParameter('api_key',       null, true);
         $scope        = $request->getParameter('scope');
         $state        = $request->getParameter('state');
-        $remoteIP     = $request->getIp();
+        $remoteIP     = $request->getClientIp();
         $apiCert      = Libs\RESTLib::FetchClientCertificate();
         $iliasClient  = Libs\RESTilias::FetchILIASClient();
 
@@ -115,7 +115,7 @@ $app->group('/v2', function () use ($app) {
         $apiKey       = $request->getParameter('api_key',       null, true);
         $scope        = $request->getParameter('scope');
         $state        = $request->getParameter('state');
-        $remoteIP     = $request->getIp();
+        $remoteIP     = $request->getClientIp();
         $apiCert      = Libs\RESTLib::FetchClientCertificate();
         $iliasClient  = Libs\RESTilias::FetchILIASClient();
 
@@ -219,7 +219,7 @@ $app->group('/v2', function () use ($app) {
         $request      = $app->request();
         $grantType    = $request->getParameter('grant_type', null, true);
         $apiSecret    = $request->getParameter('api_secret');
-        $remoteIp     = $request->getIp();
+        $remoteIp     = $request->getClientIp();
         $apiCert      = Libs\RESTLib::FetchClientCertificate();
         $iliasClient  = Libs\RESTilias::FetchILIASClient();
 
@@ -337,7 +337,7 @@ $app->group('/v2', function () use ($app) {
         $apiKey       = $request->getParameter('api_key', null, true);
         $apiSecret    = $request->getParameter('api_secret');
         $tokenCode    = $request->getParameter('token', null, true);
-        $remoteIp     = $request->getIp();
+        $remoteIp     = $request->getClientIp();
         $apiCert      = Libs\RESTLib::FetchClientCertificate();
         $iliasClient  = Libs\RESTilias::FetchILIASClient();
 
@@ -414,7 +414,7 @@ $app->group('/v2', function () use ($app) {
         $apiKey       = $request->getParameter('api_key', null, true);
         $apiSecret    = $request->getParameter('api_secret');
         $token        = $request->getParameter('token', null, true);
-        $remoteIp     = $request->getIp();
+        $remoteIp     = $request->getClientIp();
         $apiCert      = Libs\RESTLib::FetchClientCertificate();
         $iliasClient  = Libs\RESTilias::FetchILIASClient();
 

@@ -241,7 +241,7 @@ class RESTController extends \SlimRestPlugin\Slim {
     // Fetch all information that should be logged
     $log     = $this->getLog();
     $request = $this->request();
-    $ip      = $request->getIp();
+    $ip      = $request->getClientIp();
     $method  = $request->getMethod();
     $route   = $request->getResourceUri();
     $when    = date('d/m/Y, H:i:s', time());
@@ -284,7 +284,7 @@ class RESTController extends \SlimRestPlugin\Slim {
       // Fetch all information that should be logged
       $request  = $this->request();
       $response = $this->response();
-      $ip       = $request->getIp();
+      $ip       = $request->getClientIp();
       $method   = $request->getMethod();
       $route    = $request->getResourceUri();
       $when     = date('d/m/Y, H:i:s', time());
