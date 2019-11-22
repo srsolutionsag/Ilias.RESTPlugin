@@ -12,3 +12,6 @@ RESTController/extensions/ilias_app*/apiblueprint/*.html
 
 # Deliver vendor directory as temporary work around in order to ease deployment.
 # /vendor/
+
+# Misc
+.idea

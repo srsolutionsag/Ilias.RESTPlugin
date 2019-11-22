@@ -28,19 +28,19 @@ final class ILIASAppModel extends Libs\RESTModel {
 	}
 
 
-    /**
-     * collects the metadata of a file with reference $refId
-     *
-     * @param $refId int
-     * @param $userId int
-     * @return array
-     */
+	/**
+	 * collects the metadata of a file with reference $refId
+	 *
+	 * @param $refId int
+	 * @param $userId int
+	 * @return array
+	 */
 	public function getFileData($refId, $userId) {
-	    // check access
-        if(!$this->isVisible($refId))
-            return ["body" => new ErrorAnswer("Forbidden"), "status" => 403];
+		// check access
+		if(!$this->isVisible($refId))
+			return ["body" => new ErrorAnswer("Forbidden"), "status" => 403];
 
-        // get file data
+		// get file data
 		$file = new \ilObjFile($refId);
 		// file name
 		$fileName = mb_strtolower($file->getFileName());
@@ -69,35 +69,34 @@ final class ILIASAppModel extends Libs\RESTModel {
 	 *
 	 * @param $refId int
 	 * @param $userId int
-     * @return array
+	 * @return array
 	 */
 	public function setFileLearningProgressToDone($refId, $userId) {
-        // check access
-        if(!($this->isVisible($refId) && $this->isRead($refId)))
-            return ["body" => new ErrorAnswer("Forbidden"), "status" => 403];
+		// check access
+		if(!($this->isVisible($refId) && $this->isRead($refId)))
+			return ["body" => new ErrorAnswer("Forbidden"), "status" => 403];
 
-        // set state
-        $file = new \ilObjFile($refId);
-        $status = ilLPStatus::LP_STATUS_COMPLETED_NUM;
+		// set state
+		$file = new \ilObjFile($refId);
+		$status = ilLPStatus::LP_STATUS_COMPLETED_NUM;
 
-        global $DIC;
-        $ilDB = $DIC['ilDB'];
-        $q = "INSERT INTO ut_lp_marks (obj_id, usr_id, status) VALUES({$file->getId()}, {$userId}, {$status})
+		global $DIC;
+		$ilDB = $DIC['ilDB'];
+		$q = "INSERT INTO ut_lp_marks (obj_id, usr_id, status) VALUES({$file->getId()}, {$userId}, {$status})
 		      ON DUPLICATE KEY UPDATE status={$status}";
-        $result = $ilDB->query($q);
+		$result = $ilDB->query($q);
 
-        if($result === false)
-            return ["body" => new ErrorAnswer("Bad Request"), "status" => 400];
+		if($result === false)
+			return ["body" => new ErrorAnswer("Bad Request"), "status" => 400];
 
-        return ["body" => array("message" => "Learning progress was successfully set to done")];
-    }
+		return ["body" => array("message" => "Learning progress was successfully set to done")];
+	}
 
 
 	/**
 	 * Checks the access right of the given $refId for visible permission.
 	 *
 	 * @param $refId int a ref_id to check the access
-	 *
 	 * @return bool true if the permission is visible, otherwise false
 	 */
 	private function isVisible($refId) {
@@ -109,7 +108,6 @@ final class ILIASAppModel extends Libs\RESTModel {
 	 * Checks the access right of the given $refId for read permission.
 	 *
 	 * @param $refId int a ref_id to check the access
-	 *
 	 * @return bool true if the permission is read, otherwise false
 	 */
 	private function isRead($refId) {

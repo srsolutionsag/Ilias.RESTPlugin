@@ -17,12 +17,12 @@ $app->group('/v3/ilias-app', function () use ($app) {
 		$accessToken = $app->request->getToken();
 
 		$userId = $accessToken->getUserId();
-        $response = $iliasApp->getFileData($refId, $userId);
+		$response = $iliasApp->getFileData($refId, $userId);
 
-        $app->response->headers->set('Content-Type', 'application/json');
-        $app->response()->body(json_encode($response["body"]));
-        if(isset($response["status"]))
-            $app->response()->status($response["status"]);
+		$app->response->headers->set('Content-Type', 'application/json');
+		$app->response()->body(json_encode($response["body"]));
+		if(isset($response["status"]))
+			$app->response()->status($response["status"]);
 	});
 
 	$app->post('/files/:refId/learning-progress-to-done', RESTAuth::checkAccess(RESTAuth::TOKEN), function($refId) use ($app) {
@@ -30,12 +30,12 @@ $app->group('/v3/ilias-app', function () use ($app) {
 		$accessToken = $app->request->getToken();
 
 		$userId = $accessToken->getUserId();
-        $response = $iliasApp->setFileLearningProgressToDone($refId, $userId);
+		$response = $iliasApp->setFileLearningProgressToDone($refId, $userId);
 
-        $app->response->headers->set('Content-Type', 'application/json');
-        $app->response()->body(json_encode($response["body"]));
-        if(isset($response["status"]))
-            $app->response()->status($response["status"]);
+		$app->response->headers->set('Content-Type', 'application/json');
+		$app->response()->body(json_encode($response["body"]));
+		if(isset($response["status"]))
+			$app->response()->status($response["status"]);
 	});
 
 });
