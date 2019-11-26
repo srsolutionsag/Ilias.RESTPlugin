@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="PhpIncludePathManager">
+    <include_path>
+      <path value="$PROJECT_DIR$/vendor/composer" />
+      <path value="$PROJECT_DIR$/vendor/phplang/scope-exit" />
+      <path value="$PROJECT_DIR$/vendor/swaggest/json-diff" />
+      <path value="$PROJECT_DIR$/vendor/swaggest/json-schema" />
+    </include_path>
+  </component>
+</project>

@@ -510,4 +510,17 @@ class RESTRequest extends \SlimRestPlugin\Http\Request {
     // Return ids (array of integers)
     return $ids;
   }
+
+  /**
+   * Function: getClientIp()
+   *  The method 'getIp' of Slim/Http/Request in the library 'Slim' may return a string containing
+   *  multiple ips in the format "client1, proxy1, proxy2, ...". This method always selects the first ip "client1"
+   *
+   * Return:
+   *  <String> the ip of the client
+   */
+  public function getClientIp() {
+    $ips = explode(',', $this->getIp());
+    return trim($ips[0]);
+  }
 }
