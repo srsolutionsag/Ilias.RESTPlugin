@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - ILIASAPP-645 (version 1) farbwahl
 - route v3 for theme colors
 - setting theme colors in the configuration page of the plugin
+- route v1 'routesAccess' for testing purposes
 
 ## [1.8.3] - 2019-11-22
 ### Added👍👍👍👍👍👍👍👍👍👍👍👍👍👍👍👍👍👍👍👍
