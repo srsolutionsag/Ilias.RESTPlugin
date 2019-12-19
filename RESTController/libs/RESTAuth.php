@@ -19,6 +19,7 @@ namespace RESTController\libs;
  */
 class RESTAuth {
   // Possible security-levels
+  const NONE        = 'RESTAuth::NONE';        // No authentication
   const TOKEN       = 'RESTAuth::TOKEN';       // Check for valid token
   const PERMISSION  = 'RESTAuth::PERMISSION';  // TOKEN and check if allowed on route
   const ADMIN       = 'RESTAuth::ADMIN';       // TOKEN, PERMISSION and check if user has ILIAS admin-role
@@ -42,6 +43,8 @@ class RESTAuth {
   public static function checkAccess($level) {
     // Select auth that matches given security-level
     switch($level) {
+      case self::NONE:
+        return function ($route) {};
       default:
       case self::TOKEN:
         return 'RESTController\\libs\\Middleware\\OAuth2::TOKEN';
