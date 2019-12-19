@@ -48,5 +48,4 @@ $app->group('/v3/ilias-app', function () use ($app) {
         if(isset($response["status"]))
             $app->response()->status($response["status"]);
     });
-
 });

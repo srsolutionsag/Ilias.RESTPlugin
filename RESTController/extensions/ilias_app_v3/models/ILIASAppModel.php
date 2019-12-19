@@ -76,21 +76,21 @@ final class ILIASAppModel extends Libs\RESTModel {
         if(!($this->isVisible($refId) && $this->isRead($refId)))
             return ["body" => new ErrorAnswer("Forbidden"), "status" => 403];
 
-        // set state
-        $file = new \ilObjFile($refId);
-        $status = ilLPStatus::LP_STATUS_COMPLETED_NUM;
+		// set state
+		$file = new \ilObjFile($refId);
+		$status = ilLPStatus::LP_STATUS_COMPLETED_NUM;
 
-        global $DIC;
-        $ilDB = $DIC['ilDB'];
-        $q = "INSERT INTO ut_lp_marks (obj_id, usr_id, status) VALUES({$file->getId()}, {$userId}, {$status})
+		global $DIC;
+		$ilDB = $DIC['ilDB'];
+		$q = "INSERT INTO ut_lp_marks (obj_id, usr_id, status) VALUES({$file->getId()}, {$userId}, {$status})
 		      ON DUPLICATE KEY UPDATE status={$status}";
-        $result = $ilDB->query($q);
+		$result = $ilDB->query($q);
 
-        if($result === false)
-            return ["body" => new ErrorAnswer("Bad Request"), "status" => 400];
+		if($result === false)
+			return ["body" => new ErrorAnswer("Bad Request"), "status" => 400];
 
-        return ["body" => array("message" => "Learning progress was successfully set to done")];
-    }
+		return ["body" => array("message" => "Learning progress was successfully set to done")];
+	}
 
     /**
      * collects the parameters for the theming of the app
@@ -111,7 +111,6 @@ final class ILIASAppModel extends Libs\RESTModel {
             'themeContrastColor' => boolval($dat["contrast_color"])
         )];
     }
-
 
     /**
      * Checks the access right of the given $refId for visible permission.
