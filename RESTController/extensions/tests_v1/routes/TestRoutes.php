@@ -16,6 +16,27 @@ use \RESTController\extensions\questionpools_v1 as Questionpools;
 
 $app->group('/v1', function () use ($app) {
     /**
+     * Testing the connection to the REST plugin over routes
+     */
+    $app->get('/tests/routesAccess', RESTAuth::checkAccess(RESTAuth::NONE), function () use ($app) {
+        $request = $app->request();
+        $result = [
+            "body" => $request->getBody(),
+            "content_type" => $request->getContentType(),
+            "content_charset" => $request->getContentCharset(),
+            "host" => $request->getHost(),
+            "method" => $request->getMethod(),
+            "port" => $request->getPort(),
+            "scheme" => $request->getScheme(),
+            "root_uri" => $request->getRootUri(),
+            "url" => $request->getUrl(),
+            "ip" => $request->getIp(),
+            "referrer" => $request->getReferrer()
+        ];
+        $app->success(json_encode(["request" => $result]));
+    });
+
+    /**
      * Downloads a tests specified by its ref_id.
      */
     $app->get('/tests/download/:ref_id', RESTAuth::checkAccess(RESTAuth::PERMISSION), function ($ref_id) use ($app) {
@@ -55,7 +76,7 @@ $app->group('/v1', function () use ($app) {
 
     /**
      * Retrieves all questions of a test.
-     * (OPTIONAL) Desired types of questions can be specified in the 'types' parameter of the request 
+     * (OPTIONAL) Desired types of questions can be specified in the 'types' parameter of the request
      * e.g. "1,2,8" for single choice, multiple choice and text questions only.
      */
     $app->get('/tests/getQuestions/:ref_id', RESTAuth::checkAccess(RESTAuth::PERMISSION), function ($ref_id) use ($app) {
@@ -80,7 +101,7 @@ $app->group('/v1', function () use ($app) {
 
     /**
      * Retrieves all questions of a test including answers for questions of type 1,2,8. Other types still need to be implemented.
-     * (OPTIONAL) Desired types of questions can be specified in the 'types' parameter of the request 
+     * (OPTIONAL) Desired types of questions can be specified in the 'types' parameter of the request
      * e.g. "1,2,8" for single choice, multiple choice and text questions only.
      */
     $app->get('/tests/getQuestionsWithAnswers/:ref_id', RESTAuth::checkAccess(RESTAuth::PERMISSION), function ($ref_id) use ($app) {
