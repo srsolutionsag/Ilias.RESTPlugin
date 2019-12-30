@@ -97,7 +97,7 @@ final class ILIASAppModel extends Libs\RESTModel {
      *
      * @return array
      */
-    public function getThemeData() {
+    public function getThemeData($timestamp) {
         global $DIC;
         $ilDB = $DIC['ilDB'];
         $q = "SELECT * FROM ui_uihk_pegasus_theme WHERE id=1";
@@ -108,7 +108,9 @@ final class ILIASAppModel extends Libs\RESTModel {
 
         return ["body" => array(
             'themePrimaryColor' => $dat["primary_color"],
-            'themeContrastColor' => boolval($dat["contrast_color"])
+            'themeContrastColor' => boolval($dat["contrast_color"]),
+            'themeTimestamp' => intval($dat["timestamp"]),
+            'themeIconResources' => array() // TODO depending on timestamp, send back new resources
         )];
     }
 
