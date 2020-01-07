@@ -12,30 +12,40 @@ use RESTController\RESTController;
  */
 $app->group('/v3/ilias-app', function () use ($app) {
 
-	$app->get('/files/:refId', RESTAuth::checkAccess(RESTAuth::TOKEN), function($refId) use ($app) {
-		$iliasApp = new ILIASAppModel();
-		$accessToken = $app->request->getToken();
+    $app->get('/files/:refId', RESTAuth::checkAccess(RESTAuth::TOKEN), function($refId) use ($app) {
+        $iliasApp = new ILIASAppModel();
+        $accessToken = $app->request->getToken();
 
-		$userId = $accessToken->getUserId();
-		$response = $iliasApp->getFileData($refId, $userId);
+        $userId = $accessToken->getUserId();
+        $response = $iliasApp->getFileData($refId, $userId);
 
-		$app->response->headers->set('Content-Type', 'application/json');
-		$app->response()->body(json_encode($response["body"]));
-		if(isset($response["status"]))
-			$app->response()->status($response["status"]);
-	});
+        $app->response->headers->set('Content-Type', 'application/json');
+        $app->response()->body(json_encode($response["body"]));
+        if(isset($response["status"]))
+            $app->response()->status($response["status"]);
+    });
 
-	$app->post('/files/:refId/learning-progress-to-done', RESTAuth::checkAccess(RESTAuth::TOKEN), function($refId) use ($app) {
-		$iliasApp = new ILIASAppModel();
-		$accessToken = $app->request->getToken();
+    $app->post('/files/:refId/learning-progress-to-done', RESTAuth::checkAccess(RESTAuth::TOKEN), function($refId) use ($app) {
+        $iliasApp = new ILIASAppModel();
+        $accessToken = $app->request->getToken();
 
-		$userId = $accessToken->getUserId();
-		$response = $iliasApp->setFileLearningProgressToDone($refId, $userId);
+        $userId = $accessToken->getUserId();
+        $response = $iliasApp->setFileLearningProgressToDone($refId, $userId);
 
-		$app->response->headers->set('Content-Type', 'application/json');
-		$app->response()->body(json_encode($response["body"]));
-		if(isset($response["status"]))
-			$app->response()->status($response["status"]);
-	});
+        $app->response->headers->set('Content-Type', 'application/json');
+        $app->response()->body(json_encode($response["body"]));
+        if(isset($response["status"]))
+            $app->response()->status($response["status"]);
+    });
 
+    $app->get('/theme', RESTAuth::checkAccess(RESTAuth::TOKEN), function() use ($app) {
+        $iliasApp = new ILIASAppModel();
+
+        $response = $iliasApp->getThemeData();
+
+        $app->response->headers->set('Content-Type', 'application/json');
+        $app->response()->body(json_encode($response["body"]));
+        if(isset($response["status"]))
+            $app->response()->status($response["status"]);
+    });
 });

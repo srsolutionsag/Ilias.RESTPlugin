@@ -38,7 +38,7 @@ $app->group('/v1', function () use ($app) {
     $request = $app->request();
     OAuth2v2\Admin::UpdateClient($id, $request);
     if ($request->hasParameter("permissions")) {
-      $permArray  = $request->getParameter(permissions);
+      $permArray  = $request->getParameter("permissions");
       ClientsLegacyModel::setPermissions($id, $permArray);
     }
   });
@@ -53,7 +53,7 @@ $app->group('/v1', function () use ($app) {
     $api_id  = OAuth2v2\Admin::InsertClient($request);
     if ($api_id != false) {
         if ($request->hasParameter("permissions")) {
-          $permArray  = $request->getParameter(permissions);
+          $permArray  = $request->getParameter("permissions");
           ClientsLegacyModel::setPermissions($api_id, $permArray);
         }
     }
