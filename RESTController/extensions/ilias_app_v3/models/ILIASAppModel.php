@@ -95,6 +95,7 @@ final class ILIASAppModel extends Libs\RESTModel {
     /**
      * collects the parameters for the theming of the app
      *
+     * @param $timestamp integer timestamp of the last synchronization in the app
      * @return array
      */
     public function getThemeData($timestamp) {
@@ -106,11 +107,19 @@ final class ILIASAppModel extends Libs\RESTModel {
             return ["body" => new ErrorAnswer("Internal Server Error"), "status" => 500];
         $dat = $ilDB->fetchAssoc($ret);
 
+        $clientName = $DIC->clientIni()->readVariable("client", "name");
+        $iconsDir = "data/$clientName/pegasushelper/theme/icons/";
+        $keys = ["course", "file", "folder", "group", "learningplace", "link"];
+        $resources = [];
+        if($timestamp < intval($dat["timestamp"]))
+            foreach($keys as $key)
+                $resources[] = ["key" => $key, "path" => $iconsDir . "icon_$key.svg"];
+
         return ["body" => array(
-            'themePrimaryColor' => $dat["primary_color"],
-            'themeContrastColor' => boolval($dat["contrast_color"]),
-            'themeTimestamp' => intval($dat["timestamp"]),
-            'themeIconResources' => array() // TODO depending on timestamp, send back new resources
+            "themePrimaryColor" => $dat["primary_color"],
+            "themeContrastColor" => boolval($dat["contrast_color"]),
+            "themeTimestamp" => intval($dat["timestamp"]),
+            "themeIconResources" => $resources
         )];
     }
 
