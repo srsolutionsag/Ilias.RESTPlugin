@@ -107,7 +107,7 @@ final class ILIASAppModel extends Libs\RESTModel {
             return ["body" => new ErrorAnswer("Internal Server Error"), "status" => 500];
         $dat = $ilDB->fetchAssoc($ret);
 
-        $clientName = $DIC->clientIni()->readVariable("client", "name");
+        $clientName = CLIENT_ID;
         $iconsDir = "data/$clientName/pegasushelper/theme/icons/";
         $keys = ["course", "file", "folder", "group", "learningplace", "link"];
         $resources = [];
