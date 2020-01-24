@@ -41,7 +41,8 @@ $app->group('/v3/ilias-app', function () use ($app) {
     $app->get('/theme', RESTAuth::checkAccess(RESTAuth::TOKEN), function() use ($app) {
         $iliasApp = new ILIASAppModel();
 
-        $response = $iliasApp->getThemeData();
+        $timestamp = intval($app->request->get('timestamp'));
+        $response = $iliasApp->getThemeData($timestamp);
 
         $app->response->headers->set('Content-Type', 'application/json');
         $app->response()->body(json_encode($response["body"]));
