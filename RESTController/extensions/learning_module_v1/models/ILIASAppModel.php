@@ -1,10 +1,16 @@
 <?php namespace RESTController\extensions\ILIASApp\V1;
 
+use ILIAS\Data\DataSize;
+use ILIAS\Filesystem\Exception\DirectoryNotFoundException;
+use ILIAS\Filesystem\Exception\FileNotFoundException;
 use ILIAS\Filesystem\Exception\IOException;
+use ILIAS\Filesystem\Filesystem;
 use ilObjFileBasedLM;
 use ilObjFileBasedLMAccess;
 use ilUtil;
-use RESTController\extensions\ILIASApp\V2\data\ErrorAnswer;
+use mysql_xdevapi\Exception;
+use RESTController\extensions\ILIASApp\V2\data\HttpStatusCodeAnswer;
+use RESTController\extensions\ILIASApp\V2\FileHashProviderFactory;
 use RESTController\libs as Libs;
 
 require_once('./Modules/File/classes/class.ilObjFile.php');
@@ -40,7 +46,7 @@ final class ILIASAppModel extends Libs\RESTModel {
     public function getLearningModuleData($refId) {
         // check access
         if(!($this->isVisible($refId) && $this->isRead($refId)))
-            return ["body" => new ErrorAnswer("Forbidden"), "status" => 403];
+            return ["body" => new HttpStatusCodeAnswer("Forbidden"), "status" => 403];
 
         // get objectId of the learning module
         $file = new ilObjFileBasedLM($refId);
@@ -48,12 +54,17 @@ final class ILIASAppModel extends Libs\RESTModel {
 
         // get learning module data
         $startFile = $this->getStartFile($objId);
-        $zipResult = $this->getZipFile($objId);
+        $zipResult = $this->getCompressedLearningModule($objId);
+
+        // if the compression failed, return status 500
+        if(!$zipResult["success"])
+            return ["body" => new HttpStatusCodeAnswer("Internal Server Error"), "status" => 500];
         
         return ["body" => array(
             "startFile" => $startFile,
             "zipFile" => $zipResult["file"],
-            "zipDirName" => $zipResult["dirName"]
+            "zipDirName" => $zipResult["dirName"],
+            "timestamp" => $zipResult["timestamp"],
         )];
 	}
 
@@ -74,23 +85,64 @@ final class ILIASAppModel extends Libs\RESTModel {
      * makes sure that the requested lm is available in compressed form for the download via the app and returns a path for the resource
      *
      * @param $objId integer objectId of the learning module
-     * @return array<string> the absolute path to the compressed learning module
-     * @throws IOException
+     * @return array<mixed> the result of the compression
      */
-    private function getZipFile($objId) {
+    private function getCompressedLearningModule($objId) {
         global $DIC;
-        // build the source and target paths
-        $clientName = CLIENT_ID;
-        $rootDir = "data/$clientName";
-        $restLmDir = "rest/lm_zip_files";
-        $lmDirName = "lm_$objId";
-        $target = "$rootDir/$restLmDir/$lmDirName.zip";
-        // make sure that the download directory for learning modules of the REST plugin exists
         $fsWeb = $DIC->filesystem()->web();
-        $fsWeb->createDir($restLmDir);
-        // compress the learning module
-        $this->zip("$rootDir/lm_data", $lmDirName, $target); // TODO dev react when zipping failed
-        return ["file" => $target, "dirName" => $lmDirName];
+
+        try {
+            // build the source and target paths
+            $clientName = CLIENT_ID;
+            $rootDir = "data/$clientName";
+            $lmDirName = "lm_$objId";
+            $timestamp = $this->getMaxTimeStampRecursively($rootDir, "lm_data/$lmDirName", $fsWeb);
+            $restLmDir = "rest/lm_zip_files";
+            $targetZipFile = "$restLmDir/$lmDirName/$timestamp.zip";
+            $rootTarget = "$rootDir/$targetZipFile";
+
+            // make sure that the download directory for the learning module exists
+            $fsWeb->createDir("$restLmDir/$lmDirName");
+
+            // if necessary, compress the learning module
+            $success = true;
+            if(!$fsWeb->has($targetZipFile)) {
+                // empty the directory
+                $entries = $fsWeb->listContents("$restLmDir/$lmDirName");
+                foreach($entries as $e) {
+                    $path = $e->getPath();
+                    if($e->isFile()) $fsWeb->delete($path);
+                    else $fsWeb->deleteDir($path);
+                }
+                // compress the learning module
+                $success = $this->zip("$rootDir/lm_data", $lmDirName, $rootTarget);
+            }
+
+            return ["file" => $rootTarget, "dirName" => $lmDirName, "success" => $success, "timestamp" => $timestamp];
+        } catch (IOException $e) {
+            return ["success" => false];
+        }
+    }
+
+    /**
+     * checks the last modified timestamps of all files and subdirectories of the directory or
+     * file at $root/$path and returns the latest value
+     *
+     * @param $root string path from the working directory of the running php script to the working directory of the $fileSystem
+     * @param $path string relative path to the target directory or file
+     * @param $fileSystem Filesystem
+     * @param $timestamp int
+     * @return int the timestamp
+     * @throws DirectoryNotFoundException
+     */
+    function getMaxTimeStampRecursively(&$root, $path, &$fileSystem, &$timestamp = -1) {
+        $timestamp = max(stat("$root/$path")["mtime"], $timestamp);
+        $entries = $fileSystem->listContents($path);
+        foreach($entries as $e) {
+            $path = $e->getPath();
+            $timestamp = $e->isFile() ? max(stat("$root/$path")["mtime"], $timestamp) : $this->getMaxTimeStampRecursively($root, $path, $fileSystem, $timestamp);
+        }
+        return $timestamp;
     }
 
     /**
