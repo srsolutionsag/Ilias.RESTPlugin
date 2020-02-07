@@ -1,16 +1,12 @@
 <?php namespace RESTController\extensions\ILIASApp\V1;
 
-use ILIAS\Data\DataSize;
 use ILIAS\Filesystem\Exception\DirectoryNotFoundException;
-use ILIAS\Filesystem\Exception\FileNotFoundException;
 use ILIAS\Filesystem\Exception\IOException;
 use ILIAS\Filesystem\Filesystem;
 use ilObjFileBasedLM;
 use ilObjFileBasedLMAccess;
 use ilUtil;
-use mysql_xdevapi\Exception;
 use RESTController\extensions\ILIASApp\V2\data\HttpStatusCodeAnswer;
-use RESTController\extensions\ILIASApp\V2\FileHashProviderFactory;
 use RESTController\libs as Libs;
 
 require_once('./Modules/File/classes/class.ilObjFile.php');
@@ -41,7 +37,6 @@ final class ILIASAppModel extends Libs\RESTModel {
      *
      * @param $refId string reference of the learning module
      * @return array body and status
-     * @throws IOException
      */
     public function getLearningModuleData($refId) {
         // check access

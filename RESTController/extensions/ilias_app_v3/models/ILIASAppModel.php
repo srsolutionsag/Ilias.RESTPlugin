@@ -109,7 +109,7 @@ final class ILIASAppModel extends Libs\RESTModel {
 
         $clientName = CLIENT_ID;
         $iconsDir = "data/$clientName/pegasushelper/theme/icons/";
-        $keys = ["course", "file", "folder", "group", "learningplace", "link"];
+        $keys = ["course", "file", "folder", "group", "learningplace", "learningmodule", "link"];
         $resources = [];
         if($timestamp < intval($dat["timestamp"]))
             foreach($keys as $key)
