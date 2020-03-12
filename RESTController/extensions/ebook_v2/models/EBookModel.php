@@ -2,6 +2,7 @@
 
 namespace RESTController\extensions\eBook\v2\models;
 
+use ILIAS\DI\Container;
 use \RESTController\libs as Libs;
 
 final class EBookModel  extends Libs\RESTModel {
@@ -18,13 +19,20 @@ final class EBookModel  extends Libs\RESTModel {
 
 	public function __construct($load_user = true)
 	{
-		global $ilDB, $ilAccess;
+        /**
+         * @var Container $dic
+         */
+		$dic = $GLOBALS['DIC'];
 		if($load_user) {
 			Libs\RESTilias::loadIlUser();
-			Libs\RESTilias::initAccessHandling();
+			try {
+                Libs\RESTilias::initAccessHandling();
+            } catch (\Exception $exception) {
+			    // noop in certain ilias versions access handling is already initialized.
+            }
 		}
-		$this->db = $ilDB;
-		$this->access = $ilAccess;
+		$this->db = $dic->database();
+		$this->access = $dic->access();
 	}
 
 	/**
@@ -41,7 +49,7 @@ final class EBookModel  extends Libs\RESTModel {
 
 
 		$query = "
-				SELECT id, ref.ref_id, data.title, data.description, data.create_date, data.last_update, language_code, key_words FROM rep_robj_xebk_data AS book
+				SELECT id, ref.ref_id, data.title, data.description, data.create_date, data.last_update, language_code, key_words, chapter_sequence, cover_updated_at FROM rep_robj_xebk_data AS book
 				INNER JOIN object_data AS data ON data.obj_id = book.id 
 				INNER JOIN object_reference AS ref ON ref.obj_id = data.obj_id 
 				WHERE is_online = 1 AND ref.deleted is NULL 
@@ -54,6 +62,8 @@ final class EBookModel  extends Libs\RESTModel {
 			$path = $this->createPath($res, $root_ref);
 			$res['id'] = (int) $res['id'];
 			$res['ref_id'] = (int) $res['ref_id'];
+			$res['chapter_sequence'] = (int) $res['chapter_sequence'];
+			$res['cover_updated_at'] = (int) $res['cover_updated_at'];
 			$res['path'] = $path;
 			// Path must contain root ref. otherwise we are not in scope.
 			if(0 == count(array_filter($path, function ($element) use ($root_ref) {
@@ -105,6 +115,26 @@ final class EBookModel  extends Libs\RESTModel {
 
 		return $object->getEncryptedFilePath();
 	}
+
+    /**
+     * @param $user_id
+     * @param $ref_id
+     *
+     * @return string
+     * @throws NoAccessException
+     * @throws NoFileException
+     */
+    public function getCoverPathByRefId($user_id, $ref_id) {
+        if(!$this->checkAccessOfUser($user_id, $ref_id))
+            throw new NoAccessException();
+
+        $object = new \ilObjeBook($ref_id);
+
+        if (!$object->hasCover())
+            throw new NoFileException();
+
+        return $object->getCoverPath();
+    }
 
 
 	public function getKeyByRefId($user_id, $ref_id) {

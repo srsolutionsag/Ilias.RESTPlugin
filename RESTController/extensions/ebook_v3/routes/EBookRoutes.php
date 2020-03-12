@@ -26,6 +26,29 @@ use SRAG\Plugin\eBook\Synchronization\Service\Mapper\v2\SynchronizationMapper;
 
 $app->group('/v3/ebook', function () use ($app) {
 
+    $app->get('/:refId/cover', RESTAuth::checkAccess(RESTAuth::TOKEN), function($ref_id) use ($app) {
+        $accessToken = $app->request->getToken();
+        $model = new EBookModel();
+        $userId = $accessToken->getUserId();
+
+        try {
+
+            $filePath = $model->getCoverPathByRefId($userId, $ref_id);
+
+            /**
+             * @var $ilClientIniFile ilIniFile
+             */
+            require_once('./Services/FileDelivery/classes/class.ilFileDelivery.php');
+            $ilFileDelivery = new \ilFileDelivery($filePath);
+            $ilFileDelivery->setMimeType('image/jpeg');
+            $ilFileDelivery->deliver();
+
+        } catch (NoFileException $e) {
+            $app->halt(404, "No cover uploaded yet.");
+        } catch (NoAccessException $e) {
+            $app->halt(401, "No access.");
+        }
+    });
 	$app->group('/analytic', function () use ($app) {
 		$app->post('/book-download', function () use ($app) {
 
