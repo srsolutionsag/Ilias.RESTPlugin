@@ -14,12 +14,6 @@ require_once('Slim/Slim.php');
 use \RESTController\database        as Database;
 use \RESTController\core\oauth2_v2  as Auth;
 use \RESTController\libs\Exceptions as LibExceptions;
-use function boolval;
-use function fclose;
-use function fopen;
-use function is_resource;
-use function is_writeable;
-use const STDERR;
 
 /**
  * Class: RESTController
@@ -270,8 +264,7 @@ class RESTController extends \SlimRestPlugin\Slim {
         $when,
         $ip,
         $route,
-        $method,
-        print_r($parameters, true)
+        $method
       ));
   }
 
