@@ -1,9 +1,11 @@
 <?php namespace RESTController\extensions\ILIASApp\V1;
 
+use ilAccessHandler;
+use ilDB;
 use ILIAS\Filesystem\Exception\DirectoryNotFoundException;
 use ILIAS\Filesystem\Exception\IOException;
 use ILIAS\Filesystem\Filesystem;
-use ilObjFileBasedLM;
+use ilObject;
 use ilObjFileBasedLMAccess;
 use ilUtil;
 use RESTController\extensions\ILIASApp\V2\data\HttpStatusCodeAnswer;
@@ -15,12 +17,12 @@ require_once('./Modules/File/classes/class.ilObjFile.php');
 final class ILIASAppModel extends Libs\RESTModel {
 
     /**
-     * @var \ilDB
+     * @var ilDB
      */
     private $db;
 
     /**
-     * @var \ilAccessHandler
+     * @var ilAccessHandler
      */
     private $access;
 
@@ -43,12 +45,16 @@ final class ILIASAppModel extends Libs\RESTModel {
         if(!($this->isVisible($refId) && $this->isRead($refId)))
             return ["body" => new HttpStatusCodeAnswer("Forbidden"), "status" => 403];
 
-        // get objectId of the learning module
-        $file = new ilObjFileBasedLM($refId);
-        $objId = $file->getId();
+        // get objectId and type of the object
+        $objId = ilObject::_lookupObjId($refId);
+        $type = ilObject::_lookupType($objId);
+
+        // check if the object is a supported lm
+        if($type !== "htlm" && $type !== "sahs")
+            return ["body" => new HttpStatusCodeAnswer("Forbidden"), "status" => 403];
 
         // get learning module data
-        $startFile = $this->getStartFile($objId);
+        $startFile = $this->getStartFile($objId, $type);
         $zipResult = $this->getCompressedLearningModule($objId);
 
         // if the compression failed, return status 500
@@ -66,14 +72,20 @@ final class ILIASAppModel extends Libs\RESTModel {
     /**
      * reads the start file of the FileBasedLM with the given object-id
      *
-     * @param $objId integer objectId of the learning module
+     * @param $objId integer objectId of the lm
+     * @param $type string type of the lm
      * @return string
      */
-	private function getStartFile($objId) {
-        $startFile = ilObjFileBasedLMAccess::_determineStartUrl($objId);
-        // assume format [PATH_TO_LEARNING_MODULES]/lm_[OBJID]/[PATH_TO_LM_START_FILE]
-        $ind = 8 + strpos($startFile, "lm_$objId/");
-        return substr($startFile, $ind);
+	private function getStartFile($objId, $type) {
+        if($type === "htlm") {
+            $startFile = ilObjFileBasedLMAccess::_determineStartUrl($objId);
+            // assume format [PATH_TO_LEARNING_MODULES]/lm_[OBJID]/[PATH_TO_LM_START_FILE]
+            $ind = 8 + strpos($startFile, "lm_$objId/");
+            return substr($startFile, $ind);
+        } else { // type is sahs
+            // assume that imsmanifest.xml is placed in root folder
+            return "imsmanifest.xml";
+        }
     }
 
     /**
