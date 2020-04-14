@@ -12,7 +12,8 @@ A PHP implementation for finding unordered diff between two `JSON` documents.
  * To simplify changes review between two `JSON` files you can use a standard `diff` tool on rearranged pretty-printed `JSON`.
  * To detect breaking changes by analyzing removals and changes from original `JSON`.
  * To keep original order of object sets (for example `swagger.json` [parameters](https://swagger.io/docs/specification/describing-parameters/) list).
- * To make and apply JSON Patches, specified in [RFC 6902](http://tools.ietf.org/html/rfc6902) from the IETF.
+ * To [make](#getpatch) and [apply](#jsonpatch) JSON Patches, specified in [RFC 6902](http://tools.ietf.org/html/rfc6902) from the IETF.
+ * To [make](#getmergepatch) and [apply](#jsonmergepatch) JSON Merge Patches, specified in [RFC 7386](https://tools.ietf.org/html/rfc7386) from the IETF.
  * To retrieve and modify data by [JSON Pointer](http://tools.ietf.org/html/rfc6901).
  * To recursively replace by JSON value.
 
@@ -55,10 +56,27 @@ $r = new JsonDiff(
 );
 ```
 
+Available options:
+ * `REARRANGE_ARRAYS` is an option to enable arrays rearrangement to minimize the difference.
+ * `STOP_ON_DIFF` is an option to improve performance by stopping comparison when a difference is found.
+ * `JSON_URI_FRAGMENT_ID` is an option to use URI Fragment Identifier Representation (example: "#/c%25d"). If not set default JSON String Representation (example: "/c%d").
+ * `SKIP_JSON_PATCH` is an option to improve performance by not building JsonPatch for this diff.
+ * `SKIP_JSON_MERGE_PATCH` is an option to improve performance by not building JSON Merge Patch value for this diff.
+ * `TOLERATE_ASSOCIATIVE_ARRAYS` is an option to allow associative arrays to mimic JSON objects (not recommended).
+ * `COLLECT_MODIFIED_DIFF` is an option to enable [getModifiedDiff](#getmodifieddiff).
+
+Options can be combined, e.g. `JsonDiff::REARRANGE_ARRAYS + JsonDiff::STOP_ON_DIFF`.
+
 On created object you have several handy methods.
+
+#### `getDiffCnt`
+Returns total number of differences
 
 #### `getPatch`
 Returns [`JsonPatch`](#jsonpatch) of difference
+
+#### `getMergePatch`
+Returns [JSON Merge Patch](https://tools.ietf.org/html/rfc7386) value of difference
 
 #### `getRearranged`
 Returns new value, rearranged with original order.
@@ -87,6 +105,11 @@ Returns modifications as partial value of original.
 #### `getModifiedNew`
 Returns modifications as partial value of new.
 
+#### `getModifiedDiff`
+Returns list of [`ModifiedPathDiff`](src/ModifiedPathDiff.php) containing paths with original and new values.
+
+Not collected by default, requires `JsonDiff::COLLECT_MODIFIED_DIFF` option.
+
 #### `getModifiedPaths`
 Returns list of `JSON` paths that were modified from original to new.
 
@@ -110,9 +133,10 @@ Applies patch to `JSON`-decoded data.
 #### `setFlags`
 Alters default behavior.
 
-Available flag:
+Available flags:
 
 * `JsonPatch::STRICT_MODE` Disallow converting empty array to object for key creation.
+* `JsonPatch::TOLERATE_ASSOCIATIVE_ARRAYS` Allow associative arrays to mimic JSON objects (not recommended).
 
 ### `JsonPointer`
 
@@ -136,6 +160,11 @@ Gets value from data at path specified `JSON Pointer` string.
 
 #### `remove`
 Removes value from data at path specified by segments.
+
+### `JsonMergePatch`
+
+#### `apply`
+Applies patch to `JSON`-decoded data.
 
 ### `JsonValueReplace`
 
@@ -212,6 +241,12 @@ $patch = JsonPatch::import(json_decode($patchJson));
 $patch->apply($original);
 $this->assertEquals($diff->getRearranged(), $original);
 ```
+
+## PHP Classes as JSON objects
+
+Due to magical methods and other restrictions PHP classes can not be reliably mapped to/from JSON objects.
+There is support for objects of PHP classes in `JsonPointer` with limitations:
+* `null` is equal to non-existent
 
 ## CLI tool
 
