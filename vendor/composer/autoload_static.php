@@ -34,6 +34,7 @@ class ComposerStaticInit6937ff6f1bfff7b517cdc08273ae6b97
     );
 
     public static $classMap = array (
+        'ClientConfiguration' => __DIR__ . '/../..' . '/RESTController/extensions/ClientConfiguration.php',
         'Elastica\\AbstractUpdateAction' => __DIR__ . '/../..' . '/RESTController/extensions/mobile_v1/addon/Elastica/AbstractUpdateAction.php',
         'Elastica\\Aggregation\\AbstractAggregation' => __DIR__ . '/../..' . '/RESTController/extensions/mobile_v1/addon/Elastica/Aggregation/AbstractAggregation.php',
         'Elastica\\Aggregation\\AbstractSimpleAggregation' => __DIR__ . '/../..' . '/RESTController/extensions/mobile_v1/addon/Elastica/Aggregation/AbstractSimpleAggregation.php',
@@ -277,6 +278,7 @@ class ComposerStaticInit6937ff6f1bfff7b517cdc08273ae6b97
         'RESTController\\extensions\\ILIASApp\\V2\\SHA256FileHashProvider' => __DIR__ . '/../..' . '/RESTController/extensions/ilias_app_v2/services/FileHashing/SHA256FileHashProvider.php',
         'RESTController\\extensions\\ILIASApp\\V2\\data\\BlockCollection' => __DIR__ . '/../..' . '/RESTController/extensions/ilias_app_v2/models/data/BlockCollection.php',
         'RESTController\\extensions\\ILIASApp\\V2\\data\\ErrorAnswer' => __DIR__ . '/../..' . '/RESTController/extensions/ilias_app_v2/models/data/ErrorAnswer.php',
+        'RESTController\\extensions\\ILIASApp\\V2\\data\\HttpStatusCodeAnswer' => __DIR__ . '/../..' . '/RESTController/extensions/ilias_app_v3/models/data/HttpStatusCodeAnswer.php',
         'RESTController\\extensions\\ILIASApp\\V2\\data\\IliasTreeItem' => __DIR__ . '/../..' . '/RESTController/extensions/ilias_app_v2/models/data/IliasTreeItem.php',
         'RESTController\\extensions\\ILIASApp\\V2\\data\\JsonSerializableAware' => __DIR__ . '/../..' . '/RESTController/extensions/ilias_app_v2/models/data/JsonSerializableAware.php',
         'RESTController\\extensions\\ILIASApp\\V2\\data\\Learnplace' => __DIR__ . '/../..' . '/RESTController/extensions/ilias_app_v2/models/data/Learnplace.php',
@@ -397,6 +399,7 @@ class ComposerStaticInit6937ff6f1bfff7b517cdc08273ae6b97
         'SlimRestPlugin\\View' => __DIR__ . '/../..' . '/RESTController/Slim/View.php',
         'Swaggest\\JsonDiff\\Exception' => __DIR__ . '/..' . '/swaggest/json-diff/src/Exception.php',
         'Swaggest\\JsonDiff\\JsonDiff' => __DIR__ . '/..' . '/swaggest/json-diff/src/JsonDiff.php',
+        'Swaggest\\JsonDiff\\JsonMergePatch' => __DIR__ . '/..' . '/swaggest/json-diff/src/JsonMergePatch.php',
         'Swaggest\\JsonDiff\\JsonPatch' => __DIR__ . '/..' . '/swaggest/json-diff/src/JsonPatch.php',
         'Swaggest\\JsonDiff\\JsonPatch\\Add' => __DIR__ . '/..' . '/swaggest/json-diff/src/JsonPatch/Add.php',
         'Swaggest\\JsonDiff\\JsonPatch\\Copy' => __DIR__ . '/..' . '/swaggest/json-diff/src/JsonPatch/Copy.php',
@@ -409,6 +412,7 @@ class ComposerStaticInit6937ff6f1bfff7b517cdc08273ae6b97
         'Swaggest\\JsonDiff\\JsonPatch\\Test' => __DIR__ . '/..' . '/swaggest/json-diff/src/JsonPatch/Test.php',
         'Swaggest\\JsonDiff\\JsonPointer' => __DIR__ . '/..' . '/swaggest/json-diff/src/JsonPointer.php',
         'Swaggest\\JsonDiff\\JsonValueReplace' => __DIR__ . '/..' . '/swaggest/json-diff/src/JsonValueReplace.php',
+        'Swaggest\\JsonDiff\\ModifiedPathDiff' => __DIR__ . '/..' . '/swaggest/json-diff/src/ModifiedPathDiff.php',
         'Swaggest\\JsonSchema\\Constraint\\Constraint' => __DIR__ . '/..' . '/swaggest/json-schema/src/Constraint/Constraint.php',
         'Swaggest\\JsonSchema\\Constraint\\Content' => __DIR__ . '/..' . '/swaggest/json-schema/src/Constraint/Content.php',
         'Swaggest\\JsonSchema\\Constraint\\Format' => __DIR__ . '/..' . '/swaggest/json-schema/src/Constraint/Format.php',
