@@ -6,6 +6,7 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
+    'ClientConfiguration' => $baseDir . '/RESTController/extensions/ClientConfiguration.php',
     'Elastica\\AbstractUpdateAction' => $baseDir . '/RESTController/extensions/mobile_v1/addon/Elastica/AbstractUpdateAction.php',
     'Elastica\\Aggregation\\AbstractAggregation' => $baseDir . '/RESTController/extensions/mobile_v1/addon/Elastica/Aggregation/AbstractAggregation.php',
     'Elastica\\Aggregation\\AbstractSimpleAggregation' => $baseDir . '/RESTController/extensions/mobile_v1/addon/Elastica/Aggregation/AbstractSimpleAggregation.php',
@@ -249,6 +250,7 @@ return array(
     'RESTController\\extensions\\ILIASApp\\V2\\SHA256FileHashProvider' => $baseDir . '/RESTController/extensions/ilias_app_v2/services/FileHashing/SHA256FileHashProvider.php',
     'RESTController\\extensions\\ILIASApp\\V2\\data\\BlockCollection' => $baseDir . '/RESTController/extensions/ilias_app_v2/models/data/BlockCollection.php',
     'RESTController\\extensions\\ILIASApp\\V2\\data\\ErrorAnswer' => $baseDir . '/RESTController/extensions/ilias_app_v2/models/data/ErrorAnswer.php',
+    'RESTController\\extensions\\ILIASApp\\V2\\data\\HttpStatusCodeAnswer' => $baseDir . '/RESTController/extensions/ilias_app_v3/models/data/HttpStatusCodeAnswer.php',
     'RESTController\\extensions\\ILIASApp\\V2\\data\\IliasTreeItem' => $baseDir . '/RESTController/extensions/ilias_app_v2/models/data/IliasTreeItem.php',
     'RESTController\\extensions\\ILIASApp\\V2\\data\\JsonSerializableAware' => $baseDir . '/RESTController/extensions/ilias_app_v2/models/data/JsonSerializableAware.php',
     'RESTController\\extensions\\ILIASApp\\V2\\data\\Learnplace' => $baseDir . '/RESTController/extensions/ilias_app_v2/models/data/Learnplace.php',
@@ -369,6 +371,7 @@ return array(
     'SlimRestPlugin\\View' => $baseDir . '/RESTController/Slim/View.php',
     'Swaggest\\JsonDiff\\Exception' => $vendorDir . '/swaggest/json-diff/src/Exception.php',
     'Swaggest\\JsonDiff\\JsonDiff' => $vendorDir . '/swaggest/json-diff/src/JsonDiff.php',
+    'Swaggest\\JsonDiff\\JsonMergePatch' => $vendorDir . '/swaggest/json-diff/src/JsonMergePatch.php',
     'Swaggest\\JsonDiff\\JsonPatch' => $vendorDir . '/swaggest/json-diff/src/JsonPatch.php',
     'Swaggest\\JsonDiff\\JsonPatch\\Add' => $vendorDir . '/swaggest/json-diff/src/JsonPatch/Add.php',
     'Swaggest\\JsonDiff\\JsonPatch\\Copy' => $vendorDir . '/swaggest/json-diff/src/JsonPatch/Copy.php',
@@ -381,6 +384,7 @@ return array(
     'Swaggest\\JsonDiff\\JsonPatch\\Test' => $vendorDir . '/swaggest/json-diff/src/JsonPatch/Test.php',
     'Swaggest\\JsonDiff\\JsonPointer' => $vendorDir . '/swaggest/json-diff/src/JsonPointer.php',
     'Swaggest\\JsonDiff\\JsonValueReplace' => $vendorDir . '/swaggest/json-diff/src/JsonValueReplace.php',
+    'Swaggest\\JsonDiff\\ModifiedPathDiff' => $vendorDir . '/swaggest/json-diff/src/ModifiedPathDiff.php',
     'Swaggest\\JsonSchema\\Constraint\\Constraint' => $vendorDir . '/swaggest/json-schema/src/Constraint/Constraint.php',
     'Swaggest\\JsonSchema\\Constraint\\Content' => $vendorDir . '/swaggest/json-schema/src/Constraint/Content.php',
     'Swaggest\\JsonSchema\\Constraint\\Format' => $vendorDir . '/swaggest/json-schema/src/Constraint/Format.php',
