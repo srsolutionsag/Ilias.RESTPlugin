@@ -8,6 +8,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - configuration of REST clients without having to use the API
 - support for learning modules (htlm, sahs)
 
+### Fixed
+- eBook note sync now accepts strings with newline characters.
+
 ## [1.9.0] - 2020-04-02
 ### Added
 - eBook cover route
