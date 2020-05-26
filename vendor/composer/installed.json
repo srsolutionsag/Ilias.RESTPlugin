@@ -47,25 +47,26 @@
     },
     {
         "name": "swaggest/json-diff",
-        "version": "v3.4.2",
-        "version_normalized": "3.4.2.0",
+        "version": "v3.7.4",
+        "version_normalized": "3.7.4.0",
         "source": {
             "type": "git",
             "url": "https://github.com/swaggest/json-diff.git",
-            "reference": "05e61270ef2c8ed4af517ff70cf42ba559cf8bc1"
+            "reference": "fccbbd6ee31b5949ab52e9c53f7a1e1b06d84716"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/swaggest/json-diff/zipball/05e61270ef2c8ed4af517ff70cf42ba559cf8bc1",
-            "reference": "05e61270ef2c8ed4af517ff70cf42ba559cf8bc1",
+            "url": "https://api.github.com/repos/swaggest/json-diff/zipball/fccbbd6ee31b5949ab52e9c53f7a1e1b06d84716",
+            "reference": "fccbbd6ee31b5949ab52e9c53f7a1e1b06d84716",
             "shasum": ""
         },
+        "require": {
+            "ext-json": "*"
+        },
         "require-dev": {
-            "codeclimate/php-test-reporter": "^0.4.0",
-            "phpunit/php-code-coverage": "2.2.4",
             "phpunit/phpunit": "^4.8.23"
         },
-        "time": "2018-04-28T04:44:06+00:00",
+        "time": "2020-01-26T20:52:06+00:00",
         "type": "library",
         "installation-source": "dist",
         "autoload": {
@@ -87,32 +88,31 @@
     },
     {
         "name": "swaggest/json-schema",
-        "version": "v0.12.4",
-        "version_normalized": "0.12.4.0",
+        "version": "v0.12.10",
+        "version_normalized": "0.12.10.0",
         "source": {
             "type": "git",
             "url": "https://github.com/swaggest/php-json-schema.git",
-            "reference": "b603aaacd981c1bcc6215bc0607df933438572b7"
+            "reference": "5a8e78f79cdc050560b0e3cea1b13d8b72af0d17"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/swaggest/php-json-schema/zipball/b603aaacd981c1bcc6215bc0607df933438572b7",
-            "reference": "b603aaacd981c1bcc6215bc0607df933438572b7",
+            "url": "https://api.github.com/repos/swaggest/php-json-schema/zipball/5a8e78f79cdc050560b0e3cea1b13d8b72af0d17",
+            "reference": "5a8e78f79cdc050560b0e3cea1b13d8b72af0d17",
             "shasum": ""
         },
         "require": {
+            "ext-json": "*",
             "php": ">=5.4",
             "phplang/scope-exit": "^1.0",
-            "swaggest/json-diff": "^3.4.2"
+            "swaggest/json-diff": "^3.5.1"
         },
         "require-dev": {
-            "codeclimate/php-test-reporter": "^0.4.0",
+            "codeclimate/php-test-reporter": "0.4.0",
             "phpunit/php-code-coverage": "2.2.4",
-            "phpunit/phpunit": "4.8.35",
-            "swaggest/code-builder": "dev-master#e0c5c0612fd241d2d120e5ddef91cda9edc208ee",
-            "swaggest/php-code-builder": "dev-master#3e643924445eb0f8d13dd011a57a42ce75629892"
+            "phpunit/phpunit": "4.8.35"
         },
-        "time": "2018-07-30T10:53:21+00:00",
+        "time": "2019-05-16T12:33:02+00:00",
         "type": "library",
         "installation-source": "dist",
         "autoload": {
