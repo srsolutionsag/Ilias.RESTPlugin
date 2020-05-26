@@ -117,8 +117,7 @@ $schema = <<<'JSON'
             "default": "",
             "examples": [
               "This is a note."
-            ],
-            "pattern": "^(.*)$"
+            ]
           },
           "page": {
             "$id": "#/properties/notes/items/properties/page",
