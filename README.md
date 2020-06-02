@@ -3,7 +3,7 @@
 This is a plugin for the [ILIAS Learning Management System](<http://www.ilias.de>), which provides a customizable REST API.
 
 ## Warning
-This is a modified version of the original [REST plugin](https://github.com/hrz-unimr/Ilias.RESTPlugin) 
+This is a modified version of the original [REST plugin](https://github.com/hrz-unimr/Ilias.RESTPlugin)
 which contains changes required by the Pegasus mobile application. Only use this
 branch with the ILIAS Pegasus mobile application.
 
@@ -24,6 +24,16 @@ php composer.phar install --no-dev
 
 *   Open ILIAS Administration &gt; Plugins from the drop-down menu
 *   Update and active REST-Plugin using the drop-down action-menu button
+
+### Using nginx as Webserver or LoadBalancer
+Please make sure your nginx-Server has `underscores_in_headers` set to on:
+http://nginx.org/en/docs/http/ngx_http_core_module.html#underscores_in_headers
+
+### Using PHP-FPM and Apache
+Please make sure to set the `CGIPassAuth` Directive to on:
+https://httpd.apache.org/docs/2.4/en/mod/core.html#cgipassauth
+
+After installing the plugin and opening the
 
 ## Features:
 
