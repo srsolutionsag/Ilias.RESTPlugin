@@ -15,7 +15,6 @@ use \RESTController\database        as Database;
 use \RESTController\core\oauth2_v2  as Auth;
 use \RESTController\libs\Exceptions as LibExceptions;
 
-
 /**
  * Class: RESTController
  *  This is the RESTController Slim-Application
@@ -265,8 +264,7 @@ class RESTController extends \SlimRestPlugin\Slim {
         $when,
         $ip,
         $route,
-        $method,
-        print_r($parameters, true)
+        $method
       ));
   }
 
@@ -320,11 +318,20 @@ class RESTController extends \SlimRestPlugin\Slim {
     }
     catch (LibExceptions\Database $e) { }
 
+    $stdOut = 'php://stdout';
+    $stdErr = 'php://stderr';
+    $iliasLogPath = ILIAS_LOG_DIR . '/' . ILIAS_LOG_FILE;
+
+    // Use stdout or stderr if one of them is used by ILIAS
+    if ($iliasLogPath === $stdOut || $iliasLogPath === $stdErr) {
+        $logFile = $iliasLogPath;
+    }
+
     // Use fallback values
-    if (!isset($logLevel) || !is_string($logFile))
+    if (!is_string($logFile))
       $logFile = sprintf('%s/restplugin-%s.log', ILIAS_LOG_DIR, CLIENT_ID);
     if (!isset($logLevel))
-      $logLevel = 'WARN';
+      $logLevel = "WARN";
 
     // Create file if it does not exist
     if (!file_exists($logFile)) {
@@ -333,7 +340,7 @@ class RESTController extends \SlimRestPlugin\Slim {
     }
 
     // Check wether file exists and is writeable
-    if (!is_writable($logFile))
+    if (!$this->isResourceWritable($logFile))
       $app->halt(500, sprintf('Can\'t write to log-file: %s (Make sure file exists and is writeable by the PHP process)', $logFile));
 
     // Open the logfile for writing to using Slim
@@ -354,6 +361,15 @@ class RESTController extends \SlimRestPlugin\Slim {
       case 'INFO':       $log->setLevel(\SlimRestPlugin\Log::INFO);       break;
       case 'DEBUG':     $log->setLevel(\SlimRestPlugin\Log::DEBUG);       break;
     }
+  }
+
+  private function isResourceWritable($path) {
+      $handle = fopen($path, 'w');
+      if (is_resource($handle)) {
+          fclose($handle);
+          return true;
+      }
+      return false;
   }
 
 
