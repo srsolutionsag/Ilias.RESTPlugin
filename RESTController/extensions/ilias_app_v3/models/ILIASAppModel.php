@@ -1,7 +1,12 @@
 <?php namespace RESTController\extensions\ILIASApp\V3;
 
+use ilContainerReference;
 use ilLPStatus;
+use ilObject;
+use ilSessionAppointment;
 use RESTController\extensions\ILIASApp\V2\data\ErrorAnswer;
+use RESTController\extensions\ILIASApp\V2\data\HttpStatusCodeAnswer;
+use RESTController\extensions\ILIASApp\V2\data\IliasTreeItem;
 use RESTController\libs as Libs;
 
 require_once('./Modules/File/classes/class.ilObjFile.php');
@@ -10,7 +15,7 @@ require_once('./Modules/File/classes/class.ilObjFile.php');
 final class ILIASAppModel extends Libs\RESTModel {
 
     /**
-     * @var \ilDB
+     * @var \ilDBInterface
      */
     private $db;
 
@@ -18,13 +23,87 @@ final class ILIASAppModel extends Libs\RESTModel {
      * @var \ilAccessHandler
      */
     private $access;
+    /**
+     * Holds all reference types which may use the
+     * title of the element they are referring to.
+     *
+     * @var string[]
+     */
+    private static $REFERENCE_TYPES = [
+        'grpr',
+        'catr',
+        'crsr'
+    ];
 
 
     public function __construct() {
-        global $ilDB, $ilAccess;
+        global $DIC;
         Libs\RESTilias::loadIlUser();
-        $this->db = $ilDB;
-        $this->access = $ilAccess;
+        $this->db = $DIC->database();
+        $this->access = $DIC->access();
+
+        /* Some objects like the learning sequence load the template reference
+         * in the constructor which fails because there is no template.
+		 *
+		 * Therefore create a stub template entry which stops these object from crashing.
+		 */
+        if (!$DIC->offsetExists('tpl')) {
+            $DIC['tpl'] = new \stdClass();
+        }
+    }
+
+    public function getObjectByRefId($refId)
+    {
+        try {
+            // check access
+            if (!($this->isVisible($refId) && $this->isRead($refId))) {
+                return ["body" => new HttpStatusCodeAnswer("Forbidden"), "status" => 403];
+            }
+
+            $sql = "SELECT
+                object_data.*,
+                tree.child AS ref_id,
+                tree.parent AS parent_ref_id,
+                page_object.parent_id AS page_layout,
+                cs.value AS timeline
+                FROM object_data
+                  INNER JOIN object_reference ON (object_reference.obj_id = object_data.obj_id AND object_reference.deleted IS NULL)
+                  INNER JOIN tree ON (tree.child = object_reference.ref_Id)
+                  LEFT JOIN page_object ON page_object.parent_id = object_data.obj_id
+                  LEFT JOIN container_settings AS cs ON cs.id = object_data.obj_id AND cs.keyword = 'news_timeline'
+                WHERE (object_reference.ref_id = $refId AND object_data.type NOT IN ('rolf', 'itgr')) 
+                LIMIT 1;";
+
+            $set = $this->db->query($sql);
+            $row = $this->db->fetchAssoc($set);
+
+            if ($this->isRead($row['ref_id'])) {
+                $row['permissionType'] = "read";
+            } else {
+                $row['permissionType'] = "visible";
+            }
+
+            $treeItem = new IliasTreeItem(
+                strval($row['obj_id']),
+                strval($row['title']),
+                strval($row['description']),
+                ($row['page_layout'] !== null),
+                (intval($row['timeline']) === 1),
+                strval($row['permissionType']),
+                strval($row['ref_id']),
+                strval($row['parent_ref_id']),
+                strval($row['type']),
+                strval(\ilLink::_getStaticLink($row['ref_id'], $row['type'])),
+                $this->createRepoPath($row['ref_id'])
+            );
+
+            $treeItem = $this->fixSessionTitle($treeItem);
+            $treeItem = $this->fixReferenceTitle($treeItem);
+
+            return ["body" => $treeItem, "status" => 200];
+        } catch (\Exception $exception) {
+            return ["body" => new ErrorAnswer("Internal Server Error"), "status" => 500];
+        }
     }
 
 
@@ -142,5 +221,50 @@ final class ILIASAppModel extends Libs\RESTModel {
      */
     private function isRead($refId) {
         return $this->access->checkAccess('read', '', $refId);
+    }
+
+    /**
+     * Fixes the title for reference repository objects.
+     *
+     * @param IliasTreeItem $treeItem   The item which may need a title fix.
+     *
+     * @return IliasTreeItem            A clone of the ilias tree item with the fixed title.
+     */
+    private function fixReferenceTitle(IliasTreeItem $treeItem) {
+        if(in_array($treeItem->getType(), self::$REFERENCE_TYPES)) {
+            require_once './Services/ContainerReference/classes/class.ilContainerReference.php';
+            $targetTitle = ilContainerReference::_lookupTitle($treeItem->getObjId());
+            $treeItem = $treeItem->setTitle($targetTitle);
+        }
+        return $treeItem;
+    }
+
+    private function fixSessionTitle(IliasTreeItem $treeItem) {
+        if($treeItem->getType() === "sess") {
+            // required for ILIAS 5.2
+            require_once './Modules/Session/classes/class.ilSessionAppointment.php';
+
+            $appointment = ilSessionAppointment::_lookupAppointment($treeItem->getObjId());
+            $title = strlen($treeItem->getTitle()) ? (': '. $treeItem->getTitle()) : '';
+            $title = ilSessionAppointment::_appointmentToString($appointment['start'], $appointment['end'],$appointment['fullday']) . $title;
+            return $treeItem->setTitle($title);
+        }
+
+        return $treeItem;
+    }
+
+    /**
+     * @param $ref_id int
+     * @return array
+     */
+    private function createRepoPath($ref_id)
+    {
+        global $DIC;
+        $path = array();
+        foreach ($DIC->repositoryTree()->getPathFull($ref_id) as $node) {
+            $path[] = strval($node['title']);
+        }
+
+        return $path;
     }
 }
