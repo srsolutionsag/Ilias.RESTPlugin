@@ -51,7 +51,9 @@ final class ILIASAppModel extends Libs\RESTModel
 		 *
 		 * Therefore create a stub template entry which stops these object from crashing.
 		 */
-        $DIC['tpl'] = new \stdClass();
+        if (!$DIC->offsetExists('tpl')) {
+            $DIC['tpl'] = new \stdClass();
+        }
 
 	}
 
