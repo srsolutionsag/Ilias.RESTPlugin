@@ -9,6 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 ### Fixed
 - Children of objects which contains a learning sequence no longer errors.
 - Learning module ZIPs now have the correct size.
+- Plugin max ILIAS version constraint
 
 ## [1.9.1] - 2020-05-26
 ### Added
