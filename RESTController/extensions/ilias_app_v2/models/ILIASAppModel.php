@@ -3,6 +3,7 @@
 use ilContainerReference;
 use ilObject;
 use ilSessionAppointment;
+use ilTemplate;
 use RESTController\extensions\ILIASApp\V2\data\IliasTreeItem;
 use \RESTController\libs as Libs;
 
@@ -40,10 +41,20 @@ final class ILIASAppModel extends Libs\RESTModel
 
 	public function __construct()
 	{
-		global $ilDB, $ilAccess;
+		global $ilDB, $ilAccess, $DIC;
 		Libs\RESTilias::loadIlUser();
 		$this->db = $ilDB;
 		$this->access = $ilAccess;
+
+		/* Some objects like the learning sequence load the template reference
+         * in the constructor which fails because there is no template.
+		 *
+		 * Therefore create a stub template entry which stops these object from crashing.
+		 */
+        if (!$DIC->offsetExists('tpl')) {
+            $DIC['tpl'] = new \stdClass();
+        }
+
 	}
 
 

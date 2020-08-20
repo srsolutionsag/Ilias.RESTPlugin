@@ -49,4 +49,15 @@ $app->group('/v3/ilias-app', function () use ($app) {
         if(isset($response["status"]))
             $app->response()->status($response["status"]);
     });
+
+    $app->get('/object/:refId', RESTAuth::checkAccess(RESTAuth::TOKEN), function($refId) use ($app) {
+        $iliasApp = new ILIASAppModel();
+
+        $response = $iliasApp->getObjectByRefId($refId);
+
+        $app->response->headers->set('Content-Type', 'application/json');
+        $app->response()->body(json_encode($response["body"]));
+        if(isset($response["status"]))
+            $app->response()->status($response["status"]);
+    });
 });
