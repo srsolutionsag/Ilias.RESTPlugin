@@ -9,6 +9,7 @@ namespace RESTController\libs;
 
 // This allows us to use shortcuts instead of full quantifier
 // Requires <$ilDB>
+use ILIAS\DI\Container;
 use \RESTController\core\oauth2_v2 as Auth;
 
 
@@ -162,7 +163,11 @@ class RESTilias {
     header_remove('Set-Cookie');
 
     // Include ilObjUser and initialize
-    ilInitialisation::initGlobal('ilUser', 'ilObjUser', './Services/User/classes/class.ilObjUser.php');
+      /**
+       * @var Container $dic}
+       */
+    $dic = $GLOBALS['DIC'];
+    //ilInitialisation::initGlobal('ilUser', 'ilObjUser', './Services/User/classes/class.ilObjUser.php');
 
     // Restore original, since this could lead to bad side-effects otherwise
     $_SERVER['HTTP_HOST']   = $_ORG_SERVER['HTTP_HOST'];
@@ -229,6 +234,15 @@ class RESTilias {
    *  <ilObjUser> - Global ilUser object use by ILIAS
    */
   public static function loadIlUser($userId = null) {
+      /**
+       * @var Container $container
+       */
+      $container = $GLOBALS["DIC"];
+      if ($container->offsetExists("ilUser")) {
+          return $container->user();
+      }
+
+
     // Fetch user-id from access-token if non is given
     if (!isset($userId)) {
       $app          = \RESTController\RESTController::getInstance();
@@ -238,16 +252,23 @@ class RESTilias {
     }
 
     // Create user-object if id is given
-    global $ilUser, $ilias;
-    $ilUser->setId($userId);
-    $ilUser->read();
+
+    $user = new \ilObjUser();
+    $ilias = $container->offsetGet("ilias");
+    $user->setId($userId);
+    $user->read();
+    $container->offsetSet("ilUser", $user);
+
+    if (version_compare(ILIAS_VERSION_NUMERIC, "5.3.999", "<=")) {
+        $GLOBALS["ilUser"] = $user;
+    }
 
     // Initialize access-handling and attach account
     self::initAccessHandling();
-    $ilias->account = $ilUser;
+    $ilias->account = $user;
 
     // Return $ilUser (reference)
-    return $ilUser;
+    return $user;
   }
 
 
