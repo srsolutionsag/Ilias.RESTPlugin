@@ -9,6 +9,7 @@ namespace RESTController\extensions\umr_v1;
 
 
 // This allows us to use shortcuts instead of full quantifier
+use ILIAS\DI\Container;
 use \RESTController\libs as Libs;
 
 
@@ -181,7 +182,11 @@ class Redirect extends Libs\RESTModel {
     \ilAuthUtils::_initAuth();
 
     // Authenticate user (this will generate a session in usr_session and send PHPSESSID cookie)
-    global $ilAuth;
+      /**
+       * @var Container $container
+       */
+      $container = $GLOBALS["DIC"];
+    $ilAuth = $container->offsetGet("ilAuth");
     $ilAuth->setAuth($userName);
     $ilAuth->start();
 

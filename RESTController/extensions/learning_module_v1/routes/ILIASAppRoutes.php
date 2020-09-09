@@ -11,15 +11,15 @@ use RESTController\RESTController;
  * the TOKEN middleware is active.
  */
 $app->group('/v1/learning-module', function () use ($app) {
-
-    $app->get('/:refId', RESTAuth::checkAccess(RESTAuth::TOKEN), function($refId) use ($app) {
+    $app->get('/:refId', RESTAuth::checkAccess(RESTAuth::TOKEN), function ($refId) use ($app) {
         $iliasApp = new ILIASAppModel();
 
         $response = $iliasApp->getLearningModuleData($refId);
 
         $app->response->headers->set('Content-Type', 'application/json');
         $app->response()->body(json_encode($response["body"]));
-        if(isset($response["status"]))
+        if (isset($response["status"])) {
             $app->response()->status($response["status"]);
+        }
     });
 });
