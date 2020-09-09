@@ -12,7 +12,8 @@
         }
     },
     "require": {
-        "swaggest/json-schema": "^0.12.4"
+        "swaggest/json-schema": "^0.12.4",
+        "ext-json": "*"
     },
     "autoload": {
         "classmap": [
