@@ -96,7 +96,8 @@ class RESTilias
              * @var Container $container
              */
             $container = $GLOBALS["DIC"];
-            $ilIliasIniFile = $container->iliasIni();
+            $ilIliasIniFile = version_compare(ILIAS_VERSION_NUMERIC, "5.4.0", ">=") ?
+                $container->iliasIni() : $container->offsetGet("ilIliasIniFile");
 
             // Read default client (ContextRest does not do this since 5.2)
             $_GET['client_id'] = $ilIliasIniFile->readVariable('clients', 'default');
