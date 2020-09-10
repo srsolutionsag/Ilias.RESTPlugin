@@ -8,9 +8,9 @@
 
 
 $id = "rest";
-$version = "1.10.0";
+$version = "1.10.1";
 
-$ilias_min_version = "5.2.0";
+$ilias_min_version = "5.3.0";
 $ilias_max_version = "6.99";
 
 $responsible = "D.Schaefer, T.Hufschmidt";

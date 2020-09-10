@@ -1,6 +1,7 @@
 <?php namespace RESTController\extensions\ILIASApp;
 
 use \RESTController\libs as Libs;
+use ILIAS\DI\Container;
 
 require_once('./Services/Membership/classes/class.ilParticipants.php');
 require_once('./Modules/File/classes/class.ilObjFile.php');
@@ -22,14 +23,19 @@ class ILIASAppModel extends Libs\RESTModel
     protected $access;
 
 
-	public function __construct()
+    public function __construct()
     {
-        global $ilDB, $ilAccess;
         Libs\RESTilias::initILIAS();
         Libs\RESTilias::loadIlUser();
         Libs\RESTilias::initAccessHandling();
-        $this->db = $ilDB;
-        $this->access = $ilAccess;
+
+        /**
+         * @var Container $container
+         */
+        $container = $GLOBALS["DIC"];
+
+        $this->db = $container->database();
+        $this->access = $container->access();
     }
 
     /**
@@ -85,12 +91,11 @@ class ILIASAppModel extends Libs\RESTModel
 
     public function getChildrenRecursive($refId, $userId)
     {
-        if ($this->isNestedSet())
+        if ($this->isNestedSet()) {
             return $this->getChildrenRecursiveOnNestedSet($refId, $userId);
-        else {
+        } else {
             return $this->getChildrenRecursiveOnMaterializedPath($refId, $userId);
         }
-
     }
 
 
@@ -142,7 +147,6 @@ class ILIASAppModel extends Libs\RESTModel
 
     protected function fetchObjectData(array $objIds)
     {
-
         if (!count($objIds)) {
             return array();
         }
@@ -159,10 +163,9 @@ class ILIASAppModel extends Libs\RESTModel
         $return = array();
 
         while ($row = $this->db->fetchAssoc($set)) {
-
-        	if (!$this->access->checkAccess('read', '', $row['ref_id'])) {
-        		continue;
-	        }
+            if (!$this->access->checkAccess('read', '', $row['ref_id'])) {
+                continue;
+            }
 
             $return[] = array(
                 'objId' => $row['obj_id'],
@@ -186,7 +189,12 @@ class ILIASAppModel extends Libs\RESTModel
      */
     protected function createRepoPath($ref_id)
     {
-        global $tree;
+        /**
+         * @var Container $container
+         */
+        $container = $GLOBALS["DIC"];
+        $tree = $container->repositoryTree();
+
         $path = array();
         foreach ($tree->getPathFull($ref_id) as $node) {
             $path[] = $node['title'];
