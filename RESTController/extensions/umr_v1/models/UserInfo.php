@@ -9,6 +9,7 @@ namespace RESTController\extensions\umr_v1;
 
 
 // This allows us to use shortcuts instead of full quantifier
+use ILIAS\DI\Container;
 use \RESTController\libs as Libs;
 
 
@@ -27,7 +28,12 @@ class UserInfo extends Libs\RESTModel {
    *
    */
   protected static function allowedToView($usingToken, $ilObjUser, $prefName = null) {
-    global $ilSetting;
+      /**
+       * @var Container $container
+       */
+      $container = $GLOBALS["DIC"];
+
+      $ilSetting = $container->settings();
 
     // User with his (own) token or values without profile-setting allowed by default
     if ($usingToken || $prefName == null)
