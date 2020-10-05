@@ -14,6 +14,7 @@ use RecursiveIteratorIterator;
 use RESTController\extensions\ILIASApp\V2\data\HttpStatusCodeAnswer;
 use RESTController\libs as Libs;
 use SplFileInfo;
+use ilException;
 
 require_once('./Modules/File/classes/class.ilObjFile.php');
 
@@ -64,6 +65,11 @@ final class ILIASAppModel extends Libs\RESTModel {
 
         // get learning module data
         $startFile = $this->getStartFile($objId, $type);
+        if (strlen($startFile) === 0) {
+            // We are unable to find all the information for the entry point therefore no resource is found
+            return ["body" => new HttpStatusCodeAnswer("No entry point found for HTLM object"), "status" => 404];
+        }
+
         $zipResult = $this->getCompressedLearningModule($objId);
 
         // if the compression failed, return status 500
@@ -87,10 +93,15 @@ final class ILIASAppModel extends Libs\RESTModel {
      */
 	private function getStartFile($objId, $type) {
         if($type === "htlm") {
-            $startFile = ilObjFileBasedLMAccess::_determineStartUrl($objId);
-            // assume format [PATH_TO_LEARNING_MODULES]/lm_[OBJID]/[PATH_TO_LM_START_FILE]
-            $ind = 8 + strpos($startFile, "lm_$objId/");
-            return substr($startFile, $ind);
+
+            $startPath = ilObjFileBasedLMAccess::_determineStartUrl($objId);
+
+            if (strlen($startPath) > 0) {
+                $lmDir = './' . ilUtil::getWebspaceDir() . '/lm_data/lm_' . $objId . '/';
+                return str_replace($lmDir, '', $startPath);
+            }
+
+            return "";
         } else { // type is sahs
             // assume that imsmanifest.xml is placed in root folder
             return "imsmanifest.xml";
