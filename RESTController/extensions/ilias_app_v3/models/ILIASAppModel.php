@@ -2,6 +2,7 @@
 
 use ilContainerReference;
 use ilLPStatus;
+use ilLPStatusWrapper;
 use ilObject;
 use ilSessionAppointment;
 use RESTController\extensions\ILIASApp\V2\data\ErrorAnswer;
@@ -154,22 +155,18 @@ final class ILIASAppModel extends Libs\RESTModel {
         // check access
         if(!($this->isVisible($refId) && $this->isRead($refId)))
             return ["body" => new ErrorAnswer("Forbidden"), "status" => 403];
-
-		// set state
-		$file = new \ilObjFile($refId);
-		$status = ilLPStatus::LP_STATUS_COMPLETED_NUM;
-
-		global $DIC;
-		$ilDB = $DIC['ilDB'];
-		$q = "INSERT INTO ut_lp_marks (obj_id, usr_id, status) VALUES({$file->getId()}, {$userId}, {$status})
-		      ON DUPLICATE KEY UPDATE status={$status}";
-		$result = $ilDB->query($q);
-
-		if($result === false)
-			return ["body" => new ErrorAnswer("Bad Request"), "status" => 400];
-
-		return ["body" => array("message" => "Learning progress was successfully set to done")];
-	}
+        // set state
+        $file = new \ilObjFile($refId);
+        // Record read event and catchup with write events
+        \ilChangeEvent::_recordReadEvent(
+            $file->getType(),
+            $file->getRefId(),
+            $file->getId(),
+            $userId
+        );
+        \ilLPStatusWrapper::_updateStatus($file->getId(), $userId);
+        return ["body" => array("message" => "Learning progress was successfully set to done")];
+    }
 
     /**
      * collects the parameters for the theming of the app
