@@ -9,41 +9,43 @@ use \RESTController\database as Database;
  * this class provides a collection of static methods that allow
  * the configuration of REST clients without having to use the API
  */
-class ClientConfiguration {
+class ClientConfiguration
+{
 
     /**
      * Creates a new REST ApiKey/Client using the provided parameters
      *
      * @param $params string[]
      */
-    static function createClient($params) {
+    public static function createClient($params)
+    {
         // Fetch request-parameters (into table-row format)
         $row = array(
-            'id'                          => $params['id'],
-            'api_key'                     => isset($params['api_key']) ? $params['api_key'] : true,
-            'api_secret'                  => $params['api_secret'],
-            'cert_serial'                 => $params['cert_serial'],
-            'cert_issuer'                 => $params['cert_issuer'],
-            'cert_subject'                => $params['cert_subject'],
-            'redirect_uri'                => $params['redirect_uri'],
-            'consent_message'             => $params['consent_message'],
-            'client_credentials_userid'   => isset($params['client_credentials_userid']) ? $params['client_credentials_userid'] : 6,
-            'grant_client_credentials'    => $params['grant_client_credentials'] || false,
-            'grant_authorization_code'    => $params['grant_authorization_code'] || false,
-            'grant_implicit'              => $params['grant_implicit'] || false,
-            'grant_resource_owner'        => $params['grant_resource_owner'] || false,
-            'refresh_authorization_code'  => $params['refresh_authorization_code'] || false,
-            'refresh_resource_owner'      => $params['refresh_resource_owner'] || false,
-            'grant_bridge'                => $params['grant_bridge'] || false,
-            'ips'                         => $params['ips'],
-            'users'                       => $params['users'],
-            'scopes'                      => $params['scopes'],
-            'description'                 => $params['description'],
+            'id' => $params['id'],
+            'api_key' => isset($params['api_key']) ? $params['api_key'] : true,
+            'api_secret' => $params['api_secret'],
+            'cert_serial' => $params['cert_serial'],
+            'cert_issuer' => $params['cert_issuer'],
+            'cert_subject' => $params['cert_subject'],
+            'redirect_uri' => $params['redirect_uri'],
+            'consent_message' => $params['consent_message'],
+            'client_credentials_userid' => isset($params['client_credentials_userid']) ? $params['client_credentials_userid'] : 6,
+            'grant_client_credentials' => $params['grant_client_credentials'] || false,
+            'grant_authorization_code' => $params['grant_authorization_code'] || false,
+            'grant_implicit' => $params['grant_implicit'] || false,
+            'grant_resource_owner' => $params['grant_resource_owner'] || false,
+            'refresh_authorization_code' => $params['refresh_authorization_code'] || false,
+            'refresh_resource_owner' => $params['refresh_resource_owner'] || false,
+            'grant_bridge' => $params['grant_bridge'] || false,
+            'ips' => $params['ips'],
+            'users' => $params['users'],
+            'scopes' => $params['scopes'],
+            'description' => $params['description'],
         );
 
         // Construct new table from given row/request-parameter
         $client = Database\RESTclient::fromRow($row);
-        $id     = $row['id'];
+        $id = $row['id'];
 
         // Check if clientId was given and this client already exists?
         if ($id == null || !Database\RESTclient::existsByPrimary($id)) {
@@ -62,7 +64,8 @@ class ClientConfiguration {
      * @param $id number
      * @return number
      */
-    static function deleteClient($id) {
+    public static function deleteClient($id)
+    {
         ClientsLegacyModel::deleteClient($id);
         return $id;
     }
@@ -72,7 +75,8 @@ class ClientConfiguration {
      *
      * @return mixed
      */
-    static function getClients() {
+    public static function getClients()
+    {
         return ClientsLegacyModel::getClients();
     }
 
@@ -82,7 +86,8 @@ class ClientConfiguration {
      * @param $key string
      * @param $value string
      */
-    static function setClientConfig($key, $value) {
+    public static function setClientConfig($key, $value)
+    {
         // Fetch current table entry and update with new value
         $settings = Database\RESTconfig::fromSettingName($key);
         $settings->setKey('setting_value', $value);
@@ -99,7 +104,8 @@ class ClientConfiguration {
      * @return number PermissionId of newly created database entry for this permission
      * @throws \RESTController\libs\Exceptions\Database
      */
-    static function addClientPermission($clientId, $pattern, $verb, $id = null) {
+    public static function addClientPermission($clientId, $pattern, $verb, $id = null)
+    {
         // Fetch request-parameters (into table-row format)
         $row = array(
             'api_id' => intval($clientId),
@@ -113,8 +119,9 @@ class ClientConfiguration {
         $id = $row['id'];
 
         // Check for duplicate entry
-        if ($permission->exists('api_id = {{api_id}} AND pattern = {{patern}} AND verb = {{verb}}'))
+        if ($permission->exists('api_id = {{api_id}} AND pattern = {{patern}} AND verb = {{verb}}')) {
             return null;
+        }
 
         // Check if permissionId was given and this permission already exists?
         if ($id == null || !Database\RESTpermission::existsByPrimary($id)) {
@@ -125,5 +132,4 @@ class ClientConfiguration {
 
         return null;
     }
-
 }

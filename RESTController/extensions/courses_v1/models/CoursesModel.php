@@ -112,7 +112,6 @@ class CoursesModel extends Libs\RESTModel
 
         require_once('Services/Xml/classes/class.ilSaxParser.php');
         Libs\RESTilias::initGlobal('objDefinition', 'ilObjectDefinition','./Services/Object/classes/class.ilObjectDefinition.php');
-        global $ilDB, $ilias, $ilPluginAdmin, $objDefinition;
 
         $crs_items = array();
 

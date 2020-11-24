@@ -8,8 +8,8 @@ which contains changes required by the Pegasus mobile application. Only use this
 branch with the ILIAS Pegasus mobile application.
 
 ## Requirements
-* Version: ILIAS 5.2 or 5.3
-* PHP 5.5.9 or higher or PHP 7
+* Version: ILIAS 5.3 - 6
+* PHP 5.6 or higher or PHP 7.0 - 7.4
 
 ## Installation
 

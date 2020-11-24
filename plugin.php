@@ -4,14 +4,16 @@
  *
  * Authors: D.Schaefer and T.Hufschmidt <(schaefer|hufschmidt)@hrz.uni-marburg.de>
  * Since 2014
+ *
+ * Fork Maintainer: studer + raimann ag <info@studer-raimann.ch>
  */
 
 
 $id = "rest";
-$version = "1.9.1";
+$version = "2.0.2";
 
-$ilias_min_version = "5.2.0";
-$ilias_max_version = "6.0";
+$ilias_min_version = "5.3.0";
+$ilias_max_version = "6.99";
 
-$responsible = "D.Schaefer, T.Hufschmidt";
-$responsible_mail = "{schaefer|hufschmidt} at hrz.uni-marburg.de";
+$responsible = "studer + raimann ag";
+$responsible_mail = "support at studer-raimann.ch";

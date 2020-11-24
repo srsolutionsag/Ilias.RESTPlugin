@@ -3,6 +3,34 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
+## [2.0.2] - 2020-11-18
+### Fixed
+- The learning progress of the parent object gets updated now
+
+## [2.0.1] - 2020-09-30
+### Fixed
+- The learning module metadata route no longer returns invalid entry point paths in certain scenarios
+
+## [2.0.0] - 2020-09-29
+### Fixed
+- Fix issues with user session on ILIAS 6
+
+### Deprecated
+- PHP 5.x support
+- ILIAS 5.3 support
+
+### Removed
+- ILIAS 5.2 support
+
+## [1.10.0] - 2020-08-18
+### Added
+- New object route which allows to fetch a single object by refId.
+
+### Fixed
+- Children of objects which contains a learning sequence no longer errors.
+- Learning module ZIPs now have the correct size.
+- Plugin max ILIAS version constraint
+
 ## [1.9.1] - 2020-05-26
 ### Added
 - configuration of REST clients without having to use the API
