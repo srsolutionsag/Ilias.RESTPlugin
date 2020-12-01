@@ -167,15 +167,26 @@ final class ILIASAppModel extends Libs\RESTModel
 
     private function getChildrenRecursiveOnMaterializedPath($refId, $userId)
     {
-        $sql = "SELECT object_reference.obj_id FROM tree AS parent
-                INNER JOIN tree AS child ON child.path LIKE CONCAT(parent.path, '.%')
-                INNER JOIN object_reference on child.child = object_reference.ref_id
-                WHERE parent.child = " . $this->db->quote($refId, 'integer');
+// fau: optimizeAppChildrenRecursiveQuery - split into two queries
+	    $sql = "SELECT path FROM tree WHERE child = " . $this->db->quote($refId, 'integer');
         $set = $this->db->query($sql);
-        $objIds = array();
-        while ($row = $this->db->fetchObject($set)) {
-            $objIds[] = $row->obj_id;
+        if ($row = $this->db->fetchObject($set)) {
+            $path = (string) $row->path;
         }
+
+        $objIds = array();
+        if (!empty($path)) {
+            $sql = "SELECT r.obj_id 
+                FROM tree t
+                INNER JOIN object_reference r ON t.child = r.ref_id
+                WHERE t.path LIKE " . $this->db->quote($path . '.%', 'text');
+            $set = $this->db->query($sql);
+            $objIds = array();
+            while ($row = $this->db->fetchObject($set)) {
+                $objIds[] = $row->obj_id;
+            }
+        }
+// fau.
 
         return $this->fetchObjectData($objIds);
     }
