@@ -15,6 +15,11 @@ use SRAG\Plugin\eBook\Security\Service\CollisionDetection\UserRequestMutex;
 use SRAG\Plugin\eBook\Synchronization\Service\SynchronizationManager;
 use SRAG\Plugin\eBook\Synchronization\Service\Mapper\v1\SynchronizationMapper;
 
+// Deactivate routes if ebook plugin is not active
+if (!ilPluginAdmin::isPluginActive('xebk')) {
+    return;
+}
+
 /** @var $app RESTController */
 
 $app->group('/v2/ebook', function () use ($app) {
