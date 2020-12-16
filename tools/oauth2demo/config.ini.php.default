@@ -1,4 +1,0 @@
-<?php
-  $api_key    = "appollon";                // API-Key to be used
-  $api_secret = "";                        // only needed for grant type "Clients Credentials"
-  $ilias_url  = "http://ilias.localhost";  // need to be specified if your ILIAS installation is not located at the document root
